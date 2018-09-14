@@ -1,0 +1,59 @@
+{
+	"folders": [
+		{
+			"path": "/home/hippo-o-matic/Source/repos/Hipponium"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"string": "cpp",
+			"iostream": "cpp",
+			"array": "cpp",
+			"hash_map": "cpp",
+			"*.tcc": "cpp",
+			"cctype": "cpp",
+			"clocale": "cpp",
+			"cmath": "cpp",
+			"cstdarg": "cpp",
+			"cstddef": "cpp",
+			"cstdint": "cpp",
+			"cstdio": "cpp",
+			"cstdlib": "cpp",
+			"cstring": "cpp",
+			"ctime": "cpp",
+			"cwchar": "cpp",
+			"cwctype": "cpp",
+			"deque": "cpp",
+			"list": "cpp",
+			"unordered_map": "cpp",
+			"vector": "cpp",
+			"exception": "cpp",
+			"fstream": "cpp",
+			"functional": "cpp",
+			"initializer_list": "cpp",
+			"iomanip": "cpp",
+			"iosfwd": "cpp",
+			"istream": "cpp",
+			"limits": "cpp",
+			"new": "cpp",
+			"ostream": "cpp",
+			"numeric": "cpp",
+			"sstream": "cpp",
+			"stdexcept": "cpp",
+			"streambuf": "cpp",
+			"system_error": "cpp",
+			"cinttypes": "cpp",
+			"type_traits": "cpp",
+			"tuple": "cpp",
+			"typeinfo": "cpp",
+			"utility": "cpp",
+			"chrono": "cpp",
+			"memory": "cpp",
+			"ratio": "cpp",
+			"thread": "cpp",
+			"map": "cpp",
+			"optional": "cpp",
+			"string_view": "cpp"
+		}
+	}
+}
