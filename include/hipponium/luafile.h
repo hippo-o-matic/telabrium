@@ -20,6 +20,7 @@ public:
 
 	void clean();
 
+	void getNamespace(std::string name = "global");
 
 	template <typename T>
 	T get(std::string name);
@@ -28,9 +29,6 @@ public:
 	std::vector<T> getVector(std::string name);
 
 	bool gettostack(std::string name);
-
-	template <typename T>
-	T get(std::string name);
 
 	void push(bool value);
 	void push(int value);
@@ -42,7 +40,7 @@ public:
 	void parse(std::string name, ...);
 
 	template<typename T>
-	T LuaFile::parseVal(std::string name, ...);
+	T parseVal(std::string name, ...);
 
 	std::string nspace;
 
@@ -55,15 +53,12 @@ template <typename T>
 T LuaFile::get(std::string name){
 	if(!L) {
 		printError(name, "Script was not loaded");
-		return void;
 	}
 
 	T result;
-	if(gettostack(name)) {
-		result = get<T>(nspace + "." + name);
-	} else {
-		result = void;
-	}
+	if(gettostack(name))
+		result = get<T>(nspace + name);
+	
 
 	clean();
 	return result;
@@ -73,7 +68,7 @@ template<typename T>
 std::vector<T> LuaFile::getVector(std::string name){
 	std::vector<T> v;
 
-	if(!lua_gettostack(name.c_str())) {
+	if(!gettostack(name)) {
         printError(name, "Array not found");
         clean();
         return std::vector<T>();
@@ -91,10 +86,10 @@ std::vector<T> LuaFile::getVector(std::string name){
 	return v;
 }
 
-template<typename T>
+/*template<typename T>
 T LuaFile::parseVal(std::string name, ...){
 
-}
+}*/
 
 // Template Specifications
 /*template <>
@@ -106,12 +101,6 @@ inline int LuaFile::get(std::string name);
 template <>
 inline std::string LuaFile::get(std::string name);
 */
-
-//Default Templates
-template <typename T>
-T LuaFile::get(std::string name){
-	return void;
-}
 
 // Template Specifications
 template <>
@@ -140,18 +129,5 @@ inline std::string LuaFile::get(std::string name){
 		printError(name, "not a string");
 		return "ERROR";
 	}
-}
-
-void LuaFile::push(bool value){
-	lua_pushboolean(L, value);
-}
-void LuaFile::push(int value){
-	lua_pushinteger(L, value);
-}
-void LuaFile::push(float value){
-	lua_pushnumber(L, value);
-}
-void LuaFile::push(std::string value){
-	lua_pushstring(L, value.c_str());
 }
 #endif
