@@ -72,7 +72,7 @@ int main(){
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
-	std::cout<<test.get<std::string>("bar.barstr")<<std::endl;
+	std::cout<<test.get<std::string>("teststring")<<std::endl;
 
 	Camera cam(glm::vec3(0.0f, 1.0f, 0.0f));
 	Camera::ACTIVE = &cam;

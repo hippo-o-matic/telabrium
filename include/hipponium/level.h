@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-#include "LuaBridge/LuaBridge.h"
 #include "hipponium/object.h"
 
 namespace Map{

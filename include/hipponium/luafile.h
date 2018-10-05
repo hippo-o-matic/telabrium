@@ -42,6 +42,7 @@ public:
 	template<typename T>
 	T parseVal(std::string name, ...);
 
+
 	std::string nspace;
 
 private:
@@ -59,7 +60,6 @@ T LuaFile::get(std::string name){
 	if(gettostack(name))
 		result = get<T>(nspace + name);
 	
-
 	clean();
 	return result;
 }
@@ -67,23 +67,24 @@ T LuaFile::get(std::string name){
 template<typename T>
 std::vector<T> LuaFile::getVector(std::string name){
 	std::vector<T> v;
+	if(L) {
+		if(!gettostack(name)) {
+			printError(name, "Array not found");
+			clean();
+			return std::vector<T>();
+		}
 
-	if(!gettostack(name)) {
-        printError(name, "Array not found");
-        clean();
-        return std::vector<T>();
-    }
-
-	if (!lua_isnil(L, -1)){
-		lua_pushnil(L);
-		while (lua_next(L, -2)) {
-        	v.push_back((T)lua_tonumber(L, -1));
-        	lua_pop(L, 1);
-    	}
+		if (!lua_isnil(L, -1)){
+			lua_pushnil(L);
+			while (lua_next(L, -2)) {
+				v.push_back((T)lua_tonumber(L, -1));
+				lua_pop(L, 1);
+			}
+		}
+		
+		clean();
+		return v;
 	}
-	
-	clean();
-	return v;
 }
 
 /*template<typename T>
@@ -109,25 +110,31 @@ inline bool LuaFile::get(std::string name){
 }
 template <>
 inline int LuaFile::get(std::string name){
-	if(!lua_isnumber(L,-1)){
-		printError(name, "not a integer");
+	if(L) {
+		if(!lua_isnumber(L,-1)){
+			printError(name, "not a integer");
+		}
+		return (int)lua_tonumber(L,-1);
 	}
-	return (int)lua_tonumber(L,-1);
 }
 template <>
 inline float LuaFile::get(std::string name){
-	if(!lua_isnumber(L,-1)){
-		printError(name, "not a float");
+	if(L) {
+		if(!lua_isnumber(L,-1)){
+			printError(name, "not a float");
+		}
+		return (float)lua_tonumber(L,-1);
 	}
-	return (float)lua_tonumber(L,-1);
 }
 template <>
 inline std::string LuaFile::get(std::string name){
-	if(lua_isstring(L,-1)){
-		return std::string(lua_tostring(L, -1));
-	} else {
-		printError(name, "not a string");
-		return "ERROR";
+	if(L) {
+		if(lua_isstring(L,-1)){
+			return std::string(lua_tostring(L, -1));
+		} else {
+			printError(name, "not a string");
+			return "";
+		}
 	}
 }
 #endif

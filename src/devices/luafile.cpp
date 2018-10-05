@@ -5,6 +5,7 @@ LuaFile::LuaFile(std::string path){
 	if (luaL_loadfile(L, path.c_str()) || lua_pcall(L, 0, 0, 0)) {
 		std::cout<<"[!] LUA|6: Lua Error: script not loaded ("<<path<<")"<<std::endl;
 		lua_close(L);
+		L = nullptr;
 	}
 }
 LuaFile::~LuaFile(){
@@ -16,14 +17,14 @@ void LuaFile::printError(std::string name, std::string reason) {
 }
 
 void LuaFile::clean(){
-	lua_pop(L, lua_gettop(L)); //Removes all items from the lua stack
+	if(L) lua_pop(L, lua_gettop(L)); //Removes all items from the lua stack
 }
 
 void LuaFile::getNamespace(std::string name){ 
 		if(name !="global")
 			nspace = name + ".";
 		else
-			nspace = "";
+			nspace.clear();
 	}
 
 bool LuaFile::gettostack(std::string name){
@@ -32,9 +33,9 @@ bool LuaFile::gettostack(std::string name){
 	for (unsigned int i = 0; i < (nspace + name).size(); i++){
 		if((nspace + name).at(i) == '.'){
 			if(lev == 0){
-				lua_getglobal(L, var.c_str());
+				if(L) lua_getglobal(L, var.c_str());
 			} else {
-				lua_getfield(L, -1, var.c_str());
+				if(L) lua_getfield(L, -1, var.c_str());
 			}
 
 			if (lua_isnil(L, -1)){
@@ -50,9 +51,9 @@ bool LuaFile::gettostack(std::string name){
 	}
 
 	if(lev == 0){
-		lua_getglobal(L, var.c_str());
+		if(L) lua_getglobal(L, var.c_str());
 	} else{
-		lua_getfield(L, -1, var.c_str());
+		if(L) lua_getfield(L, -1, var.c_str());
 	}
 
 	if(lua_isnil(L, -1)){
@@ -69,16 +70,16 @@ std::vector<std::string> LuaFile::getKeys(){
 
 
 void LuaFile::push(bool value){
-	lua_pushboolean(L, value);
+	if(L) lua_pushboolean(L, value);
 }
 void LuaFile::push(int value){
-	lua_pushinteger(L, value);
+	if(L) lua_pushinteger(L, value);
 }
 void LuaFile::push(float value){
-	lua_pushnumber(L, value);
+	if(L) lua_pushnumber(L, value);
 }
 void LuaFile::push(std::string value){
-	lua_pushstring(L, value.c_str());
+	if(L) lua_pushstring(L, value.c_str());
 }
 
 /*void LuaFile::parse(std::string name, ...){

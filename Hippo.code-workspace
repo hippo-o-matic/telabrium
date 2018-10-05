@@ -54,6 +54,7 @@
 			"map": "cpp",
 			"optional": "cpp",
 			"string_view": "cpp"
-		}
+		},
+		"lua.targetVersion": "5.3"
 	}
 }

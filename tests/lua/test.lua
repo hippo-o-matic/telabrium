@@ -1,4 +1,4 @@
-teststring = "foo",
+teststring = "foo"
 bar = {
 	barstr = "apple"
 }
