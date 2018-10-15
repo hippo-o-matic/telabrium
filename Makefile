@@ -1,25 +1,27 @@
 CXX = g++
 CFLAGS = -Wall -g -std=c++17 -Wl,-rpath=$(LIB_PATH)
-LDFLAGS =
+
+INCLUDE_PATH = include
+LIB_PATH = lib
+
+SRC_PATH = src
+BUILD_PATH = build
 TARGET = hippotest
 
-INCLUDE_PATH = -Iinclude/
-LIB_PATH = -Llib/
-SRC_PATH = src
-
-SRC = $(wildcard $(SRC_PATH)/*.cpp $(SRC_PATH)/devices/*.cpp $(SRC_PATH)/*.c)
-OBJS = $(SRC: .cpp = .o, .c = .o)
+SRC = $(wildcard $(SRC_PATH)/*/*.* $(SRC_PATH)/*.*) 
+OBJ = $(SRC: .c=.o, .cpp=.o)
 #Ensure glfw is after GL
 LIBS = -lGL -lglfw -lassimp -lX11 -lpthread -lXrandr -lXi -ldl -llua5.3
 
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
-	$(CXX) $(CFLAGS) $? $(INCLUDE_PATH) $(LIB_PATH) $(LIBS) -o $@
+$(TARGET): $(OBJ)
+	$(CXX) $(CFLAGS) $? -o $(BUILD_PATH)/bin/$@ -I$(INCLUDE_PATH) -L$(LIB_PATH) $(LIBS)
 
-.cpp.o: 
-	$(CXX) $(CFLAGS) $(INCLUDE_PATH) -c $<
+%.o: %.cpp %.c
+	$(CXX) $(CFLAGS) -c $? -o $(BUILD_PATH)/$(OBJ) -I$(INCLUDE_PATH)
 
 clean: 
-	rm -rf $(TARGET) *.o
+	rm -rf $(BUILD_PATH)/bin/$(TARGET) 
+	rm -rf $(BUILD_PATH)/%.o
