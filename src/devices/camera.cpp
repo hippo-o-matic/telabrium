@@ -1,4 +1,4 @@
-#include "hipponium/camera.h"
+#include "luarium/camera.h"
 
 float Camera::YAW = -90.0f;
 float Camera::PITCH = 0.0f;

@@ -1,4 +1,4 @@
-#include "hipponium/luafile.h"
+#include "luarium/luafile.h"
 
 LuaFile::LuaFile(std::string path){
 	L = luaL_newstate(); //Create a new Luastate

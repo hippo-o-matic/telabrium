@@ -1,5 +1,5 @@
-#ifndef HIPPO_LUAFILE_H
-#define HIPPO_LUAFILE_H
+#ifndef LUARIUM_LUAFILE_H
+#define LUARIUM_LUAFILE_H
 
 #include <iostream>
 #include <string>

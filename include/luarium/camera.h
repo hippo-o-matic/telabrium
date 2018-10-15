@@ -1,13 +1,14 @@
-#ifndef HIPPO_CAMERA_H
-#define HIPPO_CAMERA_H
+#ifndef LUARIUM_CAMERA_H
+#define LUARIUM_CAMERA_H
 
 #include <vector>
+#include <memory>
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "hipponium/object.h"
+#include "luarium/object.h"
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement {
@@ -19,11 +20,9 @@ enum Camera_Movement {
 	DOWN,
 };
 
-// An abstract camera class that processes input and calculates the corresponding Eular Angles, Vectors and Matrices for use in OpenGL
+// A Camera object that processes a view for displaying in OpenGL. 
 class Camera : public Object{
 public:
-	static Camera* ACTIVE;
-
 	// Camera Attributes
 	glm::vec3 Front;
 	glm::vec3 Up;

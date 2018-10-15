@@ -1,2 +1,4 @@
 tests/models/ 
 tests/glCaptures
+**.directory
+.directory

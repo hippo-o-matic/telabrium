@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
@@ -15,6 +16,8 @@ public:
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
     Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
+
+	~Shader();
     // activate the shader
     // ------------------------------------------------------------------------
     void use();

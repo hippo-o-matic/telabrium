@@ -1,0 +1,30 @@
+Luarium is licensed under the MIT License. As long as the copyright below is included somewhere in your product or documentation, you are free to use this library with no cost or permission from us.
+
+------------------------------------------
+
+Copyright <YEAR> <COPYRIGHT HOLDER>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+------------------------------------------
+
+Libraries currently in use and their copyrights, as well as links to their websites or sources are provided below:
+
+Lua- Lua is free software distributed under the terms of the MIT license. www.lua.org
+Copyright © 1994–2018 Lua.org, PUC-Rio. 
+
+GLFW- GLFW is an Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan development on the desktop. It provides a simple API for creating windows, contexts and surfaces, receiving input and events. www.glfw.org
+Copyright © 2002-2006 Marcus Geelnard
+Copyright © 2006-2011 Camilla Berglund
+
+Assimp- Open Asset Import Library (short name: Assimp) is a portable Open Source library to import various well-known 3D model formats in a uniform manner.
+Copyright © 2006-2015 assimp team
+All rights reserved. 
+
+GLM- OpenGL Mathematics (GLM) is a header only C++ mathematics library for graphics software based on the OpenGL Shading Language (GLSL) specifications. glm.g-truc.net
+
+stb_image.h- A single-file public domain (or MIT licensed) library for C/C++, transforms image files into GL textures. github.com/nothings/stb

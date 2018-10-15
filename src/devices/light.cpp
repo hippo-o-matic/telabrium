@@ -1,4 +1,4 @@
-#include "hipponium/light.h"
+#include "luarium/light.h"
 
 Light::Light(){};
 
@@ -55,7 +55,7 @@ int SpotLight::idStep = 0;
 
 
 // Gather all the lights and send them to the shader
-void updateLights(Shader* shader) {
+void updateLights(std::shared_ptr<Shader> shader) {
 	shader->setInt("dirLight_AMT", DirLight::list.size()); //Tell the shader how many lights to expect
 	shader->setInt("pointLight_AMT", PointLight::list.size());
 	shader->setInt("spotLight_AMT", SpotLight::list.size());

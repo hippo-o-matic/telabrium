@@ -3,10 +3,11 @@
 
 #include <sstream>
 #include <vector>
+#include <memory>
 
-#include "hipponium/object.h"
-#include "hipponium/shader.h"
-#include "hipponium/model.h"
+#include "luarium/object.h"
+#include "luarium/shader.h"
+#include "luarium/model.h"
 
 class Light : public Object {
 public:
@@ -103,6 +104,6 @@ private:
 
 
 // Gather all the lights and send them to the shader
-void updateLights(Shader* shader);
+void updateLights(std::shared_ptr<Shader> shader);
 
 #endif

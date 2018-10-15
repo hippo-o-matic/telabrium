@@ -1,10 +1,4 @@
-﻿#include "hipponium/main.h"
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow *window);
+﻿#include "luarium/main.h"
 
 //void GLAPIENTRY glDebugFunc(GLenum source​, GLenum type​, GLuint id​, GLenum severity​, GLsizei length​, const GLchar* message​, const void* userParam);
 
@@ -21,8 +15,9 @@ LuaFile test("lua/test.lua");
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
 int main(){
-	std::cout<<"Hipponium b0.0.1"<<std::endl;
+	std::cout<<"Luarium b0.0.1"<<std::endl;
 
 	// glfw: initialize and configure
 	// ------------------------------
@@ -74,11 +69,8 @@ int main(){
 	
 	std::cout<<test.get<std::string>("teststring")<<std::endl;
 
-	Camera cam(glm::vec3(0.0f, 1.0f, 0.0f));
-	Camera::ACTIVE = &cam;
-
 	// build and compile shaders
-	Shader theShader("shaders/Standard.vs", "shaders/Standard.fs");
+	std::shared_ptr<Shader> MAIN_SHADER(new Shader(SHADER_PATH_V, SHADER_PATH_F));
 	Shader skyboxShader("shaders/skybox.vs", "shaders/skybox.fs");
 
 	// load models
@@ -122,23 +114,23 @@ int main(){
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		Camera::ACTIVE->Aspect = (float)SCR_WIDTH / (float)SCR_HEIGHT;
+		ACTIVE_CAMERA->Aspect = (float)SCR_WIDTH / (float)SCR_HEIGHT;
 
 		// don't forget to enable shader before setting uniforms
-		theShader.use();
-		theShader.setVec3("ViewPos", Camera::ACTIVE->Position);
-		updateLights(&theShader);
+		MAIN_SHADER->use();
+		MAIN_SHADER->setVec3("ViewPos", ACTIVE_CAMERA->Position);
+		updateLights(MAIN_SHADER);
 		
 
 		// view/projection transformations
-		glm::mat4 projection = glm::perspective(glm::radians(Camera::ACTIVE->fov), Camera::ACTIVE->Aspect, 0.1f, 100.0f);
-		glm::mat4 view = Camera::ACTIVE->GetViewMatrix();
-		theShader.setMat4("projection", projection);
-		theShader.setMat4("view", view);
+		glm::mat4 projection = glm::perspective(glm::radians(ACTIVE_CAMERA->fov), ACTIVE_CAMERA->Aspect, 0.1f, 100.0f);
+		glm::mat4 view = ACTIVE_CAMERA->GetViewMatrix();
+		MAIN_SHADER->setMat4("projection", projection);
+		MAIN_SHADER->setMat4("view", view);
 
-	//	floor.Draw(&theShader);
-		aa.Draw(&theShader);
-		waah.Draw(&theShader);
+	//	floor.Draw(&MAIN_SHADER);
+		aa.Draw(MAIN_SHADER);
+		waah.Draw(MAIN_SHADER);
 		// draw skybox last
 //		skybox.Draw(&skyboxShader);
 
@@ -159,22 +151,25 @@ int main(){
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {
-	Camera* camera = Camera::ACTIVE;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera->ProcessKeyboard(FORWARD, deltaTime);
+		ACTIVE_CAMERA->ProcessKeyboard(FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera->ProcessKeyboard(BACKWARD, deltaTime);
+		ACTIVE_CAMERA->ProcessKeyboard(BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera->ProcessKeyboard(LEFT, deltaTime);
+		ACTIVE_CAMERA->ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera->ProcessKeyboard(RIGHT, deltaTime);
+		ACTIVE_CAMERA->ProcessKeyboard(RIGHT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		camera->Position.y+= deltaTime * 2;
+		ACTIVE_CAMERA->Position.y+= deltaTime * 2;
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-		camera->Position.y-= deltaTime * 2;
+		ACTIVE_CAMERA->Position.y-= deltaTime * 2;
+	if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS){
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		simpleConsole();
+	}
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -188,7 +183,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-	Camera* camera = Camera::ACTIVE;
 	if (firstMouse)	{
 		lastX = xpos;
 		lastY = ypos;
@@ -201,7 +195,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	lastX = xpos;
 	lastY = ypos;
 	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
-		camera->ProcessMouseMovement(xoffset, yoffset);
+		ACTIVE_CAMERA->ProcessMouseMovement(xoffset, yoffset);
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
@@ -214,11 +208,28 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-	Camera* camera = Camera::ACTIVE;
-	camera->ProcessMouseScroll(yoffset);
+	ACTIVE_CAMERA->ProcessMouseScroll(yoffset);
 }
 
 /*void GLAPIENTRY glDebugFunc(GLenum source​, GLenum type, GLuint id​, GLenum severity, GLsizei length​, const GLchar* message, const void* userParam) {
 	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
 }*/
+
+void simpleConsole() {
+	std::string in;
+	std::cout << ">";
+	std::cin >> in;
+	std::vector<std::string> command = Luarium::segment(in, ' ');
+	if (command[0] == "rlshader"){
+		glUseProgram(0);
+		glDeleteProgram(MAIN_SHADER->ID);
+		MAIN_SHADER.reset(new Shader(SHADER_PATH_V, SHADER_PATH_F));
+		MAIN_SHADER->use();
+		printf("[?] DEBUG: Reloaded core shader\n");
+	}
+	if(command[0] == "exit"){
+		gameState = 0;
+	}
+	if(command[0] == "rllevel"){} 
+}
 

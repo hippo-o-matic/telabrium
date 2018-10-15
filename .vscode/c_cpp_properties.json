@@ -6,7 +6,7 @@
 				"usr/include",
 				"usr/local/include",
 				"${workspaceFolder}",
-				"/home/hippo-o-matic/Source/repos/Hipponium/include"
+				"/home/hippo-o-matic/Source/repos/luarium/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

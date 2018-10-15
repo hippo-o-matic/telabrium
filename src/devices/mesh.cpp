@@ -1,4 +1,4 @@
-#include "hipponium/mesh.h"
+#include "luarium/mesh.h"
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, RenderMat mat){
 	this->vertices = vertices;
@@ -11,7 +11,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 }
 
 // render the mesh
-void Mesh::Draw(Shader* shader){
+void Mesh::Draw(std::shared_ptr<Shader> shader){
 	// bind appropriate textures
 	unsigned int diffuseNr, specularNr, normalNr, heightNr, cubemapNr = 1;
 	for (unsigned int i = 0; i < textures.size(); i++){

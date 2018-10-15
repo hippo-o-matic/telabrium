@@ -1,4 +1,4 @@
-#include "hipponium/shader.h"
+#include "luarium/shader.h"
 
     Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath){
         // 1. retrieve the vertex/fragment source code from filePath
@@ -77,6 +77,10 @@
         if(geometryPath != nullptr)
             glDeleteShader(geometry);
     }
+
+	Shader::~Shader(){
+		glDeleteProgram(ID);
+	}
     // activate the shader
     // ------------------------------------------------------------------------
     void Shader::use() { 

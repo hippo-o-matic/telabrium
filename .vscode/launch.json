@@ -4,35 +4,19 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
-		{ 
-			"name": "(gdb) Attach",
-			"type": "cppdbg",
-			"request": "attach",
-			"program": "${workspaceFolder}/hippotest",
-			"processId": "${command:pickProcess}",
-			"MIMode": "gdb",
-			"setupCommands": [
-				{
-					"description": "Enable pretty-printing for gdb",
-					"text": "-enable-pretty-printing",
-					"ignoreFailures": true
-				}
-			]
-		},
 		{
 			"name": "(gdb) Launch",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${workspaceFolder}/hippotest",
+			"program": "${workspaceFolder}/build/bin/hippotest",
 			"args": [],
-//			"additionalSOLibSearchPath": "/usr/lib : /usr/local/lib : /home/hippo-o-matic/Source/repos/Hipponium/lib",
+//			"additionalSOLibSearchPath": "/usr/lib : /usr/local/lib : /home/hippo-o-matic/Source/repos/luarium/lib",
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/tests",
 			"environment": [
 				{
 					"name" : "LD_LIBRARY_PATH",
-					"value" : "/home/hippo-o-matic/Source/repos/Hipponium/lib"
+					"value" : "/home/hippo-o-matic/Source/repos/luarium/lib"
 				}
 			],
 			"externalConsole": true,

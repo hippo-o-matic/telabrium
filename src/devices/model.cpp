@@ -1,5 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include "hipponium/model.h"
+#include "luarium/model.h"
 
 // constructor, expects a filepath to a 3D model.
 Model::Model(std::string const &path, glm::vec3 pos, glm::vec3 rot, glm::vec3 scl, bool gamma) : gammaCorrection(gamma){
@@ -8,7 +8,7 @@ Model::Model(std::string const &path, glm::vec3 pos, glm::vec3 rot, glm::vec3 sc
 }
 
 // draws the model, and thus all its meshes
-void Model::Draw(Shader* shader){
+void Model::Draw(std::shared_ptr<Shader> shader){
 	glm::mat4 model;
 	model = glm::translate(model, Position);
 	model = glm::rotate(model, glm::radians(Rotation.x), glm::vec3(1, 0, 0));

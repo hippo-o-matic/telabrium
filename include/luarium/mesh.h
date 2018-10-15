@@ -1,18 +1,19 @@
-#ifndef HIPPO_MESH_H
-#define HIPPO_MESH_H
+#ifndef LUARIUM_MESH_H
+#define LUARIUM_MESH_H
 
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "hipponium/shader.h"
-#include "hipponium/object.h"
+#include "luarium/shader.h"
+#include "luarium/object.h"
 
 struct Vertex {
 	// position
@@ -58,7 +59,7 @@ public:
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, RenderMat mat);
 
 	// render the mesh
-	void Draw(Shader* shader);
+	void Draw(std::shared_ptr<Shader> shader);
 
 private:
 	/*  Render data  */

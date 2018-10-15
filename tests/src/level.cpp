@@ -1,10 +1,10 @@
-#ifndef HIPPO_LEVEL_H
-#define HIPPO_LEVEL_H
+#ifndef LUARIUM_LEVEL_H
+#define LUARIUM_LEVEL_H
 
 #include <string>
 #include <vector>
 
-#include "hipponium/luafile.h"
+#include "luarium/luafile.h"
 
 
 #endif

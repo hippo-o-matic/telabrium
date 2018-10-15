@@ -1,5 +1,5 @@
-#ifndef HIPPO_MODEL_H
-#define HIPPO_MODEL_H
+#ifndef LUARIUM_MODEL_H
+#define LUARIUM_MODEL_H
 
 #include <map>
 
@@ -9,7 +9,7 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
-#include "hipponium/mesh.h"
+#include "luarium/mesh.h"
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
@@ -29,7 +29,7 @@ public:
 		bool gamma = false);
 
 	// draws the model, and thus all its meshes
-	void Draw(Shader* shader);
+	void Draw(std::shared_ptr<Shader> shader);
 
 private:
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.

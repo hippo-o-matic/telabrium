@@ -1,12 +1,12 @@
-#ifndef HIPPO_RIGIDBODY_H
-#define HIPPO_RIGIDBODY_H
+#ifndef LUARIUM_RIGIDBODY_H
+#define LUARIUM_RIGIDBODY_H
 
 #include <vector>
 
 #include "glm/glm.hpp"
 
-#include "hipponium/object.h"
-#include "hipponium/collider.h
+#include "luarium/object.h"
+#include "luarium/collider.h
 
 class Rigidbody : public Object {
 public:

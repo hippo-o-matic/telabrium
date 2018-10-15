@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "/home/hippo-o-matic/Source/repos/Hipponium"
+			"path": "/home/hippo-o-matic/Source/repos/luarium"
 		}
 	],
 	"settings": {
@@ -53,7 +53,8 @@
 			"thread": "cpp",
 			"map": "cpp",
 			"optional": "cpp",
-			"string_view": "cpp"
+			"string_view": "cpp",
+			"atomic": "cpp"
 		},
 		"lua.targetVersion": "5.3"
 	}

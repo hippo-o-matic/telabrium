@@ -1,8 +1,8 @@
-#ifndef HIPPO_COLLIDER_H
-#define HIPPO_COLLIDER_H
+#ifndef LUARIUM_COLLIDER_H
+#define LUARIUM_COLLIDER_H
 
-#include "hipponium/object.h"
-#include "hipponium/mesh.h"
+#include "luarium/object.h"
+#include "luarium/mesh.h"
 
 struct physMat {
 	float frct; //Friction
