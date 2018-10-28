@@ -8,14 +8,14 @@ Model::Model(std::string const &path, glm::vec3 pos, glm::vec3 rot, glm::vec3 sc
 }
 
 // draws the model, and thus all its meshes
-void Model::Draw(std::shared_ptr<Shader> shader){
+void Model::Draw(Shader &shader){
 	glm::mat4 model;
 	model = glm::translate(model, Position);
 	model = glm::rotate(model, glm::radians(Rotation.x), glm::vec3(1, 0, 0));
 	model = glm::rotate(model, glm::radians(Rotation.y), glm::vec3(0, 1, 0));
 	model = glm::rotate(model, glm::radians(Rotation.z), glm::vec3(0, 0, 1));
 	model = glm::scale(model, Scale);
-	shader->setMat4("model", model);
+	shader.set("model", model);
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].Draw(shader);
 }
@@ -172,7 +172,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 			texture.type = typeName;
 			texture.path = str.C_Str();
 			textures.push_back(texture);
-			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't load duplicate textures.
 		}
 	}
 	return textures;
@@ -215,15 +215,15 @@ unsigned int TextureFromFile(const char *path, const std::string &directory, boo
     return textureID;
 }
 
-unsigned int loadCubemap(std::vector<std::string> faces) {
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+Texture loadCubemap(std::vector<std::string> faces, std::string path) {
+	Texture tex{0, "texture_cubemap", path};
+	glGenTextures(1, &tex.id);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex.id);
 
 	int width, height, nrChannels;
 	for (unsigned int i = 0; i < faces.size(); i++)
 	{
-		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		unsigned char *data = stbi_load((path + std::string("/") + faces[i]).c_str(), &width, &height, &nrChannels, 0);
 		if (data)
 		{
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
@@ -233,7 +233,7 @@ unsigned int loadCubemap(std::vector<std::string> faces) {
 		}
 		else
 		{
-			std::cout << "[!] MODEL|238: Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			std::cout << "[!] MODEL|238: Cubemap texture failed to load at path: " << path << "/" << faces[i] << std::endl;
 			stbi_image_free(data);
 		}
 	}
@@ -243,6 +243,6 @@ unsigned int loadCubemap(std::vector<std::string> faces) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	return textureID;
+	return tex;
 }
 

@@ -26,7 +26,7 @@
 const char* SHADER_PATH_V = "shaders/Standard.vs";
 const char* SHADER_PATH_F = "shaders/Standard.fs";
 
-const char* WORKING_DIRECTORY = "tests/";
+//const char* WORKING_DIRECTORY = "tests/";
 //0-Game is not running; 1-Game is running
 int gameState;
 
@@ -34,9 +34,9 @@ GLFWwindow* window;
 
 //unsigned int* Skybox::env_map = nullptr;
 
-std::shared_ptr<Shader> MAIN_SHADER;
+Shader* ACTIVE_SHADER;
 
-std::shared_ptr<Camera> ACTIVE_CAMERA(new Camera(glm::vec3(0.0f, 1.0f, 0.0f)));
+Camera* ACTIVE_CAMERA;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -51,6 +51,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
+void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 
 void simpleConsole();
 

@@ -29,7 +29,7 @@ public:
 		bool gamma = false);
 
 	// draws the model, and thus all its meshes
-	void Draw(std::shared_ptr<Shader> shader);
+	void Draw(Shader &shader);
 
 private:
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -47,6 +47,6 @@ private:
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma);
 
-unsigned int loadCubemap(std::vector<std::string> faces);
+Texture loadCubemap(std::vector<std::string> faces, std::string path);
 
 #endif
