@@ -1,5 +1,5 @@
-#ifndef SHADER_H
-#define SHADER_H
+#ifndef LUARIUM_SHADER_H
+#define LUARIUM_SHADER_H
 
 #include <string>
 #include <fstream>
@@ -13,40 +13,42 @@
 class Shader{
 public:
     unsigned int ID;
+	std::string vertexPath, fragmentPath, geometryPath;
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
-    Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
+    Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = "\0");
 
 	~Shader();
-    // activate the shader
-    // ------------------------------------------------------------------------
-    void use();
+
+	void build(); //Create a new shader program
+
+    void use(); //Activate the shader
 
     // utility uniform functions
     // ------------------------------------------------------------------------
-    void setBool(const std::string &name, bool value) const;
+    void set(const std::string &name, bool value) const; // bool
 
-    void setInt(const std::string &name, int value) const;
+    void set(const std::string &name, int value) const;// int
 
-    void setFloat(const std::string &name, float value) const;
+    void set(const std::string &name, float value) const; // float
 
-    void setVec2(const std::string &name, const glm::vec2 &value) const;
+    void set(const std::string &name, const glm::vec2 &value) const; // vec2
 
-    void setVec2(const std::string &name, float x, float y) const;
+    void set(const std::string &name, float x, float y) const; // vec2
 
-    void setVec3(const std::string &name, const glm::vec3 &value) const;
+    void set(const std::string &name, const glm::vec3 &value) const; // vec3
 
-    void setVec3(const std::string &name, float x, float y, float z) const;
+    void set(const std::string &name, float x, float y, float z) const; // vec3
 
-    void setVec4(const std::string &name, const glm::vec4 &value) const;
+    void set(const std::string &name, const glm::vec4 &value) const; // vec4
 
-    void setVec4(const std::string &name, float x, float y, float z, float w) const;
+    void set(const std::string &name, float x, float y, float z, float w) const; // vec4
 
-    void setMat2(const std::string &name, const glm::mat2 &mat) const;
+    void set(const std::string &name, const glm::mat2 &mat) const; // mat2
 
-    void setMat3(const std::string &name, const glm::mat3 &mat) const;
+    void set(const std::string &name, const glm::mat3 &mat) const; // mat3
 
-    void setMat4(const std::string &name, const glm::mat4 &mat) const;
+    void set(const std::string &name, const glm::mat4 &mat) const; // mat4
 
 
 private:

@@ -104,6 +104,6 @@ private:
 
 
 // Gather all the lights and send them to the shader
-void updateLights(std::shared_ptr<Shader> shader);
+void updateLights(Shader &shader);
 
 #endif
