@@ -136,5 +136,6 @@ inline std::string LuaFile::get(std::string name){
 			return "";
 		}
 	}
+	return "";
 }
 #endif
