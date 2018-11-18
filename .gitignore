@@ -1,5 +1,5 @@
-tests/models/*
-tests/glCaptures/*
-**.directory
-.directory
-build/*
+tests/models/
+tests/glCaptures/
+*.directory
+build/
+*.kate-swp
