@@ -54,7 +54,8 @@
 			"map": "cpp",
 			"optional": "cpp",
 			"string_view": "cpp",
-			"atomic": "cpp"
+			"atomic": "cpp",
+			"csignal": "cpp"
 		},
 		"lua.targetVersion": "5.3"
 	}
