@@ -3,3 +3,4 @@ tests/glCaptures/
 *.directory
 build/
 *.kate-swp
+*.log
