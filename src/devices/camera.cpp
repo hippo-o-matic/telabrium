@@ -18,6 +18,8 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float r
 	Rotation.x = pitch;
 	Rotation.z = roll;
 	updateCameraVectors();
+	projection = glm::perspective(glm::radians(fov), Aspect, 0.1f, 100.0f);
+	view = GetViewMatrix();
 }
 // Scalar Constructor
 Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, float roll) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), fov(FOV) {
@@ -27,6 +29,8 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
 	Rotation.x = pitch;
 	Rotation.z = roll;
 	updateCameraVectors();
+	projection = glm::perspective(glm::radians(fov), Aspect, 0.1f, 100.0f);
+	view = GetViewMatrix();
 }
 // Returns the view matrix calculated using Eular Angles and the LookAt Matrix
 glm::mat4 Camera::GetViewMatrix(){

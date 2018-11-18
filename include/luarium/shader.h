@@ -10,6 +10,8 @@
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 
+Shader* ACTIVE_SHADER;
+
 class Shader{
 public:
     unsigned int ID;

@@ -21,6 +21,7 @@
 //#include "luarium/rigidbody.h"
 #include "luarium/luafile.h"
 #include "luarium/generic.h"
+#include "luarium/debug.h"
 
 
 const char* SHADER_PATH_V = "shaders/Standard.vs";
@@ -33,10 +34,6 @@ int gameState;
 GLFWwindow* window;
 
 //unsigned int* Skybox::env_map = nullptr;
-
-Shader* ACTIVE_SHADER;
-
-Camera* ACTIVE_CAMERA;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
