@@ -1,4 +1,4 @@
-tests/models/
+tests/model/
 tests/glCaptures/
 *.directory
 build/
