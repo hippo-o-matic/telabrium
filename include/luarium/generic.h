@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include "glm/glm.hpp"
+#include <fstream>
 
 struct Vertex {
 	// position
@@ -39,7 +40,7 @@ namespace Luarium{
 	// Seperates a string into a vector of strings, separated by [seperator] (input string, seperator)
 	std::vector<std::string> segment(std::string &in, char seperator);
 
-	std::vector<Vertex> calcVertex(const std::vector<float> &verticies);
+	std::vector<Vertex> calcVertex(const std::vector<float> &verticies, const std::vector<float> &texcoords = {});
 
 	const std::vector<float> cubeVerts = {
 		// positions          
