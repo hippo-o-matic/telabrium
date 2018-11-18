@@ -57,7 +57,7 @@ in vec2 TexCoords;
 uniform vec3 ViewPos;
 
 //Settings
-#define MAX_DIRLIGHT 10
+#define MAX_DIRLIGHT 1
 #define MAX_POINTLIGHT 10
 #define MAX_SPOTLIGHT 10
 float gamma = 2.2;
@@ -114,12 +114,12 @@ vec3 CalcDirLight(dirLight light, vec3 normal, vec3 viewDir) {
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+	float spec = pow(max(dot(normal, halfwayDir), 0.0), mat.shininess);
     // combine results
-    vec3 ambient = light.ambient * mat.ambient_color;
-    vec3 diffuse = light.diffuse * diff * vec3(texture(mat.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * vec3(texture(mat.specular, TexCoords));
+	vec3 ambient = light.ambient * mat.ambient_color;
+	vec3 diffuse = light.diffuse * diff * (mat.diffuse_color);
+	vec3 specular = light.specular * spec * (vec3(texture(mat.specular, TexCoords)));
     return (ambient + diffuse + specular);
 }
 

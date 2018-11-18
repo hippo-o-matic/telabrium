@@ -1,4 +1,4 @@
-#include "luarium/debug.h"
+#include "luarium/core/debug.h"
 
 void Luarium::_filelog(std::string message, int severity, std::string outputfile, const char* filename, int line){
 	std::fstream file(outputfile);

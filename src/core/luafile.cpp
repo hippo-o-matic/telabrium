@@ -1,4 +1,4 @@
-#include "luarium/luafile.h"
+#include "luarium/core/luafile.h"
 
 LuaFile::LuaFile(std::string path){
 	L = luaL_newstate(); //Create a new Luastate
@@ -64,9 +64,9 @@ bool LuaFile::gettostack(std::string name){
 	return true;
 }
 
-std::vector<std::string> LuaFile::getKeys(){
+/*std::vector<std::string> LuaFile::getKeys(){
 
-}
+}*/
 
 
 void LuaFile::push(bool value){

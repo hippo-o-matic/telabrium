@@ -1,4 +1,4 @@
-#include "luarium/generic.h"
+#include "luarium/core/generic.h"
 
 //Parses strings into a vector of strings seperated by the seperator character
 std::vector<std::string> Luarium::segment(std::string &in, char seperator) {

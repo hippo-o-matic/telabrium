@@ -5,8 +5,8 @@
 
 #include "glm/glm.hpp"
 
-#include "luarium/object.h"
-#include "luarium/collider.h
+#include "luarium/core/object.h"
+#include "luarium/devices/collider.h"
 
 class Rigidbody : public Object {
 public:
@@ -45,7 +45,7 @@ private:
 		//Calculate the mesh's moment of inertia
 
 
-		MOI = ;
+//		MOI = ;
 	}
 
 	glm::vec3 lin_velocity = glm::vec3(0.0f, 0.0f, 0.0f); //Linear Velocity

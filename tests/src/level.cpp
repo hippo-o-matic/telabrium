@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "luarium/luafile.h"
+#include "luarium/core/luafile.h"
 
 
 #endif

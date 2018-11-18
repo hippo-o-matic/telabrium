@@ -1,4 +1,4 @@
-#include "luarium/object.h"
+#include "luarium/core/object.h"
 
 Object::Object(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl){
 	Position = pos; Rotation = rot; Scale = scl;

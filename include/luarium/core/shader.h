@@ -10,10 +10,10 @@
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 
-Shader* ACTIVE_SHADER;
-
 class Shader{
 public:
+	static Shader* ACTIVE;
+
     unsigned int ID;
 	std::string vertexPath, fragmentPath, geometryPath;
     // constructor generates the shader on the fly
@@ -58,4 +58,5 @@ private:
     // ------------------------------------------------------------------------
     void checkCompileErrors(GLuint shader, std::string type);
 };
+
 #endif

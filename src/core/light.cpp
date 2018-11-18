@@ -1,4 +1,4 @@
-#include "luarium/light.h"
+#include "luarium/core/light.h"
 
 Light::Light(){};
 

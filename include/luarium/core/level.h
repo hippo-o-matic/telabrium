@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "luarium/object.h"
+#include "luarium/core/object.h"
 
 namespace Map{
 	namespace luabridge = LB;

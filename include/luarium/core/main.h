@@ -13,21 +13,21 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "luarium/shader.h"
-#include "luarium/camera.h"
-#include "luarium/model.h"
-#include "luarium/light.h"
-//#include "luarium/text.h"
-//#include "luarium/rigidbody.h"
-#include "luarium/luafile.h"
-#include "luarium/generic.h"
-#include "luarium/debug.h"
+#include "luarium/core/shader.h"
+#include "luarium/core/camera.h"
+#include "luarium/core/model.h"
+#include "luarium/core/light.h"
+//#include "luarium/core/text.h"
+//#include "luarium/core/rigidbody.h"
+#include "luarium/core/luafile.h"
+#include "luarium/core/generic.h"
+#include "luarium/core/debug.h"
+#include "luarium/devices/skybox.h"
 
 
 const char* SHADER_PATH_V = "shaders/Standard.vs";
 const char* SHADER_PATH_F = "shaders/Standard.fs";
 
-//const char* WORKING_DIRECTORY = "tests/";
 //0-Game is not running; 1-Game is running
 int gameState;
 

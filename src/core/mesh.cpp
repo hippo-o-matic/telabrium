@@ -1,4 +1,4 @@
-#include "luarium/mesh.h"
+#include "luarium/core/mesh.h"
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, RenderMat mat){
 	this->vertices = vertices;
@@ -10,8 +10,18 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	setupMesh();
 }
 
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Texture tex, RenderMat mat){
+	this->vertices = vertices;
+	this->indices = indices;
+	this->textures.push_back(tex);
+	this->material = mat;
+
+	// now that we have all the required data, set the vertex buffers and its attribute pointers.
+	setupMesh();
+}
+
 // render the mesh
-void Mesh::Draw(std::shared_ptr<Shader> shader){
+void Mesh::Draw(Shader &shader){
 	// bind appropriate textures
 	unsigned int diffuseNr, specularNr, normalNr, heightNr, cubemapNr = 1;
 	for (unsigned int i = 0; i < textures.size(); i++){
@@ -30,7 +40,7 @@ void Mesh::Draw(std::shared_ptr<Shader> shader){
 			number = std::to_string(cubemapNr++);
 		}
 		// now set the sampler to the correct texture unit
-		glUniform1i(glGetUniformLocation(shader->ID, (type + number).c_str()), i);
+		glUniform1i(glGetUniformLocation(shader.ID, (type + number).c_str()), i);
 		// and finally bind the texture
 		if (type != "texture_cubemap")
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
@@ -39,12 +49,12 @@ void Mesh::Draw(std::shared_ptr<Shader> shader){
 //		glBindTexture(GL_TEXTURE_CUBE_MAP, *Skybox::env_map);
 	}	
 
-	shader->setVec3("mat.diffuse_color", material.diffuse_color);
-	shader->setVec3("mat.specular_color", material.specular_color);
-	shader->setVec3("mat.ambient_color", material.ambient_color);
+	shader.set("mat.diffuse_color", material.diffuse_color);
+	shader.set("mat.specular_color", material.specular_color);
+	shader.set("mat.ambient_color", material.ambient_color);
 
-	shader->setFloat("mat.shininess", material.shininess);
-	shader->setFloat("mat.IOR", material.IOR);
+	shader.set("mat.shininess", material.shininess);
+	shader.set("mat.IOR", material.IOR);
 
 	// draw mesh
 	glBindVertexArray(VAO);
@@ -68,6 +78,7 @@ void Mesh::setupMesh(){
 	// A great thing about structs is that their memory layout is sequential for all its items.
 	// The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
 	// again translates to 3/2 floats which translates to a byte array.
+
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);

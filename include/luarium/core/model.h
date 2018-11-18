@@ -9,9 +9,9 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
-#include "luarium/mesh.h"
+#include "luarium/core/mesh.h"
 
-unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
+unsigned int loadTexture(const char *path, const std::string &directory);
 
 class Model : public Object{
 public:
@@ -45,7 +45,7 @@ private:
 	std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
 };
 
-unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma);
+Texture loadTexture(const char *path);
 
 Texture loadCubemap(std::vector<std::string> faces, std::string path);
 

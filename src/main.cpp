@@ -1,6 +1,8 @@
-﻿#include "luarium/main.h"
+﻿#include "luarium/core/main.h"
 
 //void GLAPIENTRY glDebugFunc(GLenum source​, GLenum type​, GLuint id​, GLenum severity​, GLsizei length​, const GLchar* message​, const void* userParam);
+Camera* Camera::ACTIVE = NULL;
+Shader* Shader::ACTIVE = NULL;
 
 // settings 
 const unsigned int SCR_WIDTH = 1600;
@@ -55,8 +57,8 @@ int main(){
 	//debug settings
 	//------------------------------
 	std::cout<<glGetString(GL_VERSION)<<std::endl;
-	//glEnable(GL_DEBUG_OUTPUT);
-	//glDebugMessageCallback(glDebugFunc, 0);
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(debug_callback, 0);
 
 	// configure global opengl state
 	// -----------------------------
@@ -70,28 +72,35 @@ int main(){
 	std::cout<<test.get<std::string>("teststring")<<std::endl;
 
 	// build and compile shaders
-	std::shared_ptr<Shader> MAIN_SHADER(new Shader(SHADER_PATH_V, SHADER_PATH_F));
+	Shader beh(SHADER_PATH_V, SHADER_PATH_F);
+	Shader::ACTIVE = &beh;
+
 	Shader skyboxShader("shaders/skybox.vs", "shaders/skybox.fs");
 
+	Camera::ACTIVE = new Camera(glm::vec3(0,0,0));
+
 	// load models
-	Model aa("models/red.stl", glm::vec3(0,1,0));
-	Model waah("models/waa.dae", glm::vec3(0,0,-2));
+	Model aa("model/red.stl", glm::vec3(0,1,0));
+	Model waah("model/waa.dae", glm::vec3(0,0,-2));
 
 //	Rigidbody(&aa, aa.meshes[0]);
 	DirLight someLight(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	std::vector<std::string> skyFaces = {
-		"textures/skybox/right.jpg",
-		"textures/skybox/left.jpg",
-		"textures/skybox/top.jpg",
-		"textures/skybox/bottom.jpg",
-		"textures/skybox/front.jpg",
-		"textures/skybox/back.jpg"
+		"right.jpg",
+		"left.jpg",
+		"top.jpg",
+		"bottom.jpg",
+		"front.jpg",
+		"back.jpg"
 	};
-
-//	Mesh skybox(cubeVerts, cubeIndices, loadCubemap(skyFaces), {});
+	
+//	Mesh skybox(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("textures/shadertest.png")/*loadCubemap(skyFaces, "textures/skybox")*/);
+	Skybox skybox(loadCubemap(skyFaces, "textures/skybox"));
 
 	gameState = 1;
+	Luarium::log("test", 0);
+
 	// render loop
 	// -----------
 	while (gameState) {
@@ -114,25 +123,26 @@ int main(){
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		ACTIVE_CAMERA->Aspect = (float)SCR_WIDTH / (float)SCR_HEIGHT;
+		Camera::ACTIVE->Aspect = (float)SCR_WIDTH / (float)SCR_HEIGHT;
 
 		// don't forget to enable shader before setting uniforms
-		MAIN_SHADER->use();
-		MAIN_SHADER->setVec3("ViewPos", ACTIVE_CAMERA->Position);
-		updateLights(MAIN_SHADER);
+		Shader::ACTIVE->use();
+		Shader::ACTIVE->set("ViewPos", Camera::ACTIVE->Position);
+		updateLights(*Shader::ACTIVE);
 		
 
 		// view/projection transformations
-		glm::mat4 projection = glm::perspective(glm::radians(ACTIVE_CAMERA->fov), ACTIVE_CAMERA->Aspect, 0.1f, 100.0f);
-		glm::mat4 view = ACTIVE_CAMERA->GetViewMatrix();
-		MAIN_SHADER->setMat4("projection", projection);
-		MAIN_SHADER->setMat4("view", view);
+		Shader::ACTIVE->set("projection", Camera::ACTIVE->projection);
+		Shader::ACTIVE->set("view", Camera::ACTIVE->view);
 
-	//	floor.Draw(&MAIN_SHADER);
-		aa.Draw(MAIN_SHADER);
-		waah.Draw(MAIN_SHADER);
+	//	floor.Draw(&Shader::ACTIVE);
+		aa.Draw(*Shader::ACTIVE);
+		waah.Draw(*Shader::ACTIVE);
 		// draw skybox last
-//		skybox.Draw(&skyboxShader);
+		Camera::ACTIVE->view = glm::mat4(glm::mat3(Camera::ACTIVE->GetViewMatrix())); // remove translation from the view matrix
+		skyboxShader.set("view", Camera::ACTIVE->view);
+		skyboxShader.set("projection", Camera::ACTIVE->projection);
+		skybox.Draw(skyboxShader);
 
 		aa.Rotation.x += 2*deltaTime;
 
@@ -155,21 +165,26 @@ void processInput(GLFWwindow *window) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		ACTIVE_CAMERA->ProcessKeyboard(FORWARD, deltaTime);
+		Camera::ACTIVE->ProcessKeyboard(FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		ACTIVE_CAMERA->ProcessKeyboard(BACKWARD, deltaTime);
+		Camera::ACTIVE->ProcessKeyboard(BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		ACTIVE_CAMERA->ProcessKeyboard(LEFT, deltaTime);
+		Camera::ACTIVE->ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		ACTIVE_CAMERA->ProcessKeyboard(RIGHT, deltaTime);
+		Camera::ACTIVE->ProcessKeyboard(RIGHT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		ACTIVE_CAMERA->Position.y+= deltaTime * 2;
+		Camera::ACTIVE->Position.y+= deltaTime * 2;
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-		ACTIVE_CAMERA->Position.y-= deltaTime * 2;
+		Camera::ACTIVE->Position.y-= deltaTime * 2;
 	if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS){
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		simpleConsole();
 	}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS){
+		Shader::ACTIVE->build();
+		printf("[?] DEBUG: Reloaded core shader\n");
+	}
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -195,7 +210,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	lastX = xpos;
 	lastY = ypos;
 	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
-		ACTIVE_CAMERA->ProcessMouseMovement(xoffset, yoffset);
+		Camera::ACTIVE->ProcessMouseMovement(xoffset, yoffset);
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
@@ -208,12 +223,45 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-	ACTIVE_CAMERA->ProcessMouseScroll(yoffset);
+	Camera::ACTIVE->ProcessMouseScroll(yoffset);
 }
 
-/*void GLAPIENTRY glDebugFunc(GLenum source​, GLenum type, GLuint id​, GLenum severity, GLsizei length​, const GLchar* message, const void* userParam) {
+void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam){
+	std::cout << "ree" <<std::endl;
 	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
-}*/
+}
+
+std::vector<std::string> GetFirstNMessages(GLuint numMsgs)
+{
+	GLint maxMsgLen = 0;
+	glGetIntegerv(GL_MAX_DEBUG_MESSAGE_LENGTH, &maxMsgLen);
+
+	std::vector<GLchar> msgData(numMsgs * maxMsgLen);
+	std::vector<GLenum> sources(numMsgs);
+	std::vector<GLenum> types(numMsgs);
+	std::vector<GLenum> severities(numMsgs);
+	std::vector<GLuint> ids(numMsgs);
+	std::vector<GLsizei> lengths(numMsgs);
+
+	GLuint numFound = glGetDebugMessageLog(numMsgs, msgData.size(), &sources[0], &types[0], &ids[0], &severities[0], &lengths[0], &msgData[0]);
+
+	sources.resize(numFound);
+	types.resize(numFound);
+	severities.resize(numFound);
+	ids.resize(numFound);
+	lengths.resize(numFound);
+
+	std::vector<std::string> messages;
+	messages.reserve(numFound);
+
+	std::vector<GLchar>::iterator currPos = msgData.begin();
+	for(size_t msg = 0; msg < lengths.size(); ++msg)
+	{
+		messages.push_back(std::string(currPos, currPos + lengths[msg] - 1));
+		currPos = currPos + lengths[msg];
+	}
+	return messages;
+}
 
 void simpleConsole() {
 	std::string in;
@@ -222,13 +270,16 @@ void simpleConsole() {
 	std::vector<std::string> command = Luarium::segment(in, ' ');
 	if (command[0] == "rlshader"){
 		glUseProgram(0);
-		glDeleteProgram(MAIN_SHADER->ID);
-		MAIN_SHADER.reset(new Shader(SHADER_PATH_V, SHADER_PATH_F));
-		MAIN_SHADER->use();
+		Shader::ACTIVE->build();
 		printf("[?] DEBUG: Reloaded core shader\n");
 	}
-	if(command[0] == "exit"){
+	if(command[0] == "quit")
 		gameState = 0;
+	if(command[0] == "log"){
+		std::vector<std::string> m;
+		m = GetFirstNMessages(100);
+		for (int i=0; i <=100; i++)
+			std::cout<<m[i] <<std::endl;
 	}
 	if(command[0] == "rllevel"){} 
 }

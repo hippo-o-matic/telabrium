@@ -1,5 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include "luarium/model.h"
+#include "luarium/core/model.h"
 
 // constructor, expects a filepath to a 3D model.
 Model::Model(std::string const &path, glm::vec3 pos, glm::vec3 rot, glm::vec3 scl, bool gamma) : gammaCorrection(gamma){
@@ -32,7 +32,7 @@ void Model::loadModel(std::string const &path){
 		return;
 	}
 	// retrieve the directory path of the filepath
-	directory = path.substr(0, path.find_last_of('/'));
+//	directory = path.substr(0, path.find_last_of('/'));
 
 	// process ASSIMP's root node recursively
 	processNode(scene->mRootNode, scene);
@@ -167,26 +167,21 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 		}
 		if (!skip) {
 			// if texture hasn't been loaded already, load it
-			Texture texture;
-			texture.id = TextureFromFile(str.C_Str(), this->directory);
-			texture.type = typeName;
-			texture.path = str.C_Str();
-			textures.push_back(texture);
-			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't load duplicate textures.
+			Texture tex = loadTexture(str.C_Str());
+			tex.type = typeName;
+			textures.push_back(tex);
+			textures_loaded.push_back(tex);  // store it as texture loaded for entire model, to ensure we won't load duplicate textures.
 		}
 	}
 	return textures;
 }
 
-unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma){
-    std::string filename = std::string(path);
-    filename = directory + '/' + filename;
-
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
+Texture loadTexture(const char* path){
+    Texture tex{0, "", path};
+    glGenTextures(1, &tex.id);
 
     int width, height, nrComponents;
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
     if (data) {
         GLenum format;
         if (nrComponents == 1)
@@ -196,7 +191,7 @@ unsigned int TextureFromFile(const char *path, const std::string &directory, boo
         else if (nrComponents == 4)
 		    format = GL_RGBA;
 
-		glBindTexture(GL_TEXTURE_2D, textureID);
+		glBindTexture(GL_TEXTURE_2D, tex.id);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -212,7 +207,7 @@ unsigned int TextureFromFile(const char *path, const std::string &directory, boo
     }
 
 	stbi_image_free(data);
-    return textureID;
+    return tex;
 }
 
 Texture loadCubemap(std::vector<std::string> faces, std::string path) {
