@@ -6,6 +6,7 @@
 #include <string>
 #include "glm/glm.hpp"
 #include <fstream>
+#include <chrono>
 
 struct Vertex {
 	// position
@@ -41,6 +42,12 @@ namespace Luarium{
 	std::vector<std::string> segment(std::string &in, char seperator);
 
 	std::vector<Vertex> calcVertex(const std::vector<float> &verticies, const std::vector<float> &texcoords = {});
+
+	#define logf(message, severity, outputfile) _filelog(message, severity, outputfile, __FILE__, __LINE__)
+	void _filelog(std::string message, int severity, std::string outputfile, const char* filename, int line);
+
+	#define log(message, severity) _log(message, severity, __FILE__, __LINE__)
+	void _log(std::string message, int severity, const char* filename, int line);
 
 	const std::vector<float> cubeVerts = {
 		// positions          
