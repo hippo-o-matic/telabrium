@@ -139,6 +139,8 @@ int main(){
 		aa.Draw(*Shader::ACTIVE);
 		waah.Draw(*Shader::ACTIVE);
 		// draw skybox last
+		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+		skyboxShader.use();
 		Camera::ACTIVE->view = glm::mat4(glm::mat3(Camera::ACTIVE->GetViewMatrix())); // remove translation from the view matrix
 		skyboxShader.set("view", Camera::ACTIVE->view);
 		skyboxShader.set("projection", Camera::ACTIVE->projection);

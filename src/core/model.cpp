@@ -32,7 +32,7 @@ void Model::loadModel(std::string const &path){
 		return;
 	}
 	// retrieve the directory path of the filepath
-//	directory = path.substr(0, path.find_last_of('/'));
+	directory = path.substr(0, path.find_last_of('/'));
 
 	// process ASSIMP's root node recursively
 	processNode(scene->mRootNode, scene);
@@ -167,7 +167,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 		}
 		if (!skip) {
 			// if texture hasn't been loaded already, load it
-			Texture tex = loadTexture(str.C_Str());
+			Texture tex = loadTexture(str.C_Str(), this->directory);
 			tex.type = typeName;
 			textures.push_back(tex);
 			textures_loaded.push_back(tex);  // store it as texture loaded for entire model, to ensure we won't load duplicate textures.
@@ -176,12 +176,16 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 	return textures;
 }
 
-Texture loadTexture(const char* path){
-    Texture tex{0, "", path};
+Texture loadTexture(const char* path, std::string &directory){
+	std::string filename = std::string(path);
+	if (directory != "")
+    	filename = directory + '/' + filename;
+    Texture tex{0, "", filename};
+
     glGenTextures(1, &tex.id);
 
     int width, height, nrComponents;
-    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
     if (data) {
         GLenum format;
         if (nrComponents == 1)
@@ -203,7 +207,7 @@ Texture loadTexture(const char* path){
 			std::cout<<"[!] MODEL|208: GL Error:\""<<err<<"\""<<std::endl;
 
     } else {
-        std::cout << "[!] MODEL|213: Texture failed to load at path: " << path << std::endl;
+        std::cout << "[!] MODEL|213: Texture failed to load at path: " << filename << std::endl;
     }
 
 	stbi_image_free(data);

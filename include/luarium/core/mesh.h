@@ -34,7 +34,7 @@ public:
 	// render the mesh
 	void Draw(Shader &shader);
 
-private:
+protected:
 	/*  Render data  */
 	unsigned int VBO, EBO;
 

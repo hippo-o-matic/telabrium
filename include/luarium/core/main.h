@@ -21,7 +21,6 @@
 //#include "luarium/core/rigidbody.h"
 #include "luarium/core/luafile.h"
 #include "luarium/core/generic.h"
-#include "luarium/core/debug.h"
 #include "luarium/devices/skybox.h"
 
 

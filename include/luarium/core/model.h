@@ -11,8 +11,6 @@
 
 #include "luarium/core/mesh.h"
 
-unsigned int loadTexture(const char *path, const std::string &directory);
-
 class Model : public Object{
 public:
 	/*  Model Data */
@@ -45,7 +43,7 @@ private:
 	std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
 };
 
-Texture loadTexture(const char *path);
+Texture loadTexture(const char* path, std::string &directory);
 
 Texture loadCubemap(std::vector<std::string> faces, std::string path);
 
