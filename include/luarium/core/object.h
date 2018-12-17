@@ -1,6 +1,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <string>
 #include <vector>
 #include <algorithm>
 
@@ -19,15 +20,30 @@ public:
 
 	~Object();
 
-	glm::vec3 Position;
+	std::string Name;
+
+	glm::vec3 Position; // Position in real space
 	glm::vec3 Rotation;
 	glm::vec3 Scale;
 
-//	std::shared_ptr<Object> ptr(*this);
+	void adopt(Object* C); // "Adopt" an object by setting its parent, and making it's coordinates relative to your own
+	void adopt(std::vector<Object*> &C_vec); // Same thing for multiple objects
+
+	void translate_from(Object &P); // Translate self about another Object (probably the parent)
+	void translate_to(Object* P);
+	void translate_to(std::vector<Object*> P);
+
+	std::vector<Object*> operator+(Object* o);
+	std::vector<Object*> operator-(Object* o);
+
 
 protected:
 	Object* parent;
-	std::vector<Object*> Components;
+	std::vector<Object*> components;
+
+	glm::vec3 P_pos; // The position relative to the parent, if any
+	glm::vec3 P_rot;
+	glm::vec3 P_scl;
 };
 
 #endif

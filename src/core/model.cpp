@@ -28,7 +28,7 @@ void Model::loadModel(std::string const &path){
 	// check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 	{
-		std::cout << "[!] MODEL|72: Assimp: " << importer.GetErrorString() << std::endl;
+		Luarium::log("Assimp: " + *importer.GetErrorString(), 2);
 		return;
 	}
 	// retrieve the directory path of the filepath
@@ -187,7 +187,7 @@ Texture loadTexture(const char* path, std::string &directory){
     int width, height, nrComponents;
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
     if (data) {
-        GLenum format;
+        GLenum format = 4;
         if (nrComponents == 1)
             format = GL_RED;
         else if (nrComponents == 3)
@@ -203,11 +203,11 @@ Texture loadTexture(const char* path, std::string &directory){
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		if(GLenum err = glGetError() != GL_NO_ERROR)
-			std::cout<<"[!] MODEL|208: GL Error:\""<<err<<"\""<<std::endl;
-
+		if(GLenum err = glGetError() != GL_NO_ERROR){
+			std::cout << "GL Error: \"" << err << "\"" << std::endl;
+		}
     } else {
-        std::cout << "[!] MODEL|213: Texture failed to load at path: " << filename << std::endl;
+		Luarium::log("Texture failed to load at path: \"" + filename + "\"", 2);
     }
 
 	stbi_image_free(data);
@@ -232,7 +232,7 @@ Texture loadCubemap(std::vector<std::string> faces, std::string path) {
 		}
 		else
 		{
-			std::cout << "[!] MODEL|238: Cubemap texture failed to load at path: " << path << "/" << faces[i] << std::endl;
+			Luarium::log("Cubemap texture failed to load at path: \"" + path + "/" + faces[i] + "\"", 2);
 			stbi_image_free(data);
 		}
 	}

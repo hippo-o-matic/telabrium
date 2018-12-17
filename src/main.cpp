@@ -36,7 +36,7 @@ int main(){
  	// --------------------
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "hippotest", NULL, NULL);
 	if (window == NULL) {
-		std::cout << "[!!!] MAIN|58: Failed to create GLFW window" << std::endl;
+		Luarium::log("Failed to create GLFW window", 4);
 		std::cin.get();
 		glfwTerminate();
 		return -1;
@@ -50,7 +50,7 @@ int main(){
 	// glad: load all OpenGL function pointers
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "[!!!] MAIN|72: Failed to initialize GLAD" << std::endl;
+		Luarium::log("Failed to initialize GLAD", 4);
 		return -1;
 	}
 
@@ -80,10 +80,11 @@ int main(){
 	Camera::ACTIVE = new Camera(glm::vec3(0,0,0));
 
 	// load models
-	Model aa("model/red.stl", glm::vec3(0,1,0));
-	Model waah("model/waa.dae", glm::vec3(0,0,-2));
+	Model aa("model/red.stl", glm::vec3(4,1,0));
+	Model waah("model/waa.dae", glm::vec3(0,-1,-4));
+	std::string heck = "textures";
+//	Mesh bab(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("shadertest.png", heck));
 
-//	Rigidbody(&aa, aa.meshes[0]);
 	DirLight someLight(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	std::vector<std::string> skyFaces = {
@@ -95,11 +96,14 @@ int main(){
 		"back.jpg"
 	};
 	
-//	Mesh skybox(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("textures/shadertest.png")/*loadCubemap(skyFaces, "textures/skybox")*/);
-	Skybox skybox(loadCubemap(skyFaces, "textures/skybox"));
+	std::string temp = "textures";
+
+//	Skybox skybox(loadCubemap(skyFaces, "textures/skybox"));
 
 	gameState = 1;
-	Luarium::log("test", 0);
+	Luarium::log("test");
+
+	archiveTest("tests.tar.gz");
 
 	// render loop
 	// -----------
@@ -139,12 +143,8 @@ int main(){
 		aa.Draw(*Shader::ACTIVE);
 		waah.Draw(*Shader::ACTIVE);
 		// draw skybox last
-		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-		skyboxShader.use();
-		Camera::ACTIVE->view = glm::mat4(glm::mat3(Camera::ACTIVE->GetViewMatrix())); // remove translation from the view matrix
-		skyboxShader.set("view", Camera::ACTIVE->view);
-		skyboxShader.set("projection", Camera::ACTIVE->projection);
-		skybox.Draw(skyboxShader);
+	//	bab.Draw(*Shader::ACTIVE);
+//		skybox.Draw(skyboxShader);
 
 		aa.Rotation.x += 2*deltaTime;
 
@@ -156,6 +156,7 @@ int main(){
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
+	glfwDestroyWindow(window);
 	glfwTerminate();
 	return 0;
 }
@@ -286,3 +287,17 @@ void simpleConsole() {
 	if(command[0] == "rllevel"){} 
 }
 
+void archiveTest(const char* in){
+	archive* read = archive_read_new();
+	archive_entry* entry;
+	archive_read_support_filter_gzip(read);
+	archive_read_support_format_tar(read);
+	
+	archive_read_open_filename(read, in, 10240);
+	while (archive_read_next_header(read, &entry) == ARCHIVE_OK){
+		archive_read_extract(read, entry, 0);
+		archive_read_data_skip(read);
+	}
+	
+	archive_read_free(read);
+}

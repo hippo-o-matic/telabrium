@@ -84,16 +84,28 @@ std::vector<Vertex> Luarium::calcVertex(const std::vector<float> &verticies, con
 	return v;
 }
 
-void Luarium::_filelog(std::string message, int severity, std::string outputfile, const char* filename, int line){
-	std::fstream file(outputfile);
-	std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+void Luarium::log(std::string message, int severity, const char* outputfile){
+	std::fstream file(outputfile, std::fstream::out);
 
-	file << "<" << now << "> " << filename << "|" << line << ": " << message << "\n";
+	char out[80];
+	time_t now = time(0);
+	strftime(out, sizeof(out), "%Y-%m-%d.%X", localtime(&now));
+
+	std::string sev;
+	switch(severity){
+		default:
+			sev = "";
+		case 1:
+			sev = "[?] ";
+		case 2:
+			sev = "[!] ";
+		case 3:
+			sev = "[!!] ";
+		case 4:
+			sev = "[!!!] ";
+	}
+
+	file << "<" << out << "> " << sev << message << "\n";
+	std::cout << "<" << out << "> " << sev << message << "\n";
 	file.close();
-}
-
-void Luarium::_log(std::string message, int severity, const char* filename, int line){
-	std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-
-	std::cout << "<" << now << "> " << filename << "|" << line << ": " << message << "\n";
 }

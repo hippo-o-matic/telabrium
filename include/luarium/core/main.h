@@ -23,6 +23,7 @@
 #include "luarium/core/generic.h"
 #include "luarium/devices/skybox.h"
 
+#include <archive.h>
 
 const char* SHADER_PATH_V = "shaders/Standard.vs";
 const char* SHADER_PATH_F = "shaders/Standard.fs";
@@ -51,5 +52,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 
 void simpleConsole();
+
+void archiveTest(const char* in);
 
 #endif // LUARIUM_MAIN_H

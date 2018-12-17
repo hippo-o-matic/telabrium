@@ -23,7 +23,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Text
 // render the mesh
 void Mesh::Draw(Shader &shader){
 	// bind appropriate textures
-	unsigned int diffuseNr, specularNr, normalNr, heightNr, cubemapNr = 1;
+	unsigned int diffuseNr = 1, specularNr = 1, normalNr = 1, heightNr = 1, cubemapNr = 1;
 	for (unsigned int i = 0; i < textures.size(); i++){
 		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
 		std::string number;// retrieve texture number (the N in diffuse_textureN)

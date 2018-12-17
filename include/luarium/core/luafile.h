@@ -4,12 +4,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <memory> //smart pointers I guess
 #include <cstdarg> //For parsing functions with paramaters
 
 #include "lua/lua.hpp"
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"
+
+#include "luarium/core/generic.h"
 
 class LuaFile{
 public:
@@ -113,18 +114,22 @@ inline int LuaFile::get(std::string name){
 	if(L) {
 		if(!lua_isnumber(L,-1)){
 			printError(name, "not a integer");
+			return 0;
 		}
 		return (int)lua_tonumber(L,-1);
 	}
+	return 0;
 }
 template <>
 inline float LuaFile::get(std::string name){
 	if(L) {
 		if(!lua_isnumber(L,-1)){
 			printError(name, "not a float");
+			return 0;
 		}
 		return (float)lua_tonumber(L,-1);
 	}
+	return 0;
 }
 template <>
 inline std::string LuaFile::get(std::string name){

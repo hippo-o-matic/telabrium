@@ -6,7 +6,7 @@
 #include <string>
 #include "glm/glm.hpp"
 #include <fstream>
-#include <chrono>
+#include <time.h>
 
 struct Vertex {
 	// position
@@ -37,17 +37,15 @@ struct RenderMat {
 	float opacity = 0;
 };
 
+
+
 namespace Luarium{
 	// Seperates a string into a vector of strings, separated by [seperator] (input string, seperator)
 	std::vector<std::string> segment(std::string &in, char seperator);
 
 	std::vector<Vertex> calcVertex(const std::vector<float> &verticies, const std::vector<float> &texcoords = {});
 
-	#define logf(message, severity, outputfile) _filelog(message, severity, outputfile, __FILE__, __LINE__)
-	void _filelog(std::string message, int severity, std::string outputfile, const char* filename, int line);
-
-	#define log(message, severity) _log(message, severity, __FILE__, __LINE__)
-	void _log(std::string message, int severity, const char* filename, int line);
+	void log(std::string message, int severity = 0, const char* outputfile = "tests/logs/log.txt");
 
 	const std::vector<float> cubeVerts = {
 		// positions          

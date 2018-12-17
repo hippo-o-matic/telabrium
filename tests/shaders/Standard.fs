@@ -104,7 +104,7 @@ void main() {
 //	vec3 reflection = CalcReflection(norm, FragPos, ViewPos, mat.shininess);
 //	vec3 refraction = CalcRefraction(norm, FragPos, ViewPos, mat.IOR);
 
-	FragColor = texColor;
+	FragColor = vec4(0,0,0,0);
 //  FragColor.rgb = texColor.rgb * texColor.a + reflection.rgb;
 }
 

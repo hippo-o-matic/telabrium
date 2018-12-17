@@ -3,33 +3,47 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
+#include <archive.h>
 
 #include "luarium/core/object.h"
+#include "luarium/core/generic.h"
 
-namespace Map{
-	namespace luabridge = LB;
-public:
-	bool load(std::string path){
-		LB::luaL_dofile(L, path + "level.lua");
-		LB::luaL_openlibs(L);
-  		lua_pcall(L, 0, 0, 0);
-	}
+const std::string LUARIUM_CACHE_PATH = "cache/";
 
-	void unload();
+namespace Map {
+	void init(); //Initialize archive library
 
-	bool save();
+	void load(std::string path, std::string options); // Load the map 
+	void load_force_cache(std::string path); // Load the map, ignoring the current cache
+	void load_without_cache(std::string path); // Load the currently initialized map directly from the file, without extracting
 
-private:
-	lua_State* L = luaL_newstate();
-}
+	void pack(std::string dirPath, std::string out); // Compresses a map directory into a map file
+	void unpack_to(std::string path, std::string out);
+	void unpack_to_cache(std::string path = current_path); // Extract map to cache beforehand, leave blank for current map
 
+	void unload(); // Cleans up resources of currently loaded map
+	void clear_cache();
+	void clear_cache(std::string path); // Clears specified entry from cache, if blank clears whole cache
+
+	void cleanup(); // Cleanup function for Luarium::cleanup()
+
+	std::string current_path;
+
+	archive* read; // The archive structs for reading and writing data
+	archive* write;
+};
 
 class Level : public Object {
-
-	Level(std::string path);
+public:
+	Level(std::string mapPath, std::string path); // Get the parent map path and the path inside the map file
 	~Level();
 
-	bool load(std::string path);
-}
+	void load();
+	void unload();
+
+	std::string mapPath;
+	std::string path;
+};
 
 #endif

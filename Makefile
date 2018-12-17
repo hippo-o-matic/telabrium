@@ -1,4 +1,4 @@
-CXX = g++
+CXX = clang++
 CFLAGS = -Wall -g -std=c++17 -Wl,-rpath=$(LIB_PATH)
 
 INCLUDE_PATH = include
@@ -11,7 +11,7 @@ TARGET = hippotest
 SRC = $(wildcard $(SRC_PATH)/*/*.* $(SRC_PATH)/*.*) 
 OBJ = $(SRC: .c=.o, .cpp=.o)
 #Ensure glfw is after GL
-LIBS = -lGL -lglfw -lassimp -lX11 -lpthread -lXrandr -lXi -ldl -llua5.3
+LIBS = -lGL -lglfw -lassimp -lX11 -lpthread -lXrandr -lXi -ldl -llua5.3 -larchive 
 
 
 all: $(TARGET)
