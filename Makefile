@@ -1,5 +1,5 @@
-CXX = clang++
-CFLAGS = -Wall -g -std=c++17 -Wl,-rpath=$(LIB_PATH)
+CXX = g++
+CPPFLAGS = -Wall -g -std=c++17 -Wl,-rpath=$(LIB_PATH)
 
 INCLUDE_PATH = include
 LIB_PATH = lib
@@ -8,20 +8,33 @@ SRC_PATH = src
 BUILD_PATH = build
 TARGET = hippotest
 
-SRC = $(wildcard $(SRC_PATH)/*/*.* $(SRC_PATH)/*.*) 
-OBJ = $(SRC: .c=.o, .cpp=.o)
+SRC = $(wildcard $(SRC_PATH)/*.*)
+
+OBJ = $(SRC)
+OBJ := $(patsubst $(SRC_PATH)/%.cpp,$(BUILD_PATH)/%.cpp.o,$(OBJ))
+OBJ := $(patsubst $(SRC_PATH)/%.c,$(BUILD_PATH)/%.c.o,$(OBJ))
+
 #Ensure glfw is after GL
 LIBS = -lGL -lglfw -lassimp -lX11 -lpthread -lXrandr -lXi -ldl -llua5.3 -larchive 
 
 
-all: $(TARGET)
+all: $(BUILD_PATH)/bin/$(TARGET)
 
-$(TARGET): $(OBJ)
-	$(CXX) $(CFLAGS) $? -o $(BUILD_PATH)/bin/$@ -I$(INCLUDE_PATH) -L$(LIB_PATH) $(LIBS)
+$(BUILD_PATH)/bin/$(TARGET): $(OBJ)
+	@-$(MKDIR_P) $(dir $@)
+	@-echo "Linking..."
+	@-$(CXX) $(CPPFLAGS) $^ -o $@ -I$(INCLUDE_PATH) -L$(LIB_PATH) $(LIBS)
+	@-echo "\n****************************************\nSucessfully built $(TARGET)\n****************************************"
 
-%.o: %.cpp %.c
-	$(CXX) $(CFLAGS) -c $? -o $(BUILD_PATH)/$(OBJ) -I$(INCLUDE_PATH)
+$(BUILD_PATH)/%.cpp.o: $(SRC_PATH)/%.cpp
+	$(CXX) $(CPPFLAGS) -c $< -I$(INCLUDE_PATH) -o $@
+
+$(BUILD_PATH)/%.c.o: $(SRC_PATH)/%.c
+	$(CXX) $(CPPFLAGS) -c $< -I$(INCLUDE_PATH) -o $@
+	
 
 clean: 
 	rm -rf $(BUILD_PATH)/bin/$(TARGET) 
 	rm -rf $(BUILD_PATH)/%.o
+
+MKDIR_P ?= mkdir -p
