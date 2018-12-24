@@ -1,6 +1,7 @@
 tests/model/
 tests/glCaptures/
 *.directory
-build/
+build/bin/*
 *.kate-swp
 *.log
+*.o

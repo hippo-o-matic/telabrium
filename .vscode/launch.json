@@ -16,7 +16,7 @@
 			"environment": [
 				{
 					"name" : "LD_LIBRARY_PATH",
-					"value" : "/home/hippo-o-matic/Source/repos/luarium/lib"
+					"value" : "${workspaceFolder}/lib"
 				}
 			],
 			"externalConsole": false,

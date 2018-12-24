@@ -8,6 +8,8 @@
 #include <fstream>
 #include <time.h>
 
+const std::string LUARIUM_CACHE_PATH = "cache/";
+
 struct Vertex {
 	// position
 	glm::vec3 Position;
@@ -36,8 +38,6 @@ struct RenderMat {
 	float IOR = 0;
 	float opacity = 0;
 };
-
-
 
 namespace Luarium{
 	// Seperates a string into a vector of strings, separated by [seperator] (input string, seperator)

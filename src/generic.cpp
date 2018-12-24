@@ -2,7 +2,7 @@
 
 //Parses strings into a vector of strings seperated by the seperator character
 std::vector<std::string> Luarium::segment(std::string &in, char seperator) {
-	size_t pos = in.find(seperator); //Limits commands to 512 characters, might want to change later
+	size_t pos = in.find(seperator); //Limits in to 512 characters, might want to change later
 	size_t last = 0;
 	std::vector<std::string> output;
 	if (!in.empty()) do {
@@ -93,8 +93,6 @@ void Luarium::log(std::string message, int severity, const char* outputfile){
 
 	std::string sev;
 	switch(severity){
-		default:
-			sev = "";
 		case 1:
 			sev = "[?] ";
 		case 2:
@@ -103,6 +101,8 @@ void Luarium::log(std::string message, int severity, const char* outputfile){
 			sev = "[!!] ";
 		case 4:
 			sev = "[!!!] ";
+		default:
+			sev = "";
 	}
 
 	file << "<" << out << "> " << sev << message << "\n";

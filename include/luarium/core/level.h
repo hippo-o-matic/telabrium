@@ -3,20 +3,20 @@
 
 #include <string>
 #include <vector>
-#include <filesystem>
+
+#include <experimental/filesystem>
 #include <archive.h>
 
 #include "luarium/core/object.h"
 #include "luarium/core/generic.h"
 
-const std::string LUARIUM_CACHE_PATH = "cache/";
-
 namespace Map {
+
+	namespace fsys = std::experimental::filesystem; // Holy fuck that's a long name
+
 	void init(); //Initialize archive library
 
-	void load(std::string path, std::string options); // Load the map 
-	void load_force_cache(std::string path); // Load the map, ignoring the current cache
-	void load_without_cache(std::string path); // Load the currently initialized map directly from the file, without extracting
+	void load(std::string path, std::string options = ""); // Load the map 
 
 	void pack(std::string dirPath, std::string out); // Compresses a map directory into a map file
 	void unpack_to(std::string path, std::string out);
@@ -26,7 +26,7 @@ namespace Map {
 	void clear_cache();
 	void clear_cache(std::string path); // Clears specified entry from cache, if blank clears whole cache
 
-	void cleanup(); // Cleanup function for Luarium::cleanup()
+	void cleanup(std::string options = ""); // Cleanup function for Luarium::cleanup()
 
 	std::string current_path;
 

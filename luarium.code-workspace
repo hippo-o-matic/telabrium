@@ -55,7 +55,10 @@
 			"optional": "cpp",
 			"string_view": "cpp",
 			"atomic": "cpp",
-			"csignal": "cpp"
+			"csignal": "cpp",
+			"filesystem": "cpp",
+			"algorithm": "cpp",
+			"codecvt": "cpp"
 		},
 		"lua.targetVersion": "5.3"
 	}

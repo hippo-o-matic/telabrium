@@ -62,6 +62,10 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
+	if((GLenum err = glGetError()) != GL_NO_ERROR){
+			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
+			Luarium::log("Texture failed to load at path: \"" + filename + "\"", 2);
+		}
 
 	// Walk through each of the mesh's vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -177,12 +181,19 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 }
 
 Texture loadTexture(const char* path, std::string &directory){
+	GLenum err;
+if((err = glGetError()) != GL_NO_ERROR){
+			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
+		}
 	std::string filename = std::string(path);
 	if (directory != "")
     	filename = directory + '/' + filename;
     Texture tex{0, "", filename};
 
     glGenTextures(1, &tex.id);
+	if((err = glGetError()) != GL_NO_ERROR){
+			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
+		}
 
     int width, height, nrComponents;
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
@@ -195,7 +206,13 @@ Texture loadTexture(const char* path, std::string &directory){
         else if (nrComponents == 4)
 		    format = GL_RGBA;
 
+if((err = glGetError()) != GL_NO_ERROR){
+			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
+		}
 		glBindTexture(GL_TEXTURE_2D, tex.id);
+		if((err = glGetError()) != GL_NO_ERROR){
+			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
+		}
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -203,8 +220,8 @@ Texture loadTexture(const char* path, std::string &directory){
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		if(GLenum err = glGetError() != GL_NO_ERROR){
-			std::cout << "GL Error: \"" << err << "\"" << std::endl;
+		if((err = glGetError()) != GL_NO_ERROR){
+			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
 		}
     } else {
 		Luarium::log("Texture failed to load at path: \"" + filename + "\"", 2);

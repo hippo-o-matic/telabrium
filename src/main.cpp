@@ -80,7 +80,7 @@ int main(){
 	Camera::ACTIVE = new Camera(glm::vec3(0,0,0));
 
 	// load models
-	Model aa("model/red.stl", glm::vec3(4,1,0));
+	Model aa("model/red.stl", glm::vec3(1,1,0));
 	Model waah("model/waa.dae", glm::vec3(0,-1,-4));
 	std::string heck = "textures";
 //	Mesh bab(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("shadertest.png", heck));
@@ -102,8 +102,6 @@ int main(){
 
 	gameState = 1;
 	Luarium::log("test");
-
-	archiveTest("tests.tar.gz");
 
 	// render loop
 	// -----------
@@ -285,19 +283,4 @@ void simpleConsole() {
 			std::cout<<m[i] <<std::endl;
 	}
 	if(command[0] == "rllevel"){} 
-}
-
-void archiveTest(const char* in){
-	archive* read = archive_read_new();
-	archive_entry* entry;
-	archive_read_support_filter_gzip(read);
-	archive_read_support_format_tar(read);
-	
-	archive_read_open_filename(read, in, 10240);
-	while (archive_read_next_header(read, &entry) == ARCHIVE_OK){
-		archive_read_extract(read, entry, 0);
-		archive_read_data_skip(read);
-	}
-	
-	archive_read_free(read);
 }
