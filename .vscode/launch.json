@@ -13,12 +13,7 @@
 //			"additionalSOLibSearchPath": "/usr/lib : /usr/local/lib : /home/hippo-o-matic/Source/repos/luarium/lib",
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/tests",
-			"environment": [
-				{
-					"name" : "LD_LIBRARY_PATH",
-					"value" : "${workspaceFolder}/lib"
-				}
-			],
+			
 			"externalConsole": false,
 			"MIMode": "gdb",
 			"setupCommands": [

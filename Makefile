@@ -1,8 +1,13 @@
+mkfile_path := $(subst Makefile,,$(abspath $(lastword $(MAKEFILE_LIST))))
+current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
+
 CXX = g++
-CPPFLAGS = -Wall -g -std=c++17 -Wl,-rpath=$(LIB_PATH)
 
 INCLUDE_PATH = include
-LIB_PATH = lib
+LIB_PATH = $(mkfile_path)lib
+
+CPPFLAGS = -Wall -g -std=c++17 
+LFLAGS = -Wl,-rpath,$(LIB_PATH)
 
 SRC_PATH = src
 BUILD_PATH = build
@@ -23,7 +28,7 @@ all: $(BUILD_PATH)/bin/$(TARGET)
 $(BUILD_PATH)/bin/$(TARGET): $(OBJ)
 	@-$(MKDIR_P) $(dir $@)
 	@-echo "Linking..."
-	@-$(CXX) $(CPPFLAGS) $^ -o $@ -I$(INCLUDE_PATH) -L$(LIB_PATH) $(LIBS)
+	@-$(CXX) $(CPPFLAGS) $(LFLAGS) $^ -o $@ -I$(INCLUDE_PATH) -L$(LIB_PATH) $(LIBS)
 	@-echo "\n****************************************\nSucessfully built $(TARGET)\n****************************************"
 
 $(BUILD_PATH)/%.cpp.o: $(SRC_PATH)/%.cpp
@@ -35,6 +40,9 @@ $(BUILD_PATH)/%.c.o: $(SRC_PATH)/%.c
 
 clean: 
 	rm -rf $(BUILD_PATH)/bin/$(TARGET) 
-	rm -rf $(BUILD_PATH)/%.o
+	rm -rf $(BUILD_PATH)/*.o
+
+touch:
+	touch src/*
 
 MKDIR_P ?= mkdir -p
