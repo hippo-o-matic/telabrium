@@ -14,7 +14,7 @@ namespace Map {
 
 	namespace fsys = std::experimental::filesystem; // Holy fuck that's a long name
 
-	void init(); //Initialize archive library
+	void init(); //Initialize archive library12a''2'''''''';;''''''''''''''';;;;;;;;
 
 	void load(std::string path, std::string options = ""); // Load the map 
 

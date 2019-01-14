@@ -84,7 +84,7 @@ std::vector<Vertex> Luarium::calcVertex(const std::vector<float> &verticies, con
 	return v;
 }
 
-void Luarium::log(std::string message, int severity, const char* outputfile){
+void Luarium::log(std::string message, short int severity, const char* outputfile){
 	std::fstream file(outputfile, std::fstream::out);
 
 	char out[80];
@@ -94,13 +94,13 @@ void Luarium::log(std::string message, int severity, const char* outputfile){
 	std::string sev;
 	switch(severity){
 		case 1:
-			sev = "[?] ";
+			sev = "[?] "; // Info or message
 		case 2:
-			sev = "[!] ";
+			sev = "[!] "; // Warning, couldn't find model or texture file
 		case 3:
-			sev = "[!!] ";
+			sev = "[!!] "; // Error, a GL error occured
 		case 4:
-			sev = "[!!!] ";
+			sev = "[!!!] "; // Critical Error, the engine is going down 
 		default:
 			sev = "";
 	}

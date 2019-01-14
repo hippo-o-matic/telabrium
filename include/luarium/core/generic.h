@@ -45,7 +45,9 @@ namespace Luarium{
 
 	std::vector<Vertex> calcVertex(const std::vector<float> &verticies, const std::vector<float> &texcoords = {});
 
-	void log(std::string message, int severity = 0, const char* outputfile = "tests/logs/log.txt");
+	void log(std::string message, short int severity = 0, const char* outputfile = "tests/logs/log.txt");
+
+
 
 	const std::vector<float> cubeVerts = {
 		// positions          

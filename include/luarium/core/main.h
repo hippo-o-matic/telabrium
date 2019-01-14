@@ -23,10 +23,10 @@
 #include "luarium/core/generic.h"
 #include "luarium/devices/skybox.h"
 
-#include <archive.h>
+#define LUARIUM_MODE_DEBUG
 
-const char* SHADER_PATH_V = "shaders/Standard.vs";
-const char* SHADER_PATH_F = "shaders/Standard.fs";
+const char* SHADER_PATH_V = "shaders/Standard.vert";
+const char* SHADER_PATH_F = "shaders/Standard.frag";
 
 //0-Game is not running; 1-Game is running
 int gameState;
@@ -51,8 +51,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 
-void simpleConsole();
+void cleanup();
 
-void archiveTest(const char* in);
+void simpleConsole();
 
 #endif // LUARIUM_MAIN_H

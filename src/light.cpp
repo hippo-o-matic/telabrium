@@ -56,6 +56,8 @@ int SpotLight::idStep = 0;
 
 // Gather all the lights and send them to the shader
 void updateLights(Shader &shader) {
+	shader.use();
+
 	shader.set("dirLight_AMT", (int) DirLight::list.size()); //Tell the shader how many lights to expect
 	shader.set("pointLight_AMT", (int) PointLight::list.size());
 	shader.set("spotLight_AMT", (int) SpotLight::list.size());
@@ -74,6 +76,7 @@ void updateLights(Shader &shader) {
 		shader.set("spotLights[" + id + "].cutOff", glm::cos(glm::radians(e->CutOff)));
 		shader.set("spotLights[" + id + "].outerCutOff", glm::cos(glm::radians(e->OuterCutOff)));
 	}
+
 	for (auto& e : DirLight::list) {
 		std::string id = std::to_string(e->id);
 		shader.set("dirLights[" + id + "].direction", glm::radians(e->Rotation));
@@ -81,6 +84,7 @@ void updateLights(Shader &shader) {
 		shader.set("dirLights[" + id + "].diffuse", e->Diffuse);
 		shader.set("dirLights[" + id + "].specular", e->Specular);
 	}
+
 	for (auto& e : PointLight::list) {
 		std::string id = std::to_string(e->id);
 		shader.set("pointLights[" + id + "].position", e->Position);
@@ -96,5 +100,9 @@ void updateLights(Shader &shader) {
 		e->bulb->Rotation = e->Rotation;
 		e->bulb->Scale = e->Scale;
 //		e->bulb->Draw(shader);
+	}
+	GLenum err;
+	if((err = glGetError()) != GL_NO_ERROR){
+		std::cerr << "GL Error: \"" << err << "\"" << std::endl;
 	}
 } 

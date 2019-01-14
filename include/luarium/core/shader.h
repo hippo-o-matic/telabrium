@@ -15,7 +15,7 @@ class Shader{
 public:
 	static Shader* ACTIVE;
 
-    unsigned int ID;
+    unsigned int ID = 0;
 	std::string vertexPath, fragmentPath, geometryPath;
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------

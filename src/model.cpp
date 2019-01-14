@@ -9,7 +9,7 @@ Model::Model(std::string const &path, glm::vec3 pos, glm::vec3 rot, glm::vec3 sc
 
 // draws the model, and thus all its meshes
 void Model::Draw(Shader &shader){
-	glm::mat4 model;
+	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, Position);
 	model = glm::rotate(model, glm::radians(Rotation.x), glm::vec3(1, 0, 0));
 	model = glm::rotate(model, glm::radians(Rotation.y), glm::vec3(0, 1, 0));
@@ -56,16 +56,11 @@ void Model::processNode(aiNode *node, const aiScene *scene){
 
 }
 
-Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
-{
+Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 	// data to fill
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
-	if((GLenum err = glGetError()) != GL_NO_ERROR){
-			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
-			Luarium::log("Texture failed to load at path: \"" + filename + "\"", 2);
-		}
 
 	// Walk through each of the mesh's vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -181,19 +176,12 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 }
 
 Texture loadTexture(const char* path, std::string &directory){
-	GLenum err;
-if((err = glGetError()) != GL_NO_ERROR){
-			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
-		}
 	std::string filename = std::string(path);
 	if (directory != "")
     	filename = directory + '/' + filename;
     Texture tex{0, "", filename};
 
     glGenTextures(1, &tex.id);
-	if((err = glGetError()) != GL_NO_ERROR){
-			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
-		}
 
     int width, height, nrComponents;
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
@@ -206,13 +194,7 @@ if((err = glGetError()) != GL_NO_ERROR){
         else if (nrComponents == 4)
 		    format = GL_RGBA;
 
-if((err = glGetError()) != GL_NO_ERROR){
-			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
-		}
 		glBindTexture(GL_TEXTURE_2D, tex.id);
-		if((err = glGetError()) != GL_NO_ERROR){
-			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
-		}
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -220,12 +202,17 @@ if((err = glGetError()) != GL_NO_ERROR){
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    } else {
+		GLenum err;
 		if((err = glGetError()) != GL_NO_ERROR){
 			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
 		}
-    } else {
 		Luarium::log("Texture failed to load at path: \"" + filename + "\"", 2);
     }
+	GLenum err;
+	err = glGetError();
+	std::cerr << "GL Error: \"" << err << "\"" << std::endl;
 
 	stbi_image_free(data);
     return tex;

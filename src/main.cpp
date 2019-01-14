@@ -12,7 +12,7 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-LuaFile test("lua/test.lua");
+//LuaFile test("lua/test.lua");
 
 // timing
 float deltaTime = 0.0f;
@@ -54,34 +54,45 @@ int main(){
 		return -1;
 	}
 
+	#ifdef LUARIUM_MODE_DEBUG
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+
+	GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+	if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) //Only enable debug output if our version of GL supports it
+	{
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
+		glDebugMessageCallback(debug_callback, nullptr);
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+	}
+	
+	#endif
+
+
 	//debug settings
 	//------------------------------
 	std::cout<<glGetString(GL_VERSION)<<std::endl;
-	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(debug_callback, 0);
 
 	// configure global opengl state
 	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glEnable(GL_CULL_FACE);
+//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//	glEnable(GL_CULL_FACE);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	std::cout<<test.get<std::string>("teststring")<<std::endl;
+
+//	std::cout<<test.get<std::string>("teststring")<<std::endl;
 
 	// build and compile shaders
-	Shader beh(SHADER_PATH_V, SHADER_PATH_F);
-	Shader::ACTIVE = &beh;
-
-	Shader skyboxShader("shaders/skybox.vs", "shaders/skybox.fs");
+	Shader::ACTIVE = new Shader(SHADER_PATH_V, SHADER_PATH_F);
+//	Shader skyboxShader("shaders/skybox.vert", "shaders/skybox.frag");
 
 	Camera::ACTIVE = new Camera(glm::vec3(0,0,0));
 
 	// load models
-	Model aa("model/red.stl", glm::vec3(1,1,0));
-	Model waah("model/waa.dae", glm::vec3(0,-1,-4));
+	Model aa("model/boxtest.obj", glm::vec3(0,0,0));
+//	Model waah("model/waa.dae", glm::vec3(0,-1,-4));
 	std::string heck = "textures";
 //	Mesh bab(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("shadertest.png", heck));
 
@@ -96,19 +107,15 @@ int main(){
 		"back.jpg"
 	};
 	
-	std::string temp = "textures";
-
 //	Skybox skybox(loadCubemap(skyFaces, "textures/skybox"));
 
 	gameState = 1;
-	Luarium::log("test");
 
 	// render loop
 	// -----------
 	while (gameState) {
 		if(glfwWindowShouldClose(window))
 			gameState = 0;
-		
 
 		// per-frame time logic
 		// --------------------
@@ -131,20 +138,17 @@ int main(){
 		Shader::ACTIVE->use();
 		Shader::ACTIVE->set("ViewPos", Camera::ACTIVE->Position);
 		updateLights(*Shader::ACTIVE);
-		
 
 		// view/projection transformations
 		Shader::ACTIVE->set("projection", Camera::ACTIVE->projection);
-		Shader::ACTIVE->set("view", Camera::ACTIVE->view);
+		Shader::ACTIVE->set("view", Camera::ACTIVE->GetViewMatrix());
 
 	//	floor.Draw(&Shader::ACTIVE);
 		aa.Draw(*Shader::ACTIVE);
-		waah.Draw(*Shader::ACTIVE);
+//		waah.Draw(*Shader::ACTIVE);
 		// draw skybox last
-	//	bab.Draw(*Shader::ACTIVE);
+//		bab.Draw(*Shader::ACTIVE);
 //		skybox.Draw(skyboxShader);
-
-		aa.Rotation.x += 2*deltaTime;
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -154,8 +158,7 @@ int main(){
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
-	glfwDestroyWindow(window);
-	glfwTerminate();
+	cleanup();
 	return 0;
 }
 
@@ -228,40 +231,53 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 }
 
 void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam){
-	std::cout << "ree" <<std::endl;
-	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+    // useless error codes
+    if(id == 131169 || id == 131185 || id == 131218 || id == 131204) return; 
+
+    std::string output;
+	short int sev;
+
+    switch (source)
+    {
+        case GL_DEBUG_SOURCE_API:             output += "API"; break;
+        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   output += "Window System"; break;
+        case GL_DEBUG_SOURCE_SHADER_COMPILER: output += "Shader Compiler"; break;
+        case GL_DEBUG_SOURCE_THIRD_PARTY:     output += "Third Party"; break;
+        case GL_DEBUG_SOURCE_APPLICATION:     output += "Application"; break;
+        case GL_DEBUG_SOURCE_OTHER:           output += "Other"; break;
+    } output += " ";
+
+    switch (type)
+    {
+        case GL_DEBUG_TYPE_ERROR:               output += "Error"; break;
+        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: output += "Deprecated Behaviour"; break;
+        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  output += "Undefined Behaviour"; break;
+        case GL_DEBUG_TYPE_PORTABILITY:         output += "Portability"; break;
+        case GL_DEBUG_TYPE_PERFORMANCE:         output += "Performance"; break;
+        case GL_DEBUG_TYPE_MARKER:              output += "Marker"; break;
+        case GL_DEBUG_TYPE_PUSH_GROUP:          output += "Push Group"; 
+        case GL_DEBUG_TYPE_POP_GROUP:           output += "Pop Group"; break;
+        case GL_DEBUG_TYPE_OTHER:               output += "Other"; break;
+	}
+    
+    switch (severity)
+    {
+        case GL_DEBUG_SEVERITY_HIGH:         sev = 4; break;
+        case GL_DEBUG_SEVERITY_MEDIUM:       sev = 3; break;
+        case GL_DEBUG_SEVERITY_LOW:          sev = 2; break;
+        case GL_DEBUG_SEVERITY_NOTIFICATION: sev = 1; break;
+    }
+
+	Luarium::log("GL Error: " + output , sev);
 }
 
-std::vector<std::string> GetFirstNMessages(GLuint numMsgs)
-{
-	GLint maxMsgLen = 0;
-	glGetIntegerv(GL_MAX_DEBUG_MESSAGE_LENGTH, &maxMsgLen);
+void cleanup() {
+	delete Shader::ACTIVE;
+	delete Camera::ACTIVE;
+	//Map::cleanup();
 
-	std::vector<GLchar> msgData(numMsgs * maxMsgLen);
-	std::vector<GLenum> sources(numMsgs);
-	std::vector<GLenum> types(numMsgs);
-	std::vector<GLenum> severities(numMsgs);
-	std::vector<GLuint> ids(numMsgs);
-	std::vector<GLsizei> lengths(numMsgs);
-
-	GLuint numFound = glGetDebugMessageLog(numMsgs, msgData.size(), &sources[0], &types[0], &ids[0], &severities[0], &lengths[0], &msgData[0]);
-
-	sources.resize(numFound);
-	types.resize(numFound);
-	severities.resize(numFound);
-	ids.resize(numFound);
-	lengths.resize(numFound);
-
-	std::vector<std::string> messages;
-	messages.reserve(numFound);
-
-	std::vector<GLchar>::iterator currPos = msgData.begin();
-	for(size_t msg = 0; msg < lengths.size(); ++msg)
-	{
-		messages.push_back(std::string(currPos, currPos + lengths[msg] - 1));
-		currPos = currPos + lengths[msg];
-	}
-	return messages;
+	glfwDestroyWindow(window);
+	glfwTerminate();
 }
 
 void simpleConsole() {
@@ -276,11 +292,5 @@ void simpleConsole() {
 	}
 	if(command[0] == "quit")
 		gameState = 0;
-	if(command[0] == "log"){
-		std::vector<std::string> m;
-		m = GetFirstNMessages(100);
-		for (int i=0; i <=100; i++)
-			std::cout<<m[i] <<std::endl;
-	}
 	if(command[0] == "rllevel"){} 
 }

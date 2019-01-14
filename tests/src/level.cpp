@@ -69,7 +69,7 @@ void Map::clear_cache(std::string path){
 void Map::cleanup(std::string options){
 	archive_read_free(read);
 	archive_write_free(write);
-	if(options.find("CLEAR_MAPS_ON_CLEANUP")){
+	if(!options.find("KEEP_MAPS_ON_CLEANUP")){
 		Map::clear_cache();
 	}
 }

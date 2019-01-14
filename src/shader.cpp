@@ -10,6 +10,7 @@ Shader::Shader(const char* vPath, const char* fPath, const char* gPath){
 void Shader::build(){
 	if(ID)
 		glDeleteProgram(ID);
+
 	// 1. retrieve the vertex/fragment source code from filePath
 	std::string vertexCode;
 	std::string fragmentCode;
