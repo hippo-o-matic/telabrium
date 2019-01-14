@@ -1,4 +1,4 @@
-#version 330 core
+#version 450 core
 out vec4 FragColor;
 
 struct Material {
@@ -93,18 +93,18 @@ void main() {
 		lighting += CalcDirLight(dirLights[i], norm, ViewDir);
 	}
 	for (int i = 0; i < pointLight_AMT; i++) {
-//		lighting += CalcPointLight(pointLights[i], norm, FragPos, ViewDir);
+		lighting += CalcPointLight(pointLights[i], norm, FragPos, ViewDir);
 	}
 	for (int i = 0; i < spotLight_AMT; i++) {
-//		lighting += CalcSpotLight(spotLights[i], norm, FragPos, ViewDir);
+		lighting += CalcSpotLight(spotLights[i], norm, FragPos, ViewDir);
 	}
 
-	vec4 texColor = vec4(pow((vec4(lighting, 1.0)).rgba, vec4(1.0 / gamma)));
+//	vec4 texColor = vec4(pow((vec4(lighting, 1.0)).rgba, vec4(1.0 / gamma)));
 
 //	vec3 reflection = CalcReflection(norm, FragPos, ViewPos, mat.shininess);
 //	vec3 refraction = CalcRefraction(norm, FragPos, ViewPos, mat.IOR);
 
-	FragColor = vec4(0,255,0,0);
+	FragColor = vec4(100,0,0,100);
 //  FragColor.rgb = texColor.rgb * texColor.a + reflection.rgb;
 }
 
