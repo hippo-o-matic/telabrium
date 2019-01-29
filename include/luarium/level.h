@@ -7,8 +7,8 @@
 #include <experimental/filesystem>
 #include <archive.h>
 
-#include "luarium/core/object.h"
-#include "luarium/core/generic.h"
+#include "luarium/object.h"
+#include "luarium/generic.h"
 
 namespace Map {
 

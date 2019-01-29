@@ -29,7 +29,7 @@ $(BUILD_PATH)/bin/$(TARGET): $(OBJ)
 	@-$(MKDIR_P) $(dir $@)
 	@-echo "Linking..."
 	@-$(CXX) $(CPPFLAGS) $(LFLAGS) $^ -o $@ -I$(INCLUDE_PATH) -L$(LIB_PATH) $(LIBS)
-	@-echo "\n****************************************\nSucessfully built $(TARGET)\n****************************************"
+	@-echo "Done with $(TARGET)"
 
 $(BUILD_PATH)/%.cpp.o: $(SRC_PATH)/%.cpp
 	$(CXX) $(CPPFLAGS) -c $< -I$(INCLUDE_PATH) -o $@

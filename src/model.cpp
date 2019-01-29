@@ -1,5 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include "luarium/core/model.h"
+#include "luarium/model.h"
 
 // constructor, expects a filepath to a 3D model.
 Model::Model(std::string const &path, glm::vec3 pos, glm::vec3 rot, glm::vec3 scl, bool gamma) : gammaCorrection(gamma){
@@ -210,9 +210,6 @@ Texture loadTexture(const char* path, std::string &directory){
 		}
 		Luarium::log("Texture failed to load at path: \"" + filename + "\"", 2);
     }
-	GLenum err;
-	err = glGetError();
-	std::cerr << "GL Error: \"" << err << "\"" << std::endl;
 
 	stbi_image_free(data);
     return tex;

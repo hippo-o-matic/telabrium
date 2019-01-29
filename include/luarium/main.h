@@ -13,15 +13,15 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "luarium/core/shader.h"
-#include "luarium/core/camera.h"
-#include "luarium/core/model.h"
-#include "luarium/core/light.h"
-//#include "luarium/core/text.h"
-//#include "luarium/core/rigidbody.h"
-#include "luarium/core/luafile.h"
-#include "luarium/core/generic.h"
-#include "luarium/devices/skybox.h"
+#include "luarium/shader.h"
+#include "luarium/camera.h"
+#include "luarium/model.h"
+#include "luarium/light.h"
+//#include "luarium/text.h"
+//#include "luarium/rigidbody.h"
+#include "luarium/luafile.h"
+#include "luarium/generic.h"
+#include "luarium/skybox.h"
 
 #define LUARIUM_MODE_DEBUG
 

@@ -1,4 +1,4 @@
-#include "luarium/core/level.h"
+#include "luarium/level.h"
 
 void Map::init() {
 	read = archive_read_new();

@@ -10,7 +10,7 @@
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"
 
-#include "luarium/core/generic.h"
+#include "luarium/generic.h"
 
 class LuaFile{
 public:

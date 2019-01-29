@@ -7,8 +7,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "luarium/core/shader.h"
-#include "luarium/core/object.h"
+#include "luarium/shader.h"
+#include "luarium/object.h"
 
 struct Character {
 	GLuint     TextureID;  // ID handle of the glyph texture

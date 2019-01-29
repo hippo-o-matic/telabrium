@@ -1,4 +1,4 @@
-#include "luarium/core/shader.h"
+#include "luarium/shader.h"
 
 Shader::Shader(const char* vPath, const char* fPath, const char* gPath){
 	vertexPath = vPath;

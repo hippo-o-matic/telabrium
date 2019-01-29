@@ -1,4 +1,4 @@
-#include "luarium/core/camera.h"
+#include "luarium/camera.h"
 
 float Camera::YAW = -90.0f;
 float Camera::PITCH = 0.0f;
@@ -6,7 +6,6 @@ float Camera::ROLL = 0.0f;
 float Camera::SPEED = 2.5f;
 float Camera::SENSITIVTY = 0.1f;
 float Camera::FOV = 60.0f;
-
 //Generic Camera Class
 //--------------------
 
@@ -18,7 +17,6 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float r
 	Rotation.x = pitch;
 	Rotation.z = roll;
 	updateCameraVectors();
-	projection = glm::perspective(glm::radians(fov), Aspect, 0.1f, 100.0f);
 }
 // Scalar Constructor
 Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, float roll) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), fov(FOV) {
@@ -28,11 +26,14 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
 	Rotation.x = pitch;
 	Rotation.z = roll;
 	updateCameraVectors();
-	projection = glm::perspective(glm::radians(fov), Aspect, 0.1f, 100.0f);
 }
 // Returns the view matrix calculated using Eular Angles and the LookAt Matrix
 glm::mat4 Camera::GetViewMatrix(){
 	return glm::lookAt(Position, Position + Front, Up);
+}
+
+glm::mat4 Camera::GetProjectionMatrix(float aspect){
+	return glm::perspective(glm::radians(Camera::ACTIVE->fov), aspect, 0.1f, 100.0f);
 }
 	// Calculates the front vector from the Camera's (updated) Eular Angles
 void Camera::updateCameraVectors(){

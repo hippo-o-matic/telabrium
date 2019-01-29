@@ -9,7 +9,7 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
-#include "luarium/core/mesh.h"
+#include "luarium/mesh.h"
 
 class Model : public Object{
 public:

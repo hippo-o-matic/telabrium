@@ -5,9 +5,9 @@
 #include <vector>
 #include <memory>
 
-#include "luarium/core/object.h"
-#include "luarium/core/shader.h"
-#include "luarium/core/model.h"
+#include "luarium/object.h"
+#include "luarium/shader.h"
+//#include "luarium/model.h"
 
 class Light : public Object {
 public:
@@ -64,7 +64,7 @@ public:
 	static std::vector<PointLight*> list;
 	int id = 0;
 
-	Model* bulb;
+//	Model* bulb;
 
 private:
 	static int idStep;

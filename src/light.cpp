@@ -1,4 +1,4 @@
-#include "luarium/core/light.h"
+#include "luarium/light.h"
 
 Light::Light(){};
 
@@ -96,9 +96,9 @@ void updateLights(Shader &shader) {
 		shader.set("pointLights[" + id + "].quadratic", e->Quadratic);
 
 		// Update the model for the light
-		e->bulb->Position = e->Position;
-		e->bulb->Rotation = e->Rotation;
-		e->bulb->Scale = e->Scale;
+//		e->bulb->Position = e->Position;
+//		e->bulb->Rotation = e->Rotation;
+//		e->bulb->Scale = e->Scale;
 //		e->bulb->Draw(shader);
 	}
 	GLenum err;

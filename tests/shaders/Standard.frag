@@ -1,4 +1,4 @@
-#version 450 core
+#version 330 core
 out vec4 FragColor;
 
 struct Material {
@@ -72,7 +72,7 @@ uniform spotLight spotLights[MAX_SPOTLIGHT];
 
 uniform Material mat;
 
-uniform sampler2D texture_diffuse;
+uniform sampler2D texture_diffuse1; //Need to either use this instead of mat.diffuse or change the mesh file
 uniform samplerCube skybox;
 
 // function prototypes
@@ -99,12 +99,12 @@ void main() {
 		lighting += CalcSpotLight(spotLights[i], norm, FragPos, ViewDir);
 	}
 
-//	vec4 texColor = vec4(pow((vec4(lighting, 1.0)).rgba, vec4(1.0 / gamma)));
+	vec4 texColor = vec4(pow((vec4(lighting, 1.0)).rgba, vec4(1.0 / gamma)));
 
 //	vec3 reflection = CalcReflection(norm, FragPos, ViewPos, mat.shininess);
 //	vec3 refraction = CalcRefraction(norm, FragPos, ViewPos, mat.IOR);
 
-	FragColor = vec4(100,0,0,100);
+	FragColor = texColor;
 //  FragColor.rgb = texColor.rgb * texColor.a + reflection.rgb;
 }
 

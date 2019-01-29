@@ -9,7 +9,7 @@
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
-#include "luarium/core/generic.h"
+#include "luarium/generic.h"
 
 class Shader{
 public:

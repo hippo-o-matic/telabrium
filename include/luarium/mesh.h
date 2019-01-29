@@ -12,9 +12,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "luarium/core/shader.h"
-#include "luarium/core/object.h"
-#include "luarium/core/generic.h"
+#include "luarium/shader.h"
+#include "luarium/object.h"
+#include "luarium/generic.h"
 
 class Mesh {
 public:

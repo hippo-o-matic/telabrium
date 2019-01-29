@@ -1,4 +1,4 @@
-#include "luarium/devices/skybox.h"
+#include "luarium/skybox.h"
 
 Skybox::Skybox(Texture cubemap) : Mesh(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, cubemap) {
 	setupMesh();
