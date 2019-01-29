@@ -1,12 +1,11 @@
-﻿#include "luarium/core/main.h"
+﻿#include "luarium/main.h"
 
-//void GLAPIENTRY glDebugFunc(GLenum source​, GLenum type​, GLuint id​, GLenum severity​, GLsizei length​, const GLchar* message​, const void* userParam);
 Camera* Camera::ACTIVE = NULL;
 Shader* Shader::ACTIVE = NULL;
 
 // settings 
-const unsigned int SCR_WIDTH = 1600;
-const unsigned int SCR_HEIGHT = 900;
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 450;
 
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -77,7 +76,7 @@ int main(){
 	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
 //	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//	glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -86,14 +85,16 @@ int main(){
 
 	// build and compile shaders
 	Shader::ACTIVE = new Shader(SHADER_PATH_V, SHADER_PATH_F);
-//	Shader skyboxShader("shaders/skybox.vert", "shaders/skybox.frag");
+	Shader skyboxShader("shaders/skybox.vert", "shaders/skybox.frag");
 
 	Camera::ACTIVE = new Camera(glm::vec3(0,0,0));
+	Camera::ACTIVE->Aspect = (float)SCR_WIDTH / (float)SCR_HEIGHT;
+
 
 	// load models
-	Model aa("model/boxtest.obj", glm::vec3(0,0,0));
+	Model aa("model/s/nanosuit.obj", glm::vec3(0,0,0), glm::vec3(0,0,0), glm::vec3(0.2,0.2,0.2));
 //	Model waah("model/waa.dae", glm::vec3(0,-1,-4));
-	std::string heck = "textures";
+	// std::string heck = "textures";
 //	Mesh bab(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("shadertest.png", heck));
 
 	DirLight someLight(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -132,7 +133,6 @@ int main(){
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		Camera::ACTIVE->Aspect = (float)SCR_WIDTH / (float)SCR_HEIGHT;
 
 		// don't forget to enable shader before setting uniforms
 		Shader::ACTIVE->use();
@@ -140,7 +140,7 @@ int main(){
 		updateLights(*Shader::ACTIVE);
 
 		// view/projection transformations
-		Shader::ACTIVE->set("projection", Camera::ACTIVE->projection);
+		Shader::ACTIVE->set("projection", Camera::ACTIVE->GetProjectionMatrix(SCR_WIDTH / SCR_HEIGHT));
 		Shader::ACTIVE->set("view", Camera::ACTIVE->GetViewMatrix());
 
 	//	floor.Draw(&Shader::ACTIVE);
@@ -268,7 +268,7 @@ void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsi
         case GL_DEBUG_SEVERITY_NOTIFICATION: sev = 1; break;
     }
 
-	Luarium::log("GL Error: " + output , sev);
+	Luarium::log("OpenGL Error: " + output , sev);
 }
 
 void cleanup() {
