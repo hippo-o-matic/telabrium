@@ -11,6 +11,7 @@
 
 #include "luarium/mesh.h"
 
+/// A class for transitioning between the Assimp Model Loader and the native mesh class
 class Model : public Object{
 public:
 	/*  Model Data */

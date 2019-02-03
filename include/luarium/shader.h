@@ -11,6 +11,7 @@
 #include "glm/glm.hpp"
 #include "luarium/generic.h"
 
+/// A class for interacting with an OpenGL shader
 class Shader{
 public:
 	static Shader* ACTIVE;
