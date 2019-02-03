@@ -23,24 +23,25 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Text
 // render the mesh
 void Mesh::Draw(Shader &shader){
 	// bind appropriate textures
-	unsigned int diffuseNr = 1, specularNr = 1, normalNr = 1, heightNr = 1, cubemapNr = 1;
+	unsigned int diffuseNr = 0, specularNr = 0, normalNr = 0, heightNr = 0, cubemapNr = 0;
 	for (unsigned int i = 0; i < textures.size(); i++){
 		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
 		std::string number;// retrieve texture number (the N in diffuse_textureN)
+		// check the textures type
 		std::string type = textures[i].type;
 		if (type == "texture_diffuse")
 			number = std::to_string(diffuseNr++);
 		else if (type == "texture_specular")
-			number = std::to_string(specularNr++); // transfer unsigned int to stream
+			number = std::to_string(specularNr++); 
 		else if (type == "texture_normal")
-			number = std::to_string(normalNr++); // transfer unsigned int to stream
+			number = std::to_string(normalNr++); 
 		else if (type == "texture_height")
-			number = std::to_string(heightNr++); // transfer unsigned int to stream
+			number = std::to_string(heightNr++); 
 		else if (type == "texture_cubemap"){
 			number = std::to_string(cubemapNr++);
 		}
 		// now set the sampler to the correct texture unit
-		glUniform1i(glGetUniformLocation(shader.ID, (type + number).c_str()), i);
+		shader.set(("mat." + type).c_str(), (int)i);
 		// and finally bind the texture
 		if (type != "texture_cubemap")
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
@@ -49,6 +50,7 @@ void Mesh::Draw(Shader &shader){
 //		glBindTexture(GL_TEXTURE_CUBE_MAP, *Skybox::env_map);
 	}	
 
+	// Set additonal material values
 	shader.set("mat.diffuse_color", material.diffuse_color);
 	shader.set("mat.specular_color", material.specular_color);
 	shader.set("mat.ambient_color", material.ambient_color);

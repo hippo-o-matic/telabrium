@@ -16,6 +16,7 @@
 #include "luarium/object.h"
 #include "luarium/generic.h"
 
+/// A class for storing vertex, texture, and material data to be drawn as a 3d object
 class Mesh {
 public:
 	/*  Mesh Data  */
@@ -29,7 +30,7 @@ public:
 	// constructor
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, RenderMat mat = {});
 
-	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Texture tex, RenderMat mat = {});
+	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Texture tex = {}, RenderMat mat = {});
 
 	// render the mesh
 	void Draw(Shader &shader);
