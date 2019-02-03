@@ -7,7 +7,7 @@
 
 #include "luarium/object.h"
 #include "luarium/shader.h"
-//#include "luarium/model.h"
+#include "luarium/model.h"
 
 class Light : public Object {
 public:
@@ -26,8 +26,8 @@ class DirLight : public Light {
 public:
 	DirLight(
 		glm::vec3 dir = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 amb = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3 dif = glm::vec3(0.08f, 0.08f, 0.08f),
+		glm::vec3 amb = glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3 dif = glm::vec3(0.8f, 0.8f, 0.8f),
 		glm::vec3 spec = glm::vec3(1.0f, 1.0f, 1.0f));
 
 	DirLight(const DirLight &obj);
@@ -46,8 +46,8 @@ class PointLight : public Light {
 public:
 	PointLight(
 		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 amb = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3 dif = glm::vec3(0.08f, 0.08f, 0.08f),
+		glm::vec3 amb = glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3 dif = glm::vec3(0.8f, 0.8f, 0.8f),
 		glm::vec3 spec = glm::vec3(1.0f, 1.0f, 1.0f),
 		float constant = 1.0f,
 		float lin = 0.9f,
@@ -64,7 +64,7 @@ public:
 	static std::vector<PointLight*> list;
 	int id = 0;
 
-//	Model* bulb;
+	Model* bulb;
 
 private:
 	static int idStep;
@@ -76,8 +76,8 @@ public:
 	SpotLight(
 		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3 rot = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 amb = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3 dif = glm::vec3(0.08f, 0.08f, 0.08f),
+		glm::vec3 amb = glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3 dif = glm::vec3(0.8f, 0.8f, 0.8f),
 		glm::vec3 spec = glm::vec3(1.0f, 1.0f, 1.0f),
 		float constant = 1.0f,
 		float lin = 0.9f,
@@ -104,6 +104,6 @@ private:
 
 
 // Gather all the lights and send them to the shader
-void updateLights(Shader &shader);
+void updateLights(Shader &shader, Shader* bulbShader = nullptr);
 
 #endif

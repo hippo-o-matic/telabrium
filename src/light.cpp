@@ -10,7 +10,7 @@ DirLight::DirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec){
 }
 
 DirLight::~DirLight() {
-	list[id] = NULL; //Remove refrence from the list so the shader doesn't recieve outdated or garbage data
+	list[id] = NULL; // Remove refrence from the list so the shader doesn't recieve outdated or garbage data
 }
 
 std::vector<DirLight*> DirLight::list; // Declare the list and idStep out here so it becomes static fully
@@ -23,12 +23,12 @@ PointLight::PointLight(glm::vec3 pos, glm::vec3 amb, glm::vec3 dif, glm::vec3 sp
 	Constant = constant; Linear = lin; Quadratic = quad;
 	id = idStep++;
 	list.push_back(this);
-//	Model temp("models/cube.obj");
-//	bulb = &temp;
+	bulb = new Model("model/cube.obj");
 }
 
 PointLight::~PointLight() {
 	list[id] = NULL;
+	delete bulb;
 }
 
 std::vector<PointLight*> PointLight::list;
@@ -55,14 +55,14 @@ int SpotLight::idStep = 0;
 
 
 // Gather all the lights and send them to the shader
-void updateLights(Shader &shader) {
+void updateLights(Shader &shader, Shader* bulbShader) {
 	shader.use();
 
-	shader.set("dirLight_AMT", (int) DirLight::list.size()); //Tell the shader how many lights to expect
+	shader.set("dirLight_AMT", (int) DirLight::list.size()); // Tell the shader how many lights to expect
 	shader.set("pointLight_AMT", (int) PointLight::list.size());
 	shader.set("spotLight_AMT", (int) SpotLight::list.size());
 
-	//Go through each light in the vector and set the attributes to its corresponding id in the shader's array of lights
+	// Go through each light in the vector and set the attributes to its corresponding id in the shader's array of lights
 	for (auto& e : SpotLight::list) { 
 		std::string id = std::to_string(e->id);
 		shader.set("spotLights[" + id + "].position", e->Position);
@@ -96,10 +96,13 @@ void updateLights(Shader &shader) {
 		shader.set("pointLights[" + id + "].quadratic", e->Quadratic);
 
 		// Update the model for the light
-//		e->bulb->Position = e->Position;
-//		e->bulb->Rotation = e->Rotation;
-//		e->bulb->Scale = e->Scale;
-//		e->bulb->Draw(shader);
+		if (bulbShader){
+			e->bulb->Position = e->Position;
+			e->bulb->Rotation = e->Rotation;
+			e->bulb->Scale = e->Scale * glm::vec3(0.05);
+			bulbShader->set("color", e->Specular);
+			e->bulb->Draw(*bulbShader);
+		}
 	}
 	GLenum err;
 	if((err = glGetError()) != GL_NO_ERROR){
