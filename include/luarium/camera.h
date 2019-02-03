@@ -52,7 +52,7 @@ public:
 
 	// Returns the view matrix calculated using Eular Angles and the LookAt Matrix
 	glm::mat4 GetViewMatrix();
-	glm::mat4 GetProjectionMatrix(float aspect);
+	glm::mat4 GetProjectionMatrix();
 
 	void ProcessKeyboard(Camera_Movement direction, float deltaTime);
 

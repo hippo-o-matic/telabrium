@@ -32,8 +32,8 @@ glm::mat4 Camera::GetViewMatrix(){
 	return glm::lookAt(Position, Position + Front, Up);
 }
 
-glm::mat4 Camera::GetProjectionMatrix(float aspect){
-	return glm::perspective(glm::radians(Camera::ACTIVE->fov), aspect, 0.1f, 100.0f);
+glm::mat4 Camera::GetProjectionMatrix(){
+	return glm::perspective(glm::radians(fov), Aspect, 0.1f, 100.0f);
 }
 	// Calculates the front vector from the Camera's (updated) Eular Angles
 void Camera::updateCameraVectors(){
