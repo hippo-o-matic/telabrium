@@ -89,8 +89,8 @@ void Shader::build(){
 }
 
 Shader::~Shader(){
-	if(ID)
-		glDeleteProgram(ID); //Remove the program from memory
+//	if(ID)
+//		glDeleteProgram(ID); //Remove the program from memory
 }
 // activate the shader
 // ------------------------------------------------------------------------

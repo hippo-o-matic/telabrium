@@ -5,7 +5,7 @@ Object::Object(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl){
 }
 
 Object::~Object(){
-	if (parent != NULL){
+	if (parent != nullptr){
 		std::vector<Object*>* vec = &parent->components; // Get a simplified pointer to the parents components
 		vec->erase(std::remove(vec->begin(), vec->end(), this), vec->end()); // Hunt down and kill itself from the parent vector
 		parent = NULL;
