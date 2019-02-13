@@ -89,6 +89,12 @@ int main(){
 	Camera::ACTIVE->Aspect = 1;
 
 
+
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
 	// load models
 	Model aa("model/s/nanosuit.obj", glm::vec3(0,0,0), glm::vec3(0,0,0), glm::vec3(0.2,0.2,0.2));
 //	Model box("model/cube.obj", glm::vec3(2,1,0));

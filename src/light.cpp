@@ -100,7 +100,7 @@ void updateLights(Shader &shader, Shader* bulbShader) {
 			e->bulb->Position = e->Position;
 			e->bulb->Rotation = e->Rotation;
 			e->bulb->Scale = e->Scale * glm::vec3(0.05);
-			bulbShader->set("color", e->Specular);
+			bulbShader->set("color", glm::vec3(1));
 			e->bulb->Draw(*bulbShader);
 		}
 	}

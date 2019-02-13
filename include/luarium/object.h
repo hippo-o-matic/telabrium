@@ -38,7 +38,7 @@ public:
 
 
 protected:
-	Object* parent;
+	Object* parent = nullptr;
 	std::vector<Object*> components;
 
 	glm::vec3 P_pos; // The position relative to the parent, if any
