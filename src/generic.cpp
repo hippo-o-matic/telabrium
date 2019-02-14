@@ -6,7 +6,7 @@ std::vector<std::string> Luarium::segment(std::string &in, char seperator) {
 	size_t last = 0;
 	std::vector<std::string> output;
 	if (!in.empty()) do {
-		pos = in.find(seperator, last);
+		pos = in.find(seperator, last + 1);
 		output.push_back(in.substr(last, pos - last));
 		last = pos;
 	} while (pos != std::string::npos);
@@ -16,20 +16,20 @@ std::vector<std::string> Luarium::segment(std::string &in, char seperator) {
 std::vector<Vertex> Luarium::calcVertex(const std::vector<float> &verticies, const std::vector<float> &texcoords) {
 	std::vector<Vertex> v;
 	
-	//Establish some empty Vertex structs
-	for(long unsigned int i=0; i < verticies.size(); i++){
+	// Establish some empty Vertex structs
+	for(long unsigned int i=0; i < verticies.size() / 3; i++){
 		v.push_back(Vertex()); 
 	}
 
-	// Put all the vertex coords into a vertex vector
-	for(long unsigned int i=0; i + 3 <= verticies.size(); i+=3) {
-		v[i].Position = glm::vec3(verticies[i], verticies[i+1], verticies[i+2]);
+	// Put all the vertex coords into the vertex vector
+	for(long unsigned int i = 0, j = 0; i <= v.size(); i++, j+=3) {
+		v[i].Position = glm::vec3(verticies[j], verticies[j+1], verticies[j+2]);
 	}
 
 	// Calculate vertex normals, 
-	for(long unsigned int i=0; i + 3 <= v.size(); i+=3){ //The i + 3 is to make sure we don't go past where there are values
-		glm::vec3 U(v[i+1].Position - v[i].Position);
-		glm::vec3 V(v[i+2].Position - v[i].Position);
+	for(long unsigned int i=0, j=0; i <= v.size(); i++, j+=3){ //The i + 3 is to make sure we don't go past where there are values
+		glm::vec3 U(v[j+1].Position - v[j].Position);
+		glm::vec3 V(v[j+2].Position - v[j].Position);
 
 		glm::vec3 N(
 			U.y*V.z - U.z*V.y,
@@ -38,8 +38,6 @@ std::vector<Vertex> Luarium::calcVertex(const std::vector<float> &verticies, con
 		);
  
 		v[i].Normal = N;
-		v[i+1].Normal = N;
-		v[i+2].Normal = N;
 	}
 
 	// Generate texcoords if there are none
