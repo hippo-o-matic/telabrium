@@ -20,7 +20,7 @@ OBJ := $(patsubst $(SRC_PATH)/%.cpp,$(BUILD_PATH)/%.cpp.o,$(OBJ))
 OBJ := $(patsubst $(SRC_PATH)/%.c,$(BUILD_PATH)/%.c.o,$(OBJ))
 
 #Ensure glfw is after GL
-LIBS = -lGL -lglfw -lassimp -lX11 -lpthread -lXrandr -lXi -ldl -llua5.3 -larchive 
+LIBS = -lGL -lglfw -lassimp -lX11 -lpthread -lXrandr -lXi -ldl -llua5.3 -larchive -lstdc++fs
 
 
 all: $(BUILD_PATH)/bin/$(TARGET)
