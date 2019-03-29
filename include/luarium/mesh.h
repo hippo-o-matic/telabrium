@@ -14,7 +14,7 @@
 
 #include "luarium/shader.h"
 #include "luarium/object.h"
-#include "luarium/generic.h"
+#include "luarium/utility.h"
 
 /// A class for storing vertex, texture, and material data to be drawn as a 3d object
 class Mesh {

@@ -8,13 +8,13 @@
 #include <archive.h>
 
 #include "luarium/object.h"
-#include "luarium/generic.h"
+#include "luarium/utility.h"
 
 namespace Map {
 
-	namespace fsys = std::experimental::filesystem; // Holy fuck that's a long name
+	namespace fsys = std::experimental::filesystem; // That's a long name
 
-	void init(); //Initialize archive library12a''2'''''''';;''''''''''''''';;;;;;;;
+	void init(); //Initialize archive library
 
 	void load(std::string path, std::string options = ""); // Load the map 
 

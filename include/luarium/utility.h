@@ -1,5 +1,5 @@
-#ifndef LUARIUM_GENERIC_H
-#define LUARIUM_GENERIC_H
+#ifndef LUARIUM_UTILITY_H
+#define LUARIUM_UTILITY_H
 
 #include <iostream>
 #include <vector>

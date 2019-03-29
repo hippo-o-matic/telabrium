@@ -1,15 +1,20 @@
-#include "luarium/generic.h"
+#include "luarium/utility.h"
 
 //Parses strings into a vector of strings seperated by the seperator character
 std::vector<std::string> Luarium::segment(std::string &in, char seperator) {
-	size_t pos = in.find(seperator); //Limits in to 512 characters, might want to change later
 	size_t last = 0;
+	size_t pos = 0; //Limits in to 512 characters, might want to change later
 	std::vector<std::string> output;
-	if (!in.empty()) do {
-		pos = in.find(seperator, last + 1);
+
+	if (in.empty()) 
+		return output;
+	
+	while (pos != std::string::npos) {
+		pos = in.find(seperator, last);
 		output.push_back(in.substr(last, pos - last));
-		last = pos;
-	} while (pos != std::string::npos);
+		last = pos + 1;
+	}
+
 	return output;
 }
 

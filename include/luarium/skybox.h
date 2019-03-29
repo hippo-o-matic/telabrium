@@ -1,7 +1,7 @@
 #ifndef LUARIUM_SKYBOX
 #define LUARIUM_SKYBOX
 
-#include "luarium/generic.h"
+#include "luarium/utility.h"
 #include "luarium/camera.h"
 #include "luarium/mesh.h"
 

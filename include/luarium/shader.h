@@ -9,7 +9,7 @@
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
-#include "luarium/generic.h"
+#include "luarium/utility.h"
 
 /// A class for interacting with an OpenGL shader
 class Shader{

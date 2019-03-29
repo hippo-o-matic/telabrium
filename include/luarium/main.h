@@ -20,8 +20,9 @@
 //#include "luarium/text.h"
 //#include "luarium/rigidbody.h"
 #include "luarium/luafile.h"
-#include "luarium/generic.h"
+#include "luarium/utility.h"
 #include "luarium/skybox.h"
+#include "luarium/archiver.h"
 
 #define LUARIUM_MODE_DEBUG
 
@@ -34,6 +35,8 @@ int gameState;
 GLFWwindow* window;
 
 //unsigned int* Skybox::env_map = nullptr;
+
+GLFWwindow* init_main_window();
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
