@@ -11,8 +11,6 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-//LuaFile test("lua/test.lua");
-
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -20,38 +18,12 @@ float lastFrame = 0.0f;
 int main(){
 	std::cout<<"Luarium b0.0.1"<<std::endl;
 
-	// glfw: initialize and configure
-	// ------------------------------
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	GLFWwindow* window = init_main_window();
 
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
-#endif
-
-	 // glfw window creation
- 	// --------------------
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "hippotest", NULL, NULL);
-	if (window == NULL) {
-		Luarium::log("Failed to create GLFW window", 4);
-		std::cin.get();
-		glfwTerminate();
+	if(window == nullptr)
 		return -1;
-	}
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
-	glfwSetScrollCallback(window, scroll_callback);
-
-	// glad: load all OpenGL function pointers
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		Luarium::log("Failed to initialize GLAD", 4);
-		return -1;
-	}
+	
+	std::cout<<glGetString(GL_VERSION)<<std::endl;
 
 	#ifdef LUARIUM_MODE_DEBUG
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
@@ -66,11 +38,6 @@ int main(){
 	}
 	
 	#endif
-
-
-	//debug settings
-	//------------------------------
-	std::cout<<glGetString(GL_VERSION)<<std::endl;
 
 	// configure global opengl state
 	// -----------------------------
@@ -88,18 +55,19 @@ int main(){
 	Camera::ACTIVE = new Camera(glm::vec3(0,0,0));
 	Camera::ACTIVE->Aspect = 1;
 
+	Luarium::Archive::pack("archive/test1", "archive/test1.hpak");
 
-
+	Luarium::Archive::unpack("archive/test1.hpak", "archive/test2/");
 
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
 	// load models
-	Model aa("model/s/nanosuit.obj", glm::vec3(0,0,0), glm::vec3(0,0,0), glm::vec3(0.2,0.2,0.2));
-//	Model box("model/cube.obj", glm::vec3(2,1,0));
+	Model aa("model/s/nanosuit.obj");
+	Model box("model/cube.obj", glm::vec3(2,1,0));
 	std::string heck = "textures";
-	Mesh bab(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("shadertest.png", heck));
+	// Mesh bab(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("shadertest.png", heck));
 
 	DirLight someLight(glm::vec3(70.0f, 0.0f, 20.0f), glm::vec3(0.001));
 	SpotLight spot(glm::vec3(0));
@@ -116,15 +84,6 @@ int main(){
 	Skybox skybox(loadCubemap(skyFaces, "textures/skybox"));
 
 	gameState = 1;
-
-	// for(unsigned int i; i < box.meshes[0].vertices.size(); i++){
-	// 	std::cout << box.meshes[0].vertices[i].Position.x << ',';
-	// 	std::cout << box.meshes[0].vertices[i].Position.y << ',';
-	// 	std::cout << box.meshes[0].vertices[i].Position.z << ',' << std::endl;
-	// }
-	// std::cout << "-------------------------------------\n";
-	// for(unsigned int i; i < box.meshes[0].indices.size(); i++)
-	// 	std::cout << box.meshes[0].indices[i] << std::endl;
 
 	// render loop
 	// -----------
@@ -164,12 +123,11 @@ int main(){
 		
 		updateLights(*Shader::ACTIVE, &unshaded);
 
-		// floor.Draw(&Shader::ACTIVE);
 		aa.Draw();
-		// box.Draw();
-		// waah.Draw(*Shader::ACTIVE);
+		box.Draw();
+		
 		// draw skybox last
-		bab.Draw(*Shader::ACTIVE);
+		// bab.Draw(*Shader::ACTIVE);
 		skybox.Draw(skyboxShader);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -183,8 +141,6 @@ int main(){
 	cleanup();
 	return 0;
 }
-
-/// GLFW Callbacks
 
 void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -212,6 +168,43 @@ void processInput(GLFWwindow *window) {
 		Shader::ACTIVE->build();
 		printf("[?] DEBUG: Reloaded core shader\n");
 	}
+}
+
+GLFWwindow* init_main_window() {
+	// glfw: initialize and configure
+	// ------------------------------
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef __APPLE__
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
+#endif
+
+	 // glfw window creation
+ 	// --------------------
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "hippotest", NULL, NULL);
+	if (window == NULL) {
+		Luarium::log("Failed to create GLFW window", 4);
+		std::cin.get();
+		glfwTerminate();
+		return nullptr;
+	}
+	glfwMakeContextCurrent(window);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+
+	// glad: load all OpenGL function pointers
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		Luarium::log("Failed to initialize GLAD", 4);
+		return nullptr;
+	}
+	
+	return window;
 }
 
 // executed when the window is resized
@@ -320,11 +313,11 @@ void simpleConsole() {
 		gameState = 0;
 	}
 	else if(command[0] == "pm"){
-		if(command[1] == " GL_FILL")
+		if(command[1] == "GL_FILL")
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		if(command[1] == " GL_LINE")
+		if(command[1] == "GL_LINE")
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		if(command[1] == " GL_POINT")
+		if(command[1] == "GL_POINT")
 			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 		return;
 	} 
