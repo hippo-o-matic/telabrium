@@ -1,9 +1,11 @@
-tests/model/
-tests/glCaptures/
-.directory
-*.directory
-build/bin/
+**/tests/model/*
+**/tests/glCaptures/*
+**/tests/archive/*
+
+**.directory
+**/build/*
+**/.vscode/ipch/**
+
 *.kate-swp
 *.log
 *.o
-.vscode/ipch/
