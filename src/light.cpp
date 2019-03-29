@@ -10,7 +10,7 @@ DirLight::DirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec){
 }
 
 DirLight::~DirLight() {
-	list[id] = NULL; // Remove refrence from the list so the shader doesn't recieve outdated or garbage data
+	list.erase(list.begin() + id); // Remove refrence from the list so the shader doesn't recieve outdated or garbage data
 }
 
 std::vector<DirLight*> DirLight::list; // Declare the list and idStep out here so it becomes static fully
@@ -27,7 +27,7 @@ PointLight::PointLight(glm::vec3 pos, glm::vec3 amb, glm::vec3 dif, glm::vec3 sp
 }
 
 PointLight::~PointLight() {
-	list[id] = NULL;
+	list.erase(list.begin() + id);
 	delete bulb;
 }
 
@@ -47,7 +47,7 @@ SpotLight::SpotLight(glm::vec3 pos, glm::vec3 rot, glm::vec3 amb, glm::vec3 dif,
 }
 
 SpotLight::~SpotLight() {
-	list[id] = NULL;
+	list.erase(list.begin() + id);
 }
 
 std::vector<SpotLight*> SpotLight::list;
