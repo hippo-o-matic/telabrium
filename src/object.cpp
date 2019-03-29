@@ -14,35 +14,37 @@ Object::~Object(){
 
 void Object::adopt(Object* C){
 	C->parent = this;
-	C->P_pos = C->Position - Position;
-	C->P_rot = C->Rotation - Rotation;
-	C->P_scl = C->Scale - Scale;
 	components.push_back(C);
 }
 
 void Object::adopt(std::vector<Object*> &C_vec){
 	for(unsigned int i=0; i < C_vec.size(); i++){
 		C_vec[i]->parent = this;
-		C_vec[i]->P_pos = C_vec[i]->Position - Position;
-		C_vec[i]->P_rot = C_vec[i]->Rotation - Rotation;
-		C_vec[i]->P_scl = C_vec[i]->Scale - Scale;
 		components.push_back(C_vec[i]);
 	}
 }
 
-void Object::translate_from(Object& P){
-	Rotation = P_rot + P.Rotation; // Real rot = Relative rot + Parent rot
+Object Object::realize(){
+	Object o;
+	if(parent != nullptr) {
+		o.Position = Position + parent->realize().Position;
+		o.Rotation = (Rotation + parent->realize().Rotation);
+		o.Scale = Scale + parent->realize().Scale;
+	}
 
+	return o;
 }
 
 std::vector<Object*> Object::operator+(Object* o){
-	this->components.push_back(o);
-	return this->components;
+	components.push_back(o);
+	o->parent = this;
+	return components;
 }
 
 std::vector<Object*> Object::operator-(Object* o){
-	std::vector<Object*>* vec = &this->components; // Same thing as object destructor but with itself instead of parent
+	std::vector<Object*>* vec = &components; // Same thing as object destructor but with itself instead of parent
 	vec->erase(std::remove(vec->begin(), vec->end(), o), vec->end());
-	return this->components;
+	o->parent = nullptr;
+	return components;
 }
 
