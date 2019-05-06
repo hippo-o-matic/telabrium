@@ -54,10 +54,10 @@ int main(){
 
 	Camera::ACTIVE = new Camera(glm::vec3(0,0,0));
 	Camera::ACTIVE->Aspect = 1;
+	
+	// Luarium::Archive::pack("archive/test1", "archive/test1.hpak");
 
-	Luarium::Archive::pack("archive/test1", "archive/test1.hpak");
-
-	Luarium::Archive::unpack("archive/test1.hpak", "archive/test2/");
+	// Luarium::Archive::unpack("archive/test1.hpak", "archive/test2/");
 
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -67,7 +67,7 @@ int main(){
 	Model aa("model/s/nanosuit.obj");
 	Model box("model/cube.obj", glm::vec3(2,1,0));
 	std::string heck = "textures";
-	// Mesh bab(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("shadertest.png", heck));
+	Mesh bab(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("shadertest.png", heck));
 
 	DirLight someLight(glm::vec3(70.0f, 0.0f, 20.0f), glm::vec3(0.001));
 	SpotLight spot(glm::vec3(0));
@@ -124,10 +124,10 @@ int main(){
 		updateLights(*Shader::ACTIVE, &unshaded);
 
 		aa.Draw();
-		box.Draw();
+	//	box.Draw();
 		
 		// draw skybox last
-		// bab.Draw(*Shader::ACTIVE);
+		bab.Draw(*Shader::ACTIVE);
 		skybox.Draw(skyboxShader);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

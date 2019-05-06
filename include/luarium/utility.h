@@ -43,6 +43,7 @@ namespace Luarium{
 	// Seperates a string into a vector of strings, separated by [seperator] (input string, seperator)
 	std::vector<std::string> segment(std::string &in, char seperator);
 
+	// Translates a basic array of verticies into a format readable by the Mesh class
 	std::vector<Vertex> calcVertex(const std::vector<float> &verticies, const std::vector<float> &texcoords = {});
 
 	void log(std::string message, short int severity = 0, const char* outputfile = "tests/logs/log.txt");
@@ -51,34 +52,49 @@ namespace Luarium{
 
 	const std::vector<float> cubeVerts = {
 		// positions          
-		1,-1,-1,
-		1,-1,1,
-		-1,-1,1,
-		-1,-1,-1,
-		1,1,-1,
-		-1,1,-1,
-		-1,1,1,
-		1,1,1,
-		1,-1,-1,
-		1,1,-1,
-		1,1,1,
-		1,-1,1,
-		1,-1,1,
-		1,1,1,
-		-1,1,1,
-		-1,-1,1,
-		-1,-1,1,
-		-1,1,1,
-		-1,1,-1,
-		-1,-1,-1,
-		1,1,-1,
-		1,-1,-1,
-		-1,-1,-1,
-		-1,1,-1
+		-1.0, -1.0,  1.0,
+		1.0, -1.0,  1.0,
+		1.0,  1.0,  1.0,
+		-1.0,  1.0,  1.0,
+		
+		// Back face
+		-1.0, -1.0, -1.0,
+		-1.0,  1.0, -1.0,
+		1.0,  1.0, -1.0,
+		1.0, -1.0, -1.0,
+		
+		// Top face
+		-1.0,  1.0, -1.0,
+		-1.0,  1.0,  1.0,
+		1.0,  1.0,  1.0,
+		1.0,  1.0, -1.0,
+		
+		// Bottom face
+		-1.0, -1.0, -1.0,
+		1.0, -1.0, -1.0,
+		1.0, -1.0,  1.0,
+		-1.0, -1.0,  1.0,
+		
+		// Right face
+		1.0, -1.0, -1.0,
+		1.0,  1.0, -1.0,
+		1.0,  1.0,  1.0,
+		1.0, -1.0,  1.0,
+		
+		// Left face
+		-1.0, -1.0, -1.0,
+		-1.0, -1.0,  1.0,
+		-1.0,  1.0,  1.0,
+		-1.0,  1.0, -1.0
 	};
 
 	const std::vector<unsigned int> cubeIndices = {
-		0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 1, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23
+		0,  1,  2,      0,  2,  3, // front
+		4,  5,  6,      4,  6,  7, // back
+		8,  9,  10,     8,  10, 11, // top
+		12, 13, 14,     12, 14, 15, // bottom
+		16, 17, 18,     16, 18, 19, // right
+		20, 21, 22,     20, 22, 23 // left
 	};
 }
 
