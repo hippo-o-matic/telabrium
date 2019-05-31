@@ -9,6 +9,7 @@
 
 #include "luarium/object.h"
 #include "luarium/utility.h"
+#include "luarium/archiver.h"
 
 namespace Map {
 
@@ -17,10 +18,6 @@ namespace Map {
 	void init(); //Initialize archive library
 
 	void load(std::string path, std::string options = ""); // Load the map 
-
-	void pack(std::string dirPath, std::string out); // Compresses a map directory into a map file
-	void unpack_to(std::string path, std::string out);
-	void unpack_to_cache(std::string path = current_path); // Extract map to cache beforehand, leave blank for current map
 
 	void unload(); // Cleans up resources of currently loaded map
 	void clear_cache();
@@ -45,5 +42,10 @@ public:
 	std::string mapPath;
 	std::string path;
 };
+
+class SetReader {
+	SetReader();
+	
+}
 
 #endif

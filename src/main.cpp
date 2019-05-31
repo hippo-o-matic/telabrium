@@ -55,9 +55,9 @@ int main(){
 	Camera::ACTIVE = new Camera(glm::vec3(0,0,0));
 	Camera::ACTIVE->Aspect = 1;
 	
-	// Luarium::Archive::pack("archive/test1", "archive/test1.hpak");
+	Luarium::Archive::pack("archive/test1", "archive/test1.hpak");
 
-	// Luarium::Archive::unpack("archive/test1.hpak", "archive/test2/");
+	Luarium::Archive::unpack("archive/test1.hpak", "archive/test2/");
 
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
