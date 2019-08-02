@@ -3,21 +3,21 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 
 #include <experimental/filesystem>
-#include <archive.h>
+
+#include "json/json.h"
+#include "json/json-forwards.h"
 
 #include "luarium/object.h"
 #include "luarium/utility.h"
-#include "luarium/archiver.h"
+#include "micropak.hpp"
 
 namespace Map {
-
 	namespace fsys = std::experimental::filesystem; // That's a long name
 
-	void init(); //Initialize archive library
-
-	void load(std::string path, std::string options = ""); // Load the map 
+	int load(std::string path, std::string options = ""); // Load the map 
 
 	void unload(); // Cleans up resources of currently loaded map
 	void clear_cache();
@@ -25,27 +25,18 @@ namespace Map {
 
 	void cleanup(std::string options = ""); // Cleanup function for Luarium::cleanup()
 
-	std::string current_path;
+	std::vector<std::string> map_cache;
 
-	archive* read; // The archive structs for reading and writing data
-	archive* write;
+	std::unique_ptr<Level> index;
 };
 
 class Level : public Object {
 public:
-	Level(std::string mapPath, std::string path); // Get the parent map path and the path inside the map file
+	Level(); // Get the parent map path and the path inside the map file
 	~Level();
 
 	void load();
 	void unload();
-
-	std::string mapPath;
-	std::string path;
 };
-
-class SetReader {
-	SetReader();
-	
-}
 
 #endif

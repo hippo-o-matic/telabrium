@@ -58,7 +58,8 @@
 			"csignal": "cpp",
 			"filesystem": "cpp",
 			"algorithm": "cpp",
-			"codecvt": "cpp"
+			"codecvt": "cpp",
+			"any": "cpp"
 		},
 		"lua.targetVersion": "5.3"
 	}

@@ -22,7 +22,6 @@
 #include "luarium/luafile.h"
 #include "luarium/utility.h"
 #include "luarium/skybox.h"
-#include "luarium/archiver.h"
 
 #define LUARIUM_MODE_DEBUG
 

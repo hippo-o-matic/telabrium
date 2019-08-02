@@ -1,0 +1,17 @@
+{
+    "id" : "root",
+    "spatial":[0,0,0, 0,0,0, 0,0,0],
+    "components" : [
+        {
+            "id" : "jeff",
+            "type" : "Model",
+            "spatial" : [1,0,0, 0,0,0, 0,0,0],
+            "path" : "model/s/nanosuit.obj"
+        },
+        {
+            "id":"mainlight",
+            "type":"Dirlight"
+            
+        }
+    ]
+}   

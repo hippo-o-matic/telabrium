@@ -19,6 +19,12 @@ public:
 	glm::vec3 Ambient; 
 	glm::vec3 Diffuse;
 	glm::vec3 Specular;
+
+	// Gather all the lights and send them to the shader
+	static void updateLights(Shader &shader);
+	
+protected:
+	void jload(Json::Value j);
 };
 
 // Directional Light: Provides light from one direction
@@ -37,6 +43,8 @@ public:
 	static std::vector<DirLight*> list; // The vector that contains all the lights of this class, for shader processing
 	int id = 0;
 
+	void jload(Json::Value j);
+	DECLARE_OBJECT_TYPE(DirLight);
 private:
 	static int idStep; // Remember where we left off when assigning id's
 };
@@ -64,14 +72,14 @@ public:
 	static std::vector<PointLight*> list;
 	int id = 0;
 
-	Model* bulb;
-
+	void jload(Json::Value j);
+	DECLARE_OBJECT_TYPE(PointLight);
 private:
 	static int idStep;
 };
 
-// Spot Light: Creates a conic light originating from a single point
-class SpotLight : public Light{
+// Spotlight: Creates a conic light originating from a single point
+class SpotLight : public Light {
 public:
 	SpotLight(
 		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -83,7 +91,8 @@ public:
 		float lin = 0.9f,
 		float quad = 0.032f,
 		float cut = 12.5f,
-		float ocut = 15.0f);
+		float ocut = 15.0f
+	);
 
 	SpotLight(const SpotLight &obj);
 
@@ -98,12 +107,10 @@ public:
 	static std::vector<SpotLight*> list;
 	int id;
 
+	void jload(Json::Value j);
+	DECLARE_OBJECT_TYPE(SpotLight);
 private:
 	static int idStep;
-};
-
-
-// Gather all the lights and send them to the shader
-void updateLights(Shader &shader, Shader* bulbShader = nullptr);
+}; 
 
 #endif

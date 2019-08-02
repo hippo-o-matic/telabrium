@@ -8,7 +8,7 @@
 #include <fstream>
 #include <time.h>
 
-const std::string LUARIUM_CACHE_PATH = "cache/";
+const std::string LUARIUM_CACHE_PATH = "tests/cache/";
 
 struct Vertex {
 	// position
