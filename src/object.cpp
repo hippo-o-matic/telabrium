@@ -9,7 +9,7 @@ Object::~Object(){
 }
 
 // Calculates the object's spatial properties relative to global space
-Object::spatial Object::derefrence(){
+Object::spatial Object::derefrence() {
 	spatial o;
 	
 	if(parent != nullptr) {
@@ -72,4 +72,42 @@ void Object::jload(Json::Value j) {
 	this->Position = glm::vec3(jPos[0].asFloat(), jPos[1].asFloat(), jPos[2].asFloat());
 	this->Rotation = glm::vec3(jRot[0].asFloat(), jRot[1].asFloat(), jRot[2].asFloat());
 	this->Scale = glm::vec3(jScl[0].asFloat(), jScl[1].asFloat(), jScl[2].asFloat());
+}
+
+
+
+Object::ptr ObjFactory::createInstance(std::string const& s) {
+	ObjFactory::map_type::iterator it = getMap()->find(s);
+	if(it == getMap()->end()) {
+		Luarium::log("Could not find object type \"" + s + "\", type not registered", 1);
+		return 0;
+	}
+	return it->second.create_f();
+}
+
+template<class T>
+void (T::*ObjFactory::getValueFunc(std::string const& s))(Json::Value) { // Returns the value function provided when registering type
+	ObjFactory::map_type::iterator it = getMap()->find(s);
+	if(it == getMap()->end()){
+		Luarium::log("Could not find object type \"" + s + "\", type not registered", 1);
+		return 0;
+	}
+	return it->second.value_func;
+}
+
+std::shared_ptr<ObjFactory::map_type> ObjFactory::getMap() {
+	if(!typemap) { typemap = std::shared_ptr<ObjFactory::map_type>(); } 
+	return typemap; 
+}
+
+template<class T> Object::ptr ObjFactory::create() { return std::make_unique<T>(); } // A function that creates and returns a new instance of any Object
+
+template<class T>
+ObjRegister<T>::ObjRegister(const char* s, void (T::*value_func)(Json::Value)) {
+	object_functions f = {
+		&create<T>,
+		static_cast<mfptr>(value_func),
+	};
+
+	getMap()->insert(std::pair<std::string, object_functions>(s, f));
 }

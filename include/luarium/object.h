@@ -14,18 +14,9 @@
 
 #include "luarium/utility.h"
 
-// Creates a registery function for the object, place inside class definition
-#define DECLARE_OBJECT_TYPE(NAME) \
-    static ObjectRegister<NAME> reg
-
-// Registers the object as one that can be created, place after class definition
-// (The name of the function, a json parsing function)
-#define DEFINE_OBJECT_TYPE(NAME, FUNC) \
-    ObjectRegister<NAME> NAME::reg(#NAME, FUNC)
-
 class Object {
     typedef std::unique_ptr<Object> ptr;
-    friend struct ObjectFactory; // A struct that allows us to generate new Object instances
+    friend struct ObjFactory; // A struct that allows us to generate new Object instances
 
     // Kind of jank, but this is for any functions that want to return object values without returning their component vectors or parents
     struct spatial {
@@ -60,8 +51,9 @@ public:
     spatial derefrence(); // Calculates the object's spatial properties relative to global space
 
     // A vector that holds objects with no parent, in practice shouldn't hold anything other than Level objects
-    static std::vector<Object::ptr> global; 
+    static std::vector<Object::ptr> global;
 
+	void DECLARE_OBJECT_TYPE(Object);
 protected:
 	Object* parent; // Raw pointer to the objects parent
 	std::vector<Object::ptr> components; // Vector of the objects sub-components
@@ -70,8 +62,7 @@ protected:
 };
 
 
-
-struct ObjectFactory {
+struct ObjFactory {
     struct object_functions{
         Object::ptr (*create_f)(); // A pointer to a function that allows us to create a new instance of the object type
         void (Object::*value_func)(Json::Value); // This one's a bit weird, but its a pointer to a member function, so we can fill out an object's values later
@@ -80,48 +71,35 @@ struct ObjectFactory {
     typedef void (Object::*mfptr)(Json::Value); // Member function pointer for the value function
 
 public:
-    static Object::ptr createInstance(std::string const& s) {
-        map_type::iterator it = getMap()->find(s);
-        if(it == getMap()->end()) {
-            Luarium::log("Could not find object type \"" + s + "\", type not registered", 1);
-            return 0;
-        }
-        return it->second.create_f();
-    }
+    static Object::ptr createInstance(std::string const& s); // Creates a registered object and returns its unique pointer
 
-    template<class T> static void (T::*getValueFunc(std::string const& s))(Json::Value) { // Returns the value function provided when registering type
-        map_type::iterator it = getMap()->find(s);
-        if(it == getMap()->end()){
-            Luarium::log("Could not find object type \"" + s + "\", type not registered", 1);
-            return 0;
-        }
-        return it->second.value_func;
-    }
+    template<class T>
+	static void (T::*getValueFunc(std::string const& s))(Json::Value);
 
 protected:
-    static std::shared_ptr<map_type> getMap() {
-        if(!typemap) { typemap = std::shared_ptr<map_type>(); } 
-        return typemap; 
-    }
+    static std::shared_ptr<map_type> getMap();
 
-    // Object factories for different object creation
-    template<typename T> static Object::ptr create() { return std::make_unique<T>(); } // A function that creates and returns a new instance of any Object
-
+    template<class T>
+	static Object::ptr create(); // A function that creates and returns a new instance of any Object
+	
 private:
     static std::shared_ptr<map_type> typemap;
 };
 
 
-template<typename T>
-struct ObjectRegister : ObjectFactory {
-    ObjectRegister(const char* s, void (T::*value_func)(Json::Value)) {
-        object_functions f = {
-            &create<T>,
-            static_cast<mfptr>(value_func),
-        };
-
-        getMap()->insert(std::pair<std::string, object_functions>(s, f));
-    }
+template<class T>
+struct ObjRegister : ObjFactory {
+    ObjRegister(const char* s, void (T::*value_func)(Json::Value));
 };
+
+
+// Creates a registery function for the object, place inside class definition
+#define DECLARE_OBJECT_TYPE(NAME) \
+	static ObjRegister<NAME> reg
+
+// Registers the object as one that can be created, place after class definition
+// (The name of the function, a json parsing function)
+#define DEFINE_OBJECT_TYPE(NAME, FUNC) \
+    ObjRegister<NAME> NAME::reg(#NAME, FUNC)
 
 #endif
