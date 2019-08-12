@@ -26,15 +26,17 @@ LIBS = -lGL -lglfw -lassimp -lX11 -lpthread -lXrandr -lXi -ldl -llua5.3 -lstdc++
 all: $(BUILD_PATH)/bin/$(TARGET)
 
 $(BUILD_PATH)/bin/$(TARGET): $(OBJ)
-	@-$(MKDIR_P) $(dir $@)
+	@-$(MKDIR_P) $(@D)
 	@-echo "Linking..."
 	@-$(CXX) $(CPPFLAGS) $(LFLAGS) $^ -o $@ -I$(INCLUDE_PATH) -L$(LIB_PATH) $(LIBS)
 	@-echo "Done with $(TARGET)"
 
 $(BUILD_PATH)/%.cpp.o: $(SRC_PATH)/%.cpp
+	@-$(MKDIR_P) $(@D)
 	$(CXX) $(CPPFLAGS) -c $< -I$(INCLUDE_PATH) -o $@
 
 $(BUILD_PATH)/%.c.o: $(SRC_PATH)/%.c
+	@-$(MKDIR_P) $(@D)
 	$(CXX) $(CPPFLAGS) -c $< -I$(INCLUDE_PATH) -o $@
 	
 
