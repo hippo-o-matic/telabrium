@@ -59,7 +59,11 @@
 			"filesystem": "cpp",
 			"algorithm": "cpp",
 			"codecvt": "cpp",
-			"any": "cpp"
+			"any": "cpp",
+			"strstream": "cpp",
+			"bit": "cpp",
+			"complex": "cpp",
+			"variant": "cpp"
 		},
 		"lua.targetVersion": "5.3"
 	}

@@ -44,14 +44,14 @@ public:
 	int id = 0;
 
 	void jload(Json::Value j);
-	DECLARE_OBJECT_TYPE(DirLight);
+
 private:
 	static int idStep; // Remember where we left off when assigning id's
 };
 
 // Point Light: Creates a spherical light originating from a single point
 class PointLight : public Light {
-public:
+public:	
 	PointLight(
 		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3 amb = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -73,7 +73,7 @@ public:
 	int id = 0;
 
 	void jload(Json::Value j);
-	DECLARE_OBJECT_TYPE(PointLight);
+
 private:
 	static int idStep;
 };
@@ -108,7 +108,12 @@ public:
 	int id;
 
 	void jload(Json::Value j);
-	DECLARE_OBJECT_TYPE(SpotLight);
+
+protected:
+	static std::function<Object::ptr()> luarium_obj_create;
+    std::function<void(Json::Value)> value_f;
+    static bool luarium_obj_reg;
+
 private:
 	static int idStep;
 }; 

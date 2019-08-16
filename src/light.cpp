@@ -29,7 +29,6 @@ void DirLight::jload(Json::Value j) {
 	Light::jload(j);
 }
 
-DEFINE_OBJECT_TYPE(DirLight, &DirLight::jload);
 std::vector<DirLight*> DirLight::list; // Declare the list and idStep out here so it becomes static fully
 int DirLight::idStep = 0;
 
@@ -54,7 +53,6 @@ void PointLight::jload(Json::Value j) {
 	this->Quadratic = j["quadratic"].asFloat();
 }
 
-DEFINE_OBJECT_TYPE(PointLight, &PointLight::jload);
 std::vector<PointLight*> PointLight::list;
 int PointLight::idStep = 0;
 
@@ -84,7 +82,12 @@ void SpotLight::jload(Json::Value j) {
 	this->OuterCutOff = j["outercutoff"].asFloat();
 }
 
-DEFINE_OBJECT_TYPE(SpotLight, &SpotLight::jload);
+
+std::function<Object::ptr()> SpotLight::luarium_obj_create = [](){ return std::make_unique<SpotLight>(); };
+// std::function<void(Json::Value)> value_f = SpotLight::jload;
+bool SpotLight::luarium_obj_reg = ObjFactory::registerType ("SpotLight", SpotLight::luarium_obj_create, SpotLight::jload);
+
+
 std::vector<SpotLight*> SpotLight::list;
 int SpotLight::idStep = 0;
 
