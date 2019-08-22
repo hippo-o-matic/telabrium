@@ -107,12 +107,12 @@ public:
 	static std::vector<SpotLight*> list;
 	int id;
 
-	void jload(Json::Value j);
-
 protected:
 	static std::function<Object::ptr()> luarium_obj_create;
     std::function<void(Json::Value)> value_f;
     static bool luarium_obj_reg;
+
+	static void jload(Object::ptr* obj, Json::Value j);
 
 private:
 	static int idStep;

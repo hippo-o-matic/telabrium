@@ -85,7 +85,7 @@ Object::ptr ObjFactory::createInstance(std::string const& s) {
 	return it->second.create_f();
 }
 
-bool const ObjFactory::registerType(const char* name, std::function<Object::ptr()> create_f, std::function<void> value_f(Json::Value)) {
+bool const ObjFactory::registerType(const char* name, std::function<Object::ptr()> create_f, std::function<void> value_f(Object::ptr*, Json::Value)) {
 	object_functions f = {
 		create_f,
 		value_f

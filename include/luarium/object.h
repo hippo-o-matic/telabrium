@@ -56,7 +56,7 @@ protected:
 	Object* parent; // Raw pointer to the objects parent
 	std::vector<Object::ptr> components; // Vector of the objects sub-components
 
-    void jload(Json::Value j);
+    void virtual jload(Json::Value j);
 
     // Object register members
     static std::function<Object::ptr()> luarium_obj_create;
@@ -67,16 +67,16 @@ protected:
 // A class that registers, creates, and defines new Objects
 class ObjFactory {
     struct object_functions{
-        std::function<Object::ptr()> create_f; // A pointer to a function that allows us to create a new instance of the object type
-        std::function<void(Json::Value)> value_f; // A member function pointer to a function that will allow us to define objects with a Json::Value
+        Object::ptr (*create_f); // A pointer to a function that allows us to create a new instance of the object type
+        void (*value_f)(Object::ptr*, Json::Value); // A member function pointer to a function that will allow us to define objects with a Json::Value
     };
     typedef std::map<std::string, object_functions> map_type;
-    typedef void (Object::*mfptr)(Json::Value); // Member function pointer for the value function
+    typedef void (Object::*mfptr)(Object::ptr*, Json::Value); // Member function pointer for the value function
 
 public:
     static Object::ptr createInstance(std::string const& s); // Creates a registered object and returns its unique pointer
 
-    static bool const registerType(const char* name, std::function<Object::ptr()> create_f, std::function<void> value_f(Json::Value));
+    static bool const registerType(const char* name, std::function<Object::ptr()> create_f, std::function<void> value_f(Object::ptr*, Json::Value));
 
     template<class T>
 	void (T::*getValueFunc(std::string const& s))(Json::Value) { // Returns the value function provided when registering type
@@ -97,7 +97,7 @@ private:
 /* Creates a register function for the object and calls it, place inside class definition
 * luarium_obj_create(): A function that returns a new NAME
 * VALUE_F(): A function address of a function that fills out an object based off of a Json::Value
-* luarium_obj_reg: a trick using static initialization order to register the type before main()*/    
+* luarium_obj_reg: a trick using static initialization order to register the type before main()*/
 #define LUARIUM_REGISTER_OBJECT(NAME, VALUE_F) \
     static std::function<Object::ptr()> NAME::luarium_obj_create = [](){ return std::make_unique<NAME>(); }; \
     std::function<void(Json::Value)> NAME::value_f = VALUE_F; \

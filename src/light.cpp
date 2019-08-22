@@ -71,15 +71,16 @@ SpotLight::~SpotLight() {
 	list.erase(list.begin() + id);
 }
 
-void SpotLight::jload(Json::Value j) {
-	this->Light::jload(j);
+void SpotLight::jload(Object::ptr* in, Json::Value j) {
+	SpotLight* obj = dynamic_cast<SpotLight*>(in.get());
+	obj->Light::jload(j);
 
-	this->Constant = j["constant"].asFloat();
-	this->Linear = j["linear"].asFloat();
-	this->Quadratic = j["quadratic"].asFloat();
+	obj->Constant = j["constant"].asFloat();
+	obj->Linear = j["linear"].asFloat();
+	obj->Quadratic = j["quadratic"].asFloat();
 
-	this->CutOff = j["cutoff"].asFloat();
-	this->OuterCutOff = j["outercutoff"].asFloat();
+	obj->CutOff = j["cutoff"].asFloat();
+	obj->OuterCutOff = j["outercutoff"].asFloat();
 }
 
 
