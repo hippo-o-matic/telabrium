@@ -63,7 +63,19 @@
 			"strstream": "cpp",
 			"bit": "cpp",
 			"complex": "cpp",
-			"variant": "cpp"
+			"variant": "cpp",
+			"bitset": "cpp",
+			"condition_variable": "cpp",
+			"set": "cpp",
+			"unordered_set": "cpp",
+			"iterator": "cpp",
+			"memory_resource": "cpp",
+			"random": "cpp",
+			"future": "cpp",
+			"mutex": "cpp",
+			"cfenv": "cpp",
+			"typeindex": "cpp",
+			"valarray": "cpp"
 		},
 		"lua.targetVersion": "5.3"
 	}
