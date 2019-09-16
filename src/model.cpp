@@ -1,25 +1,30 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "luarium/model.h"
 
+// Static initialization
+Task<Model, Shader&> Model::drawT(&Model::Draw);
+
 // constructor, expects a filepath to a 3D model.
-Model::Model(std::string const &path, glm::vec3 pos, glm::vec3 rot, glm::vec3 scl, bool gamma) : gammaCorrection(gamma){
-	loadModel(path);
-	Position = pos; Rotation = rot; Scale = scl;
+Model::Model(std::string const &p, glm::vec3 pos, glm::vec3 rot, glm::vec3 scl, bool gamma) : gammaCorrection(gamma){
+	loadModel(p);
+	path = p;
+	pos = pos; rot = rot; scl = scl;
+	drawT.addObj(this);
 }
 
 // draws the model, and thus all its meshes
 void Model::Draw(Shader &shader){
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, Position);
-	model = glm::rotate(model, glm::radians(Rotation.x), glm::vec3(1, 0, 0));
-	model = glm::rotate(model, glm::radians(Rotation.y), glm::vec3(0, 1, 0));
-	model = glm::rotate(model, glm::radians(Rotation.z), glm::vec3(0, 0, 1));
-	model = glm::scale(model, Scale);
+	model = glm::translate(model, pos);
+	model = glm::rotate(model, glm::radians(rot.x), glm::vec3(1, 0, 0));
+	model = glm::rotate(model, glm::radians(rot.y), glm::vec3(0, 1, 0));
+	model = glm::rotate(model, glm::radians(rot.z), glm::vec3(0, 0, 1));
+	model = glm::scale(model, scl);
 	shader.set("model", model);
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].Draw(shader);
 }
-
+ 
 // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 void Model::loadModel(std::string const &path){
 	// read file via ASSIMP
@@ -28,7 +33,7 @@ void Model::loadModel(std::string const &path){
 	// check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 	{
-		Luarium::log("Assimp: " + *importer.GetErrorString(), 2);
+		LuariumLog(importer.GetErrorString(), 2);
 		return;
 	}
 	// retrieve the directory path of the filepath
@@ -67,11 +72,11 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 	{
 		Vertex vertex;
 		glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
-							// positions
+							// poss
 		vector.x = mesh->mVertices[i].x;
 		vector.y = mesh->mVertices[i].y;
 		vector.z = mesh->mVertices[i].z;
-		vertex.Position = vector;
+		vertex.pos = vector;
 		// normals
 		vector.x = mesh->mNormals[i].x;
 		vector.y = mesh->mNormals[i].y;
@@ -208,7 +213,7 @@ Texture loadTexture(const char* path, std::string &directory){
 		if((err = glGetError()) != GL_NO_ERROR){
 			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
 		}
-		Luarium::log("Texture failed to load at path: \"" + filename + "\"", 2);
+		LuariumLog("Texture failed to load at path: \"" + filename + "\"", 2);
     }
 
 	stbi_image_free(data);
@@ -233,7 +238,7 @@ Texture loadCubemap(std::vector<std::string> faces, std::string path) {
 		}
 		else
 		{
-			Luarium::log("Cubemap texture failed to load at path: \"" + path + "/" + faces[i] + "\"", 2);
+			LuariumLog("Cubemap texture failed to load at path: \"" + path + "/" + faces[i] + "\"", 2);
 			stbi_image_free(data);
 		}
 	}
@@ -246,3 +251,11 @@ Texture loadCubemap(std::vector<std::string> faces, std::string path) {
 	return tex;
 }
 
+
+void Model::jload(Json::Value j) {
+	this->Object::jload(j);
+
+	this->path = j["path"].asString();
+	loadModel(path);
+	drawT.addObj(this);
+}

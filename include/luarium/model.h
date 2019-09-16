@@ -10,27 +10,36 @@
 #include "assimp/postprocess.h"
 
 #include "luarium/mesh.h"
+#include "luarium/task.h"
 
 /// A class for transitioning between the Assimp Model Loader and the native mesh class
-class Model : public Object{
+class Model : public Object {
 public:
 	/*  Model Data */
 	std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 	std::vector<Mesh> meshes;
 	std::string directory;
+	std::string path;
 	bool gammaCorrection;
 
+	// draws the model, and thus all its meshes
+	void Draw(Shader& shader = *Shader::ACTIVE);
+	static Task<Model, Shader&> drawT; // The render task that automatically renders the models
+
+	virtual void jload(Json::Value);
+
 	// constructor, expects a filepath to a 3D model.
-	Model(std::string const &path,
+	Model(std::string const &p,
 		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3 rot = glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3 scl = glm::vec3(1.0f, 1.0f, 1.0f),
 		bool gamma = false);
 
-	// draws the model, and thus all its meshes
-	void Draw(Shader &shader = *Shader::ACTIVE);
+	Model() = default;
 
 private:
+	LUARIUM_REGISTER_OBJECT(Model);
+
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 	void loadModel(std::string const &path);
 
