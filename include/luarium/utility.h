@@ -10,44 +10,11 @@
 
 const std::string LUARIUM_CACHE_PATH = "tests/cache/";
 
-struct Vertex {
-	// position
-	glm::vec3 Position;
-	// normal
-	glm::vec3 Normal;
-	// texCoords
-	glm::vec2 TexCoords;
-	// tangent
-	glm::vec3 Tangent;
-	// bitangent
-	glm::vec3 Bitangent;
-};
-
-struct Texture {
-	unsigned int id;
-	std::string type;
-	std::string path;
-};
-
-struct RenderMat {
-	glm::vec3 diffuse_color = glm::vec3(0,0,0);
-	glm::vec3 specular_color = glm::vec3(0,0,0);
-	glm::vec3 ambient_color = glm::vec3(0,0,0);
-
-	float shininess = 0;
-	float IOR = 0;
-	float opacity = 0;
-};
-
 namespace Luarium{
 	// Seperates a string into a vector of strings, separated by [seperator] (input string, seperator)
 	std::vector<std::string> segment(std::string &in, char seperator);
 
-	// Translates a basic array of verticies into a format readable by the Mesh class
-	std::vector<Vertex> calcVertex(const std::vector<float> &verticies, const std::vector<float> &texcoords = {});
-
-	void log(std::string message, short int severity = 0, const char* outputfile = "tests/logs/log.txt");
-
+	void log(std::string message, const char* file, int line, short int severity = 0, const char* outputfile = "tests/logs/log.txt");
 
 
 	const std::vector<float> cubeVerts = {
@@ -97,6 +64,9 @@ namespace Luarium{
 		20, 21, 22,     20, 22, 23 // left
 	};
 }
+
+#define LuariumLog(MESSAGE, SEVERITY) \
+Luarium::log(MESSAGE, __FILE__, __LINE__)
 
 #endif
 
