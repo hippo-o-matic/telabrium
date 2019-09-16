@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <map>
 #include <memory>
-#include <functional>
 
 #include "glm/glm.hpp"
 #include "json/json.h"
@@ -20,9 +19,9 @@ public:
 
     // Kind of jank, but this is for any functions that want to return object values without returning their component vectors or parents
     struct spatial {
-        glm::vec3 Position;
-        glm::vec3 Rotation;
-        glm::vec3 Scale;
+        glm::vec3 pos;
+        glm::vec3 rot;
+        glm::vec3 scl;
     };
 
 	Object(
@@ -31,14 +30,15 @@ public:
         glm::vec3 scl = glm::vec3(1.0f, 1.0f, 1.0f)
     );
 
-	~Object();
+	virtual ~Object();
 
 	std::string id;
+    std::string type;
 
     // Spatial properties relative to parent
-	glm::vec3 Position;
-	glm::vec3 Rotation;
-	glm::vec3 Scale;
+	glm::vec3 pos;
+	glm::vec3 rot;
+	glm::vec3 scl;
 
 	void operator<<(Object::ptr &o); // Move an object from one parent to another
     void operator<<(std::vector<Object::ptr> &o_vec); // Move a vector of objects from one parent to another
@@ -49,58 +49,53 @@ public:
 
     spatial derefrence(); // Calculates the object's spatial properties relative to global space
 
+    template<class T>
+    std::unique_ptr<T>& to() { return dynamic_cast<std::unique_ptr<T>&>(*this); } // Method for casting a type back to it's native type, [TODO] make automatic when any Object::ptr is refrenced
+
     // A vector that holds objects with no parent, in practice shouldn't hold anything other than Level objects
-    static std::vector<Object::ptr> global;
+    // static std::vector<Object::ptr> global;
 
 protected:
 	Object* parent; // Raw pointer to the objects parent
 	std::vector<Object::ptr> components; // Vector of the objects sub-components
 
-    void virtual jload(Json::Value j);
-
-    // Object register members
-    static std::function<Object::ptr()> luarium_obj_create;
-    std::function<void(Json::Value)> value_f;
-    static bool luarium_obj_reg;
+    virtual void jload(Json::Value j);
 };
 
 // A class that registers, creates, and defines new Objects
 class ObjFactory {
-    struct object_functions{
-        Object::ptr (*create_f); // A pointer to a function that allows us to create a new instance of the object type
-        void (*value_f)(Object::ptr*, Json::Value); // A member function pointer to a function that will allow us to define objects with a Json::Value
-    };
-    typedef std::map<std::string, object_functions> map_type;
-    typedef void (Object::*mfptr)(Object::ptr*, Json::Value); // Member function pointer for the value function
+    typedef Object::ptr (*createFunc)(); // A function pointer for the creation functions
+    typedef std::map<std::string, createFunc> map_type;
+    // typedef void (Object::*mfptr)(Object::ptr*, Json::Value); // Member function pointer for the value function
 
 public:
-    static Object::ptr createInstance(std::string const& s); // Creates a registered object and returns its unique pointer
+    static Object::ptr createObject(std::string const& s); // Creates a registered object and returns its unique pointer
 
-    static bool const registerType(const char* name, std::function<Object::ptr()> create_f, std::function<void> value_f(Object::ptr*, Json::Value));
-
-    template<class T>
-	void (T::*getValueFunc(std::string const& s))(Json::Value) { // Returns the value function provided when registering type
-        ObjFactory::map_type::iterator it = getMap()->find(s);
-        if(it == getMap()->end()){
-            Luarium::log("Could not find object type \"" + s + "\", type not registered", 1);
-            return nullptr;
-        }
-        return it->second.value_func;
-    }
+    static bool const registerType(const char* name, Object::ptr (*create_f)());
 	
 private:
     static std::shared_ptr<map_type> getMap();
-    static std::shared_ptr<map_type> typemap; // The map of all the types and their functions
+    inline static std::shared_ptr<map_type> typemap = nullptr; // The map of all the types and their functions
 };
-
 
 /* Creates a register function for the object and calls it, place inside class definition
 * luarium_obj_create(): A function that returns a new NAME
-* VALUE_F(): A function address of a function that fills out an object based off of a Json::Value
+* VALUE_F(Object::ptr*, Json::Value): A function address of a function that fills out an object based off of a Json::Value,
+* should take a pointer to a unique pointer of an object (Object::ptr*) and a Json::Value
 * luarium_obj_reg: a trick using static initialization order to register the type before main()*/
-#define LUARIUM_REGISTER_OBJECT(NAME, VALUE_F) \
-    static std::function<Object::ptr()> NAME::luarium_obj_create = [](){ return std::make_unique<NAME>(); }; \
-    std::function<void(Json::Value)> NAME::value_f = VALUE_F; \
-    static bool NAME::luarium_obj_reg = ObjFactory::registerType (#NAME, NAME::luarium_obj_create, VALUE_F)
+#define LUARIUM_REGISTER_OBJECT(NAME) \
+    inline static Object::ptr luarium_obj_create() { return std::make_unique<NAME>(); }; \
+    inline static bool luarium_obj_reg = ObjFactory::registerType (#NAME, NAME::luarium_obj_create)
+
+
+class BlankObject : public Object {
+public:
+    BlankObject() = default;
+
+    void jload(Json::Value j);
+
+private:
+    LUARIUM_REGISTER_OBJECT(BlankObject);
+};
 
 #endif

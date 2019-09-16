@@ -1,7 +1,7 @@
 #include "luarium/object.h"
 
 Object::Object(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl){
-	Position = pos; Rotation = rot; Scale = scl;
+	pos = pos; rot = rot; scl = scl;
 }
 
 Object::~Object(){
@@ -15,9 +15,9 @@ Object::spatial Object::derefrence() {
 	if(parent != nullptr) {
 		spatial d_parent = parent->derefrence();
 
-		o.Position = Position + d_parent.Position;
-		o.Rotation = Rotation + d_parent.Rotation;
-		o.Scale = Scale * d_parent.Scale;
+		o.pos = pos + d_parent.pos;
+		o.rot = rot + d_parent.rot;
+		o.scl = scl * d_parent.scl;
 	}
 
 	return o;
@@ -63,42 +63,47 @@ template<class T> std::unique_ptr<T>& Object::operator[](std::string id) {
 }
 
 void Object::jload(Json::Value j) {
-	this->id = j["id"].asString();
+	this->id = j.get("id", "").asString();
+	this->type = j.get("type", "BlankObject").asString();
 
-	Json::Value jPos = j["position"];
-	Json::Value jRot = j["rotation"];
-	Json::Value jScl = j["scale"];
+	Json::Value jPos = j["pos"];
+	Json::Value jRot = j["rot"];
+	Json::Value jScl = j["scl"];
 
-	this->Position = glm::vec3(jPos[0].asFloat(), jPos[1].asFloat(), jPos[2].asFloat());
-	this->Rotation = glm::vec3(jRot[0].asFloat(), jRot[1].asFloat(), jRot[2].asFloat());
-	this->Scale = glm::vec3(jScl[0].asFloat(), jScl[1].asFloat(), jScl[2].asFloat());
+	this->pos = glm::vec3(jPos[0].asFloat(), jPos[1].asFloat(), jPos[2].asFloat());
+	this->rot = glm::vec3(jRot[0].asFloat(), jRot[1].asFloat(), jRot[2].asFloat());
+	this->scl = glm::vec3(jScl[0].asFloat(), jScl[1].asFloat(), jScl[2].asFloat());
+
+	Json::Value items = j["components"];
+
+    for(unsigned i = 0; i < items.size(); i++) {
+		Object::ptr o = ObjFactory::createObject(items[i]["type"].asString());
+		o->jload(items[i]);
+		o->parent = this;
+		components.push_back(std::move(o));
+	}
 }
 
 
-
-Object::ptr ObjFactory::createInstance(std::string const& s) {
+Object::ptr ObjFactory::createObject(std::string const& s) {
 	ObjFactory::map_type::iterator it = getMap()->find(s);
 	if(it == getMap()->end()) {
-		Luarium::log("Could not find object type \"" + s + "\", type not registered", 1);
+		LuariumLog("Could not find object type \"" + s + "\", type not registered", 2);
 		return nullptr;
 	}
-	return it->second.create_f();
+	return it->second();
 }
 
-bool const ObjFactory::registerType(const char* name, std::function<Object::ptr()> create_f, std::function<void> value_f(Object::ptr*, Json::Value)) {
-	object_functions f = {
-		create_f,
-		value_f
-	};
-
-	getMap()->insert(std::pair<std::string, object_functions>(name, f));
-	
+bool const ObjFactory::registerType(const char* name, Object::ptr (*create_f)()) {
+	getMap()->emplace(name, create_f);	
 	return true;
 }
 
-std::shared_ptr<ObjFactory::map_type> ObjFactory::typemap = nullptr;
-
 std::shared_ptr<ObjFactory::map_type> ObjFactory::getMap() {
-	if(!typemap) { typemap = std::shared_ptr<ObjFactory::map_type>(); } 
-	return typemap; 
+	if(!typemap) { typemap = std::make_shared<ObjFactory::map_type>(); } 
+	return typemap;
+}
+
+void BlankObject::jload(Json::Value j) {
+	Object::jload(j);
 }
