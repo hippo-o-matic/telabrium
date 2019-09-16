@@ -17,7 +17,7 @@
 namespace Map {
 	namespace fsys = std::experimental::filesystem; // That's a long name
 
-	int load(std::string path, std::string options = ""); // Load the map 
+	void load(std::string path, std::string options = ""); // Load the map 
 
 	void unload(); // Cleans up resources of currently loaded map
 	void clear_cache();
@@ -25,17 +25,18 @@ namespace Map {
 
 	void cleanup(std::string options = ""); // Cleanup function for Luarium::cleanup()
 
-	std::vector<std::string> map_cache;
+	extern std::vector<std::string> map_cache;
 
-	std::unique_ptr<Level> index;
+	extern Object::ptr index_level;
 };
 
 class Level : public Object {
 public:
 	Level(); // Get the parent map path and the path inside the map file
-	~Level();
+	~Level() = default;
 
-	void load();
+	void load(std::string path);
+	virtual void jload(Json::Value lvl);
 	void unload();
 };
 

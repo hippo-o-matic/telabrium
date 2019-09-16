@@ -1,11 +1,12 @@
 ﻿#include "luarium/main.h"
 
-Camera* Camera::ACTIVE = NULL;
-Shader* Shader::ACTIVE = NULL;
+std::unique_ptr<Camera> Camera::ACTIVE = nullptr;
+std::unique_ptr<Shader> Shader::ACTIVE = nullptr;
+Level* test = new Level;
 
 // settings 
-const unsigned int SCR_WIDTH = 1000;
-const unsigned int SCR_HEIGHT = 1000;
+const unsigned int SCR_WIDTH = 1280;
+const unsigned int SCR_HEIGHT = 720;
 
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -29,7 +30,7 @@ int main(){
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 	GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-	if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) //Only enable debug output if our version of GL supports it
+	if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) // Only enable debug output if our version of GL supports it
 	{
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
@@ -43,30 +44,35 @@ int main(){
 	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-
+	glFrontFace(GL_CW);
 //	glEnable(GL_BLEND);
 //	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// build and compile shaders
-	Shader::ACTIVE = new Shader(SHADER_PATH_V, SHADER_PATH_F);
+	Shader::ACTIVE = std::make_unique<Shader>(SHADER_PATH_V, SHADER_PATH_F);
 	Shader skyboxShader("shaders/skybox.vert", "shaders/skybox.frag");
 	Shader unshaded("shaders/Standard.vert", "shaders/unshaded.frag");
 
-	Camera::ACTIVE = new Camera(glm::vec3(0,0,0));
-	Camera::ACTIVE->Aspect = 1;
-	
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+	Camera::ACTIVE = std::make_unique<Camera>();
+	float aspect = ((float)SCR_WIDTH/(float)SCR_HEIGHT);
+	Camera::ACTIVE->Aspect = (aspect >= 1) ? aspect : ((float)SCR_HEIGHT/(float)SCR_WIDTH); // Set the default aspect to the window aspect
+
+	setInputBinds();
 
 	// load models
-	Model aa("model/s/nanosuit.obj");
-	Model box("model/cube.obj", glm::vec3(2,1,0));
-	std::string heck = "textures";
-	Mesh bab(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("shadertest.png", heck));
 
-	DirLight someLight(glm::vec3(70.0f, 0.0f, 20.0f), glm::vec3(0.001));
-	SpotLight spot(glm::vec3(0));
+	test->load("levels/test/index.json");
+
+	Model plant("models/nanosuit/nanosuit.obj", glm::vec3(2,1,0));
+	// Model plont("models/nanosuit/nanosuit.obj", glm::vec3(10,1,0));
+	// Model bop("models/g.dae", glm::vec3(3,0,1));
+	// Model bip("models/untitled.dae", glm::vec3(20, 0, 0));
+
+	// std::string heck = "textures";
+	// Mesh bab(calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("shadertest.png", heck));
+
+	// DirLight someLight(glm::vec3(70.0f, 0.0f, 20.0f));
+	// PointLight ee(glm::vec3(4,0,0));
 
 	std::vector<std::string> skyFaces = {
 		"right.jpg",
@@ -96,34 +102,29 @@ int main(){
 
 		// input
 		// -----
-		processInput(window);
+		Input::process(window);
+		// test->load("levels/test/foo.json");
 
 		// render
 		// ------
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		spot.Position = Camera::ACTIVE->Position;
-		spot.Rotation = Camera::ACTIVE->Front;
-
-
 		// don't forget to enable shader before setting uniforms
 		Shader::ACTIVE->use();
-		Shader::ACTIVE->set("ViewPos", Camera::ACTIVE->Position);
+		Shader::ACTIVE->set("ViewPos", Camera::ACTIVE->pos);
 
 		// view/projection transformations
 		Shader::ACTIVE->set("projection", Camera::ACTIVE->GetProjectionMatrix());
 		Shader::ACTIVE->set("view", Camera::ACTIVE->GetViewMatrix());
-		unshaded.set("projection", Camera::ACTIVE->GetProjectionMatrix());
-		unshaded.set("view", Camera::ACTIVE->GetViewMatrix());
+		// unshaded.set("projection", Camera::ACTIVE->GetProjectionMatrix());
+		// unshaded.set("view", Camera::ACTIVE->GetViewMatrix());
 		
 		Light::updateLights(*Shader::ACTIVE);
-
-		aa.Draw();
-	//	box.Draw();
+		
+		Model::drawT.exec(*Shader::ACTIVE);
 		
 		// draw skybox last
-		bab.Draw(*Shader::ACTIVE);
 		skybox.Draw(skyboxShader);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -138,33 +139,36 @@ int main(){
 	return 0;
 }
 
-void processInput(GLFWwindow *window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		Camera::ACTIVE->ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		Camera::ACTIVE->ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		Camera::ACTIVE->ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		Camera::ACTIVE->ProcessKeyboard(RIGHT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		Camera::ACTIVE->Position.y+= deltaTime * 2;
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-		Camera::ACTIVE->Position.y-= deltaTime * 2;
-	if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS){
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		simpleConsole();
-	}
-
+void setInputBinds() {
+	std::unique_ptr<Camera>& c = Camera::ACTIVE;
+	Input::addBind(GLFW_KEY_ESCAPE, [](GLFWwindow* w){ glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL); });
 	
-	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS){
-		Shader::ACTIVE->build();
-		printf("[?] DEBUG: Reloaded core shader\n");
-	}
+	// Input::addBind(GLFW_KEY_W, [&c](GLFWwindow* w){ c->pos += c->Front * c->Speed * deltaTime; });
+	// Input::addBind(GLFW_KEY_S, [&c](GLFWwindow* w){ c->pos -= c->Front * c->Speed * deltaTime; });
+	// Input::addBind(GLFW_KEY_A, [&c](GLFWwindow* w){ c->pos -= c->Right * c->Speed * deltaTime; });
+	// Input::addBind(GLFW_KEY_D, [&c](GLFWwindow* w){ c->pos += c->Right * c->Speed * deltaTime; });
+
+	Input::addBind(GLFW_KEY_W, [&c](GLFWwindow* w){
+		c->pos += glm::normalize(glm::vec3(c->Front.x, 0, c->Front.z)) * c->Speed * deltaTime; });
+	Input::addBind(GLFW_KEY_S, [&c](GLFWwindow* w){ 
+		c->pos -= glm::normalize(glm::vec3(c->Front.x, 0, c->Front.z)) * c->Speed * deltaTime; });
+	Input::addBind(GLFW_KEY_A, [&c](GLFWwindow* w){
+		c->pos -= glm::vec3(c->Right.x, 0, c->Right.z) * c->Speed * deltaTime; });
+	Input::addBind(GLFW_KEY_D, [&c](GLFWwindow* w){
+		c->pos += glm::vec3(c->Right.x, 0, c->Right.z) * c->Speed * deltaTime; });
+	
+	Input::addBind(GLFW_KEY_SPACE, [&c](GLFWwindow* w){ c->pos.y += c->Speed * deltaTime; });
+	Input::addBind(GLFW_KEY_LEFT_CONTROL, [&c](GLFWwindow* w){ c->pos.y -= c->Speed * deltaTime; });
+	Input::addBind(GLFW_KEY_LEFT_SHIFT, [&c](GLFWwindow* w){ c->Speed = 5; });
+	Input::addBind(GLFW_KEY_LEFT_SHIFT, [&c](GLFWwindow* w){ c->Speed = 2.5; }, GLFW_RELEASE);
+	Input::addBind(GLFW_KEY_GRAVE_ACCENT, [](GLFWwindow* w){
+		glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		simpleConsole();
+	});
+
+	Input::addBind(GLFW_KEY_LEFT_BRACKET, [](GLFWwindow* w){test->load("levels/test/foo.json");});
 }
+
 
 GLFWwindow* init_main_window() {
 	// glfw: initialize and configure
@@ -182,7 +186,7 @@ GLFWwindow* init_main_window() {
  	// --------------------
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "hippotest", NULL, NULL);
 	if (window == NULL) {
-		Luarium::log("Failed to create GLFW window", 4);
+		LuariumLog("Failed to create GLFW window", 4);
 		std::cin.get();
 		glfwTerminate();
 		return nullptr;
@@ -196,7 +200,7 @@ GLFWwindow* init_main_window() {
 	// glad: load all OpenGL function pointers
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		Luarium::log("Failed to initialize GLAD", 4);
+		LuariumLog("Failed to initialize GLAD", 4);
 		return nullptr;
 	}
 	
@@ -208,6 +212,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	// make sure the viewport matches the new window dimensions; note that width and 
 	// height will be significantly larger than specified on retina displays.
 	glViewport(0, 0, width, height);
+	float aspect = ((float)width/(float)height);
+	Camera::ACTIVE->Aspect = (aspect >= 1) ? aspect : ((float)height/(float)width);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -241,8 +247,8 @@ void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsi
     // useless error codes
     if(id == 131169 || id == 131185 || id == 131218 || id == 131204) return; 
 
-    std::string output;
-	short int sev;
+    std::string output = "OpenGL Error: ";
+	// short sev = 0;
 
     switch (source)
     {
@@ -267,21 +273,19 @@ void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsi
         case GL_DEBUG_TYPE_OTHER:               output += "Other"; break;
 	}
     
-    switch (severity)
-    {
-        case GL_DEBUG_SEVERITY_HIGH:         sev = 4; break;
-        case GL_DEBUG_SEVERITY_MEDIUM:       sev = 3; break;
-        case GL_DEBUG_SEVERITY_LOW:          sev = 2; break;
-        case GL_DEBUG_SEVERITY_NOTIFICATION: sev = 1; break;
-    }
+    // switch (severity)
+    // {
+    //     case GL_DEBUG_SEVERITY_HIGH:         sev = 4; break;
+    //     case GL_DEBUG_SEVERITY_MEDIUM:       sev = 3; break;
+    //     case GL_DEBUG_SEVERITY_LOW:          sev = 2; break;
+    //     case GL_DEBUG_SEVERITY_NOTIFICATION: sev = 1; break;
+    // }
 
-	Luarium::log("OpenGL Error: " + output , sev);
+	LuariumLog(output, 2);
 	glGetError();
 }
 
 void cleanup() {
-	delete Shader::ACTIVE;
-	delete Camera::ACTIVE;
 	//Map::cleanup();
 
 	glfwDestroyWindow(window);
@@ -300,15 +304,13 @@ void simpleConsole() {
 
 	std::vector<std::string> command = Luarium::segment(in, ' '); // Split the input string into a vector of strings
 
-	if (command[0] == "rlshader"){
+	if (command[0] == "rshader"){
 		glUseProgram(0);
 		Shader::ACTIVE->build();
 		printf("[?] DEBUG: Reloaded core shader\n");
-	}
-	else if(command[0] == "quit"){
+	} else if(command[0] == "quit"){
 		gameState = 0;
-	}
-	else if(command[0] == "pm"){
+	} else if(command[0] == "pm"){
 		if(command[1] == "GL_FILL")
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		if(command[1] == "GL_LINE")
@@ -316,9 +318,14 @@ void simpleConsole() {
 		if(command[1] == "GL_POINT")
 			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 		return;
-	} 
-
-	else {
+	} else if(command[0] == "aspect") {
+		Camera::ACTIVE->Aspect = std::stof(command[1]);
+	} else if(command[0] == "load") {
+		test->load(command[1]);
+		std::cout << "Done" << std::endl;
+	} else if(command[0] == "unload") {
+		test->unload();
+	} else {
 		printf("[?] DEBUG: Command not recognized :/\n");
 	}
 }

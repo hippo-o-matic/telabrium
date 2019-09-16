@@ -1,5 +1,5 @@
 {
-    "id" : "root",
+    "id" : "toot",
     "type" : "Level",
     "position" : [0,0,0],
     "rotation" : [0,0,0],
@@ -17,9 +17,9 @@
             "id":"mainlight",
             "type":"DirLight",
 
-            "ambient":[0,0,0],
-            "diffuse":[1,0.8,0.8],
-            "specular":[1,1,1]  
+            "ambient":[0,1,0]
+            // "diffuse":[0.8,0.8,0.8],
+            // "specular":[1,1,1]  
         }
     ]
-}   
+}

@@ -22,6 +22,8 @@
 #include "luarium/luafile.h"
 #include "luarium/utility.h"
 #include "luarium/skybox.h"
+#include "luarium/input.h"
+#include "luarium/level.h"
 
 #define LUARIUM_MODE_DEBUG
 
@@ -41,7 +43,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow *window);
+
+void setInputBinds();
 
 void processInput(GLFWwindow *window);
 
@@ -56,5 +59,7 @@ void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsi
 void cleanup();
 
 void simpleConsole();
+
+extern Level* test;
 
 #endif // LUARIUM_MAIN_H
