@@ -1,12 +1,12 @@
 #include "luarium/skybox.h"
 
 
-Skybox::Skybox(Texture cubemap) : Mesh(Luarium::calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, cubemap) {
+Skybox::Skybox(Texture cubemap) : Mesh(calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, cubemap) {
 	setupMesh();
 }
 
 void Skybox::Draw(Shader &shader){
-	glFrontFace(GL_CW); // Allows us to render the cube so it isn't culled
+	// glFrontFace(GL_CCW); // Allows us to render the cube so it isn't culled
 	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 	shader.use();
 	shader.set("view", glm::mat4(glm::mat3(Camera::ACTIVE->GetViewMatrix()))); // remove translation from the view matrix
@@ -19,6 +19,6 @@ void Skybox::Draw(Shader &shader){
 	glBindVertexArray(0);
 
 	glDepthFunc(GL_LESS); // set depth function back to default
-	glFrontFace(GL_CCW); // Set front face back to default
+	// glFrontFace(GL_CW); // Set front face back to default
 	glActiveTexture(GL_TEXTURE0);
 }
