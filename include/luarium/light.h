@@ -21,42 +21,49 @@ public:
 	glm::vec3 Specular;
 
 	// Gather all the lights and send them to the shader
-	static void updateLights(Shader &shader);
-	
-protected:
-	void jload(Json::Value j);
+	static void updateLights(Shader& shader);
+
+	virtual void jload(Json::Value j);
+
+private:
+	LUARIUM_REGISTER_OBJECT(Light);
 };
 
 // Directional Light: Provides light from one direction
 class DirLight : public Light {
 public:
 	DirLight(
-		glm::vec3 dir = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 amb = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 dif = glm::vec3(0.8f, 0.8f, 0.8f),
-		glm::vec3 spec = glm::vec3(1.0f, 1.0f, 1.0f));
+		glm::vec3 dir = glm::vec3(0.0f),
+		glm::vec3 amb = glm::vec3(0.0f),
+		glm::vec3 dif = glm::vec3(0.8f),
+		glm::vec3 spec = glm::vec3(1.0f));
 
 	DirLight(const DirLight &obj);
 
 	~DirLight();
 
-	static std::vector<DirLight*> list; // The vector that contains all the lights of this class, for shader processing
-	int id = 0;
+	int nid = 0; // Numeric id for the shader
 
-	void jload(Json::Value j);
+	static Task<DirLight, Shader&> updateT; // Task for sending light data to the shader
+	static void updateTF(Shader&); // Task function for updateT
+	void updateOF(Shader&); // Object function for updateT
+
+	virtual void jload(Json::Value j);
 
 private:
-	static int idStep; // Remember where we left off when assigning id's
+	LUARIUM_REGISTER_OBJECT(DirLight);
+
+	static int nidStep; // Remember where we left off when assigning nid's
 };
 
 // Point Light: Creates a spherical light originating from a single point
 class PointLight : public Light {
 public:	
 	PointLight(
-		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 amb = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 dif = glm::vec3(0.8f, 0.8f, 0.8f),
-		glm::vec3 spec = glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3 pos = glm::vec3(0.0f),
+		glm::vec3 amb = glm::vec3(0.0f),
+		glm::vec3 dif = glm::vec3(0.8f),
+		glm::vec3 spec = glm::vec3(1.0f),
 		float constant = 1.0f,
 		float lin = 0.9f,
 		float quad = 0.032f);
@@ -69,24 +76,29 @@ public:
 	float Linear;
 	float Quadratic;
 
-	static std::vector<PointLight*> list;
-	int id = 0;
+	int nid = 0;
 
-	void jload(Json::Value j);
+	static Task<PointLight, Shader&> updateT; // Task for sending light data to the shader
+	static void updateTF(Shader& s); // Task function for updateT
+	void updateOF(Shader&); // Object function for updateT
+
+	virtual void jload(Json::Value j);
 
 private:
-	static int idStep;
+	LUARIUM_REGISTER_OBJECT(PointLight);
+
+	static int nidStep;
 };
 
 // Spotlight: Creates a conic light originating from a single point
 class SpotLight : public Light {
 public:
 	SpotLight(
-		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 rot = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 amb = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 dif = glm::vec3(0.8f, 0.8f, 0.8f),
-		glm::vec3 spec = glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3 pos = glm::vec3(0.0f),
+		glm::vec3 rot = glm::vec3(0.0f),
+		glm::vec3 amb = glm::vec3(0.0f),
+		glm::vec3 dif = glm::vec3(0.8f),
+		glm::vec3 spec = glm::vec3(1.0f),
 		float constant = 1.0f,
 		float lin = 0.9f,
 		float quad = 0.032f,
@@ -104,18 +116,18 @@ public:
 	float CutOff; // The start of the cutoff fade, in degrees
 	float OuterCutOff; // The edge of the cutoff fade, in degrees
 
-	static std::vector<SpotLight*> list;
-	int id;
+	int nid;
 
-protected:
-	static std::function<Object::ptr()> luarium_obj_create;
-    std::function<void(Json::Value)> value_f;
-    static bool luarium_obj_reg;
+	static Task<SpotLight, Shader&> updateT; // Task for sending light data to the shader
+	static void updateTF(Shader& s); // Task function for updateT
+	void updateOF(Shader&); // Object function for updateT
 
-	static void jload(Object::ptr* obj, Json::Value j);
+	virtual void jload(Json::Value j);
 
 private:
-	static int idStep;
+	LUARIUM_REGISTER_OBJECT(SpotLight);
+
+	static int nidStep;
 }; 
 
 #endif
