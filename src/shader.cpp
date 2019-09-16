@@ -47,7 +47,7 @@ void Shader::build(){
 		}
 	}
 	catch (const std::ifstream::failure &e){
-		Luarium::log("Shader file was not sucessfully read", 3);
+		LuariumLog("Shader file was not sucessfully read", 3);
 	}
 	
 	const char* vShaderCode = vertexCode.c_str();
@@ -146,8 +146,7 @@ void Shader::set(const std::string &name, const glm::mat4 &mat) const{
 
 // utility function for checking shader compilation/linking errors.
 // ------------------------------------------------------------------------
-void Shader::checkCompileErrors(GLuint shader, std::string type)
-{
+void Shader::checkCompileErrors(GLuint shader, std::string type) {
 	GLint success;
 	GLchar infoLog[1024];
 	if(type != "PROGRAM")
@@ -158,7 +157,7 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
 			glGetShaderInfoLog(shader, 1024, NULL, infoLog);
 			std::string error;
 			error = "Shader failed to compile. Faliure type was: " + type + "\n-------------------------------------------------------\n" + infoLog + "\n-------------------------------------------------------\n";
-			Luarium::log(error, 3);
+			LuariumLog(error, 3);
 		}
 	}
 	else
@@ -169,7 +168,7 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
 			glGetProgramInfoLog(shader, 1024, NULL, infoLog);
 			std::string error;
 			error = "Shader failed to link. Faliure type was: " + type + "\n-------------------------------------------------------\n" + infoLog + "\n-------------------------------------------------------\n";
-			Luarium::log(error, 3);
+			LuariumLog(error, 3);
 		}
 	}
 }

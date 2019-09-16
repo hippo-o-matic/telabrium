@@ -14,7 +14,7 @@
 /// A class for interacting with an OpenGL shader
 class Shader{
 public:
-	static Shader* ACTIVE;
+	static std::unique_ptr<Shader> ACTIVE;
 
     unsigned int ID = 0;
 	std::string vertexPath, fragmentPath, geometryPath;
