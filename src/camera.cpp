@@ -10,26 +10,26 @@ float Camera::FOV = 60.0f;
 //--------------------
 
 //Vector Constructor
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float roll) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), fov(FOV) {
-	Position = position;
+Camera::Camera(glm::vec3 pos, glm::vec3 up, float yaw, float pitch, float roll) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), Speed(SPEED), MouseSensitivity(SENSITIVTY), fov(FOV) {
+	pos = pos;
 	WorldUp = up;
-	Rotation.y = yaw;
-	Rotation.x = pitch;
-	Rotation.z = roll;
+	rot.y = yaw;
+	rot.x = pitch;
+	rot.z = roll;
 	updateCameraVectors();
 }
 // Scalar Constructor
-Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, float roll) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), fov(FOV) {
-	Position = glm::vec3(posX, posY, posZ);
+Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, float roll) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), Speed(SPEED), MouseSensitivity(SENSITIVTY), fov(FOV) {
+	pos = glm::vec3(posX, posY, posZ);
 	WorldUp = glm::vec3(upX, upY, upZ);
-	Rotation.y = yaw;
-	Rotation.x = pitch;
-	Rotation.z = roll;
+	rot.y = yaw;
+	rot.x = pitch;
+	rot.z = roll;
 	updateCameraVectors();
 }
 // Returns the view matrix calculated using Eular Angles and the LookAt Matrix
 glm::mat4 Camera::GetViewMatrix(){
-	return glm::lookAt(Position, Position + Front, Up);
+	return glm::lookAt(pos, pos + Front, Up);
 }
 
 glm::mat4 Camera::GetProjectionMatrix(){
@@ -39,9 +39,10 @@ glm::mat4 Camera::GetProjectionMatrix(){
 void Camera::updateCameraVectors(){
 	// Calculate the new Front vector
 	glm::vec3 front;
-	front.x = cos(glm::radians(Rotation.y)) * cos(glm::radians(Rotation.x));
-	front.y = sin(glm::radians(Rotation.x));
-	front.z = sin(glm::radians(Rotation.y)) * cos(glm::radians(Rotation.x));
+	front.x = cos(glm::radians(rot.y)) * cos(glm::radians(rot.x));
+	front.y = sin(glm::radians(rot.x));
+	front.z = sin(glm::radians(rot.y)) * cos(glm::radians(rot.x));
+	
 	Front = glm::normalize(front);
 	// Also re-calculate the Right and Up vector
 	Right = glm::normalize(glm::cross(Front, WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
@@ -49,36 +50,20 @@ void Camera::updateCameraVectors(){
 	
 };
 
-void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
-	float velocity = MovementSpeed * deltaTime;
-	if (direction == FORWARD)
-		Position += Front * velocity;
-	if (direction == BACKWARD)
-		Position -= Front * velocity;
-	if (direction == LEFT)
-		Position -= Right * velocity;
-	if (direction == RIGHT)
-		Position += Right * velocity;
-	if (direction == UP)
-		Position[1] += velocity;
-	if (direction == DOWN)
-		Position[1] -= velocity;
-}
-
 void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch) {
 	xoffset *= MouseSensitivity;
 	yoffset *= MouseSensitivity;
 
-	Rotation.y += xoffset;
-	Rotation.x += yoffset;
+	rot.y += xoffset;
+	rot.x += yoffset;
 
 	// Make sure that when pitch is out of bounds, screen doesn't get flipped
 	if (constrainPitch)
 	{
-		if (Rotation.x > 89.0f)
-			Rotation.x = 89.0f;
-		if (Rotation.x < -89.0f)
-			Rotation.x = -89.0f;
+		if (rot.x > 89.0f)
+			rot.x = 89.0f;
+		if (rot.x < -89.0f)
+			rot.x = -89.0f;
 	}
 
 	// Update Front, Right and Up Vectors using the updated Eular angles

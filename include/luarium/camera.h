@@ -11,19 +11,19 @@
 #include "luarium/object.h"
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
-enum Camera_Movement {
-	FORWARD,
-	BACKWARD,
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN,
-};
+// enum Camera_Movement {
+// 	FORWARD,
+// 	BACKWARD,
+// 	LEFT,
+// 	RIGHT,
+// 	UP,
+// 	DOWN,
+// };
 
 // A Camera object that processes a view for displaying in OpenGL. 
 class Camera : public Object{
 public:
-	static Camera* ACTIVE;
+	static std::unique_ptr<Camera> ACTIVE;
 
 	// Camera Attributes
 	glm::vec3 Front;
@@ -32,7 +32,7 @@ public:
 	glm::vec3 WorldUp;
 
 	// Camera options
-	float MovementSpeed;
+	float Speed;
 	float MouseSensitivity;
 	float fov;
 	float Aspect;
@@ -54,7 +54,7 @@ public:
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjectionMatrix();
 
-	void ProcessKeyboard(Camera_Movement direction, float deltaTime);
+	// void ProcessKeyboard(Camera_Movement direction, float deltaTime);
 
 	void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 
