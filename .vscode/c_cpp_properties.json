@@ -3,16 +3,17 @@
         {
             "name": "Linux",
             "includePath": [
-				"/usr/include",
-				"/usr/local/include",
-				"${workspaceFolder}",
-				"/home/hippo-o-matic/Source/repos/luarium/include"
+                "/usr/include",
+                "/usr/local/include",
+                "${workspaceFolder}",
+                "/home/hippo-o-matic/Source/repos/luarium/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x64"
+            "intelliSenseMode": "clang-x64",
+            "configurationProvider": "go2sh.cmake-integration"
         }
     ],
     "version": 4
