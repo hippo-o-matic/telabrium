@@ -25,9 +25,9 @@ public:
     };
 
 	Object(
-        glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3 rot = glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3 scl = glm::vec3(1.0f, 1.0f, 1.0f)
+        glm::vec3 pos = glm::vec3(0.0f),
+        glm::vec3 rot = glm::vec3(0.0f),
+        glm::vec3 scl = glm::vec3(1.0f)
     );
 
 	virtual ~Object();
@@ -36,9 +36,9 @@ public:
     std::string type;
 
     // Spatial properties relative to parent
-	glm::vec3 pos;
-	glm::vec3 rot;
-	glm::vec3 scl;
+	glm::vec3 pos = glm::vec3(0);
+	glm::vec3 rot = glm::vec3(0);
+	glm::vec3 scl = glm::vec3(1);
 
 	void operator<<(Object::ptr &o); // Move an object from one parent to another
     void operator<<(std::vector<Object::ptr> &o_vec); // Move a vector of objects from one parent to another
