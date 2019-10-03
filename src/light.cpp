@@ -1,4 +1,4 @@
-#include "luarium/light.h"
+#include "telabrium/light.h"
 
 // Static initialization
 Task<DirLight, Shader&> DirLight::updateT(&DirLight::updateOF, &DirLight::updateTF);

@@ -1,4 +1,4 @@
-#include "luarium/shader.h"
+#include "telabrium/shader.h"
 
 Shader::Shader(const char* vPath, const char* fPath, const char* gPath){
 	vertexPath = vPath;
@@ -47,7 +47,7 @@ void Shader::build(){
 		}
 	}
 	catch (const std::ifstream::failure &e){
-		LuariumLog("Shader file was not sucessfully read", 3);
+		TelabriumLog("Shader file was not sucessfully read", 3);
 	}
 	
 	const char* vShaderCode = vertexCode.c_str();
@@ -157,7 +157,7 @@ void Shader::checkCompileErrors(GLuint shader, std::string type) {
 			glGetShaderInfoLog(shader, 1024, NULL, infoLog);
 			std::string error;
 			error = "Shader failed to compile. Faliure type was: " + type + "\n-------------------------------------------------------\n" + infoLog + "\n-------------------------------------------------------\n";
-			LuariumLog(error, 3);
+			TelabriumLog(error, 3);
 		}
 	}
 	else
@@ -168,7 +168,7 @@ void Shader::checkCompileErrors(GLuint shader, std::string type) {
 			glGetProgramInfoLog(shader, 1024, NULL, infoLog);
 			std::string error;
 			error = "Shader failed to link. Faliure type was: " + type + "\n-------------------------------------------------------\n" + infoLog + "\n-------------------------------------------------------\n";
-			LuariumLog(error, 3);
+			TelabriumLog(error, 3);
 		}
 	}
 }

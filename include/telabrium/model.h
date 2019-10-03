@@ -9,8 +9,8 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
-#include "luarium/mesh.h"
-#include "luarium/task.h"
+#include "telabrium/mesh.h"
+#include "telabrium/task.h"
 
 /// A class for transitioning between the Assimp Model Loader and the native mesh class
 class Model : public Object {

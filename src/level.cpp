@@ -1,4 +1,4 @@
-#include "luarium/level.h"
+#include "telabrium/level.h"
 
 Object::ptr Map::index_level;
 
@@ -25,7 +25,7 @@ void Map::load(std::string path, std::string options) {
         index_level = ObjFactory::createObject("Level");
         index_level->to<Level>()->load(path + index_path);
     } else {
-        LuariumLog("Could not find the index level, can't load map" + path, 2);
+        TelabriumLog("Could not find the index level, can't load map" + path, 2);
     }
     
 }
@@ -35,19 +35,19 @@ Level::Level() {}
 void Level::load(std::string path) {
     std::ifstream file(path.c_str());
     if(!file) {
-        LuariumLog("File \"" + path + "\" was not found", 3);
+        TelabriumLog("File \"" + path + "\" was not found", 3);
         return;
     }
 
     Json::Value json;
     try { file >> json; } catch(const Json::RuntimeError& e) {
-        LuariumLog(std::string("Json Error: ") + e.what(), 3);
+        TelabriumLog(std::string("Json Error: ") + e.what(), 3);
         return;
     }
     
 
     if(json["type"] != "Level") {
-        LuariumLog("Could not load the level: root object isn't type 'level'", 2);
+        TelabriumLog("Could not load the level: root object isn't type 'level'", 2);
         return;
     }
 

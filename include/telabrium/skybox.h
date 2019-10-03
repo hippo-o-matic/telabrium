@@ -1,9 +1,9 @@
 #ifndef LUARIUM_SKYBOX
 #define LUARIUM_SKYBOX
 
-#include "luarium/utility.h"
-#include "luarium/camera.h"
-#include "luarium/mesh.h"
+#include "telabrium/utility.h"
+#include "telabrium/camera.h"
+#include "telabrium/mesh.h"
 
 class Skybox : public Mesh {
 public:

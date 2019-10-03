@@ -16,9 +16,10 @@
         {
             "id":"mainlight",
             "type":"DirLight",
+            "rot":[70,1,20],
 
-            "ambient":[0,0,0],
-            "diffuse":[1,0.8,0.8],
+            "ambient":[0.01,0.01,0],
+            "diffuse":[0.8,0.8,0.8],
             "specular":[1,1,1]  
         }
     ]

@@ -1,4 +1,4 @@
-#include "luarium/input.h"
+#include "telabrium/input.h"
 
 double Input::mouse_lastX = 0;
 double Input::mouse_lastY = 0;
@@ -36,13 +36,13 @@ void Input::saveConfig(Json::Value& json) {
 
 void Input::addBind(const char* name, std::function<void()> func, int key, int action) {
     if(key == GLFW_KEY_UNKNOWN)
-        LuariumLog("Can't add a bind to an unknown key", 2); return;
+        TelabriumLog("Can't add a bind to an unknown key", 2); return;
 
     // If the bind doesn't already exist, push a new one to the binds vector
     if(std::find_if(binds.begin(), binds.end(), [name](bind b){ return b.name == name; }) != binds.end()) { // Find the bind by name
         binds.push_back({name, func, key, action,});
     } else {
-        LuariumLog("A bind with the id \"" + std::string(name) + "\" already exists", 2);
+        TelabriumLog("A bind with the id \"" + std::string(name) + "\" already exists", 2);
     }
         
 }
@@ -64,7 +64,7 @@ void Input::editBindFunc(const char* name, std::function<void()> func) {
     if(it != binds.end()) {
         it->func = func;
     } else {
-        LuariumLog("Can't find bind \"" + std::string(name) + "\" to edit", 1);
+        TelabriumLog("Can't find bind \"" + std::string(name) + "\" to edit", 1);
     }
 }
 
@@ -74,7 +74,7 @@ void Input::editBindKey(const char* name, int key, int action) {
         it->key = key; // Assign values if it does
         it->action = (action == -2) ? it->action : action; // If the action is the default (-2), leave it as the same
     } else {
-        LuariumLog("Can't find bind \"" + std::string(name) + "\" to edit", 1);
+        TelabriumLog("Can't find bind \"" + std::string(name) + "\" to edit", 1);
     }
 }
 

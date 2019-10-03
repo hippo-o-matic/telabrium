@@ -12,8 +12,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "luarium/shader.h"
-#include "luarium/object.h"
+#include "telabrium/shader.h"
+#include "telabrium/object.h"
 
 struct Vertex {
 	// position

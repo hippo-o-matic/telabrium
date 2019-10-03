@@ -1,4 +1,4 @@
-#include "luarium/camera.h"
+#include "telabrium/camera.h"
 
 float Camera::YAW = -90.0f;
 float Camera::PITCH = 0.0f;

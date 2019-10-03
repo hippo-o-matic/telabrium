@@ -1,7 +1,7 @@
-#include "luarium/utility.h"
+#include "telabrium/utility.h"
 
 //Parses strings into a vector of strings seperated by the seperator character
-std::vector<std::string> Luarium::segment(std::string &in, char seperator) {
+std::vector<std::string> Telabrium::segment(std::string &in, char seperator) {
 	size_t last = 0;
 	size_t pos = 0; //Limits in to 512 characters, might want to change later
 	std::vector<std::string> output;
@@ -18,7 +18,7 @@ std::vector<std::string> Luarium::segment(std::string &in, char seperator) {
 	return output;
 }
 
-void Luarium::log(std::string message, const char* f, int line, short int severity, const char* outputfile){
+void Telabrium::log(std::string message, const char* f, int line, short int severity, const char* outputfile){
 	std::fstream file(outputfile, std::fstream::out);
 
 	char t[80];

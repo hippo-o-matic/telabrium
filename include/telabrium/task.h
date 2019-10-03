@@ -3,7 +3,7 @@
 #include <vector>
 #include <functional>
 
-#include "luarium/object.h"
+#include "telabrium/object.h"
 
 // An automation class that takes a vector of objects (T) and runs an object (obj_func) for each one with args of type (Args...).
 // Also runs (task_func) once everytime the vector is run

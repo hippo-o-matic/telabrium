@@ -10,7 +10,7 @@
 			"request": "launch",
 			"program": "${workspaceFolder}/build/bin/hippotest",
 			"args": [],
-//			"additionalSOLibSearchPath": "/usr/lib : /usr/local/lib : /home/hippo-o-matic/Source/repos/luarium/lib",
+//			"additionalSOLibSearchPath": "/usr/lib : /usr/local/lib : /home/hippo-o-matic/Source/repos/telabrium/lib",
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/tests",
 			

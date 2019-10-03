@@ -5,9 +5,9 @@
 #include <vector>
 #include <memory>
 
-#include "luarium/object.h"
-#include "luarium/shader.h"
-#include "luarium/model.h"
+#include "telabrium/object.h"
+#include "telabrium/shader.h"
+#include "telabrium/model.h"
 
 class Light : public Object {
 public:

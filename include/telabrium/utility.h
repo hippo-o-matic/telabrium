@@ -10,7 +10,7 @@
 
 const std::string LUARIUM_CACHE_PATH = "tests/cache/";
 
-namespace Luarium{
+namespace Telabrium{
 	// Seperates a string into a vector of strings, separated by [seperator] (input string, seperator)
 	std::vector<std::string> segment(std::string &in, char seperator);
 
@@ -65,8 +65,8 @@ namespace Luarium{
 	};
 }
 
-#define LuariumLog(MESSAGE, SEVERITY) \
-Luarium::log(MESSAGE, __FILE__, __LINE__)
+#define TelabriumLog(MESSAGE, SEVERITY) \
+Telabrium::log(MESSAGE, __FILE__, __LINE__)
 
 #endif
 

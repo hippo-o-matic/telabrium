@@ -5,8 +5,8 @@
 
 #include "glm/glm.hpp"
 
-#include "luarium/object.h"
-#include "luarium/collider.h"
+#include "telabrium/object.h"
+#include "telabrium/collider.h"
 
 class Rigidbody : public Object {
 public:

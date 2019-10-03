@@ -8,7 +8,7 @@
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "C:/Users/hippo/source/repos/luarium/Debug/luarium.exe",
+            "program": "C:/Users/hippo/source/repos/telabrium/Debug/telabrium.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

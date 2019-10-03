@@ -9,10 +9,10 @@
                 "-g", "-Wall",
                 "src/Main.cpp", "src/glad.c",
                 "-o", "hippotest",
-                "-I/home/hippo-o-matic/Source/repos/luarium/include",// "-I/usr/include", "-I/usr/local/include",
-                "-L/home/hippo-o-matic/Source/C++/repos/luarium/lib",// "-L/usr/lib", "-L/usr/local/lib",
+                "-I/home/hippo-o-matic/Source/repos/telabrium/include",// "-I/usr/include", "-I/usr/local/include",
+                "-L/home/hippo-o-matic/Source/C++/repos/telabrium/lib",// "-L/usr/lib", "-L/usr/local/lib",
 				"-lglfw", "-lassimp", "-lGL", "-lX11", "-lpthread", "-lXrandr", "-lXi", "-ldl", "-llua52",
-				"-Wl,-rpath,\"/home/hippo-o-matic/Source/repos/luarium/lib\"",
+				"-Wl,-rpath,\"/home/hippo-o-matic/Source/repos/telabrium/lib\"",
                 "-std=c++17"
             ],
             "problemMatcher": [

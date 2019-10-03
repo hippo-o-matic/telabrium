@@ -5,8 +5,8 @@
 
 #include "glm/glm.hpp"
 
-#include "luarium/object.h"
-#include "luarium/collider.h
+#include "telabrium/object.h"
+#include "telabrium/collider.h
 
 class Rigidbody : public Object {
 public:
@@ -24,11 +24,11 @@ public:
 	void update(float deltaTime) {
 		glm::vec3 lin_accel = force / glm::vec3(mass);
 		lin_velocity += lin_accel * glm::vec3(deltaTime);
-		parent->Position += lin_velocity * glm::vec3(deltaTime);
+		parent->pos += lin_velocity * glm::vec3(deltaTime);
 
 		glm::vec3 ang_accel = torque / glm::vec3(MOI);
 		ang_velocity += ang_accel * glm::vec3(deltaTime);
-		parent->Rotation += ang_velocity * glm::vec3(deltaTime);
+		parent->rot += ang_velocity * glm::vec3(deltaTime);
 	}
 
 	static std::vector<Rigidbody*> list;
@@ -38,7 +38,7 @@ private:
 		//Calculate the object's torque
 		glm::vec3 r; // r is the center of mass, found by averaging all a mesh's points
 		for (int i; i > collider->mesh.vertices.size(); i++) {
-			r += collider->mesh.vertices[i].Position / glm::vec3(collider->mesh.vertices.size());
+			r += collider->mesh.vertices[i].pos / glm::vec3(collider->mesh.vertices.size());
 		}
 		torque = glm::cross(r, force);
 	

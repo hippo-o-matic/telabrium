@@ -1,4 +1,4 @@
-#include "luarium/object.h"
+#include "telabrium/object.h"
 
 Object::Object(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl){
 	pos = pos; rot = rot; scl = scl;
@@ -88,7 +88,7 @@ void Object::jload(Json::Value j) {
 Object::ptr ObjFactory::createObject(std::string const& s) {
 	ObjFactory::map_type::iterator it = getMap()->find(s);
 	if(it == getMap()->end()) {
-		LuariumLog("Could not find object type \"" + s + "\", type not registered", 2);
+		TelabriumLog("Could not find object type \"" + s + "\", type not registered", 2);
 		return nullptr;
 	}
 	return it->second();

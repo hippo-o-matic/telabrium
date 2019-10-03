@@ -6,7 +6,7 @@
 #include "GLFW/glfw3.h"
 #include "json/json.h"
 
-#include "luarium/utility.h"
+#include "telabrium/utility.h"
 
 // A class for setting up input binds, assigning keys to them, and polling those keys
 class Input {

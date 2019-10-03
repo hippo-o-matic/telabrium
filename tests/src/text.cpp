@@ -7,8 +7,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "luarium/shader.h"
-#include "luarium/object.h"
+#include "telabrium/shader.h"
+#include "telabrium/object.h"
 
 struct Character {
 	GLuint     TextureID;  // ID handle of the glyph texture
@@ -21,13 +21,13 @@ class Text {
 public:
 	Text(std::string txt, glm::vec2 pos = glm::vec2(0,0), float scl = 1.0) {
 		content = txt;
-		Position = pos;
-		scale = scl;
+		pos = pos;
+		scl = scl;
 	}
 	Text(std::string txt, float x = 0, float y = 0, float scl = 1.0) {
 		content = txt;
-		Position = glm::vec2(x, y);
-		scale = scl;
+		pos = glm::vec2(x, y);
+		scl = scl;
 	}
 
 	void Draw(Shader* shader) {
@@ -35,8 +35,8 @@ public:
 	}
 
 	std::string content;
-	glm::vec2 Position;
-	float scale;
+	glm::vec2 pos;
+	float scl;
 
 private:
 	

@@ -1,4 +1,4 @@
-#include "luarium/mesh.h"
+#include "telabrium/mesh.h"
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, RenderMat mat){
 	this->vertices = vertices;

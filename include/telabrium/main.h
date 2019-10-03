@@ -1,5 +1,5 @@
-#ifndef LUARIUM_MAIN_H
-#define LUARIUM_MAIN_H
+#ifndef TELABRIUM_MAIN_H
+#define TELABRIUM_MAIN_H
 
 //#define _GLIBCXX_USE_CXX11_ABI 0
 
@@ -13,19 +13,19 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "luarium/shader.h"
-#include "luarium/camera.h"
-#include "luarium/model.h"
-#include "luarium/light.h"
-//#include "luarium/text.h"
-//#include "luarium/rigidbody.h"
-#include "luarium/luafile.h"
-#include "luarium/utility.h"
-#include "luarium/skybox.h"
-#include "luarium/input.h"
-#include "luarium/level.h"
+#include "telabrium/shader.h"
+#include "telabrium/camera.h"
+#include "telabrium/model.h"
+#include "telabrium/light.h"
+//#include "telabrium/text.h"
+//#include "telabrium/rigidbody.h"
+#include "telabrium/luafile.h"
+#include "telabrium/utility.h"
+#include "telabrium/skybox.h"
+#include "telabrium/input.h"
+#include "telabrium/level.h"
 
-#define LUARIUM_MODE_DEBUG
+#define TELABRIUM_MODE_DEBUG
 
 const char* SHADER_PATH_V = "shaders/Standard.vert";
 const char* SHADER_PATH_F = "shaders/Standard.frag";
@@ -44,9 +44,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
-void setInputBinds();
-
-void processInput(GLFWwindow *window);
+void setupInputBinds();
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -62,4 +60,6 @@ void simpleConsole();
 
 extern Level* test;
 
-#endif // LUARIUM_MAIN_H
+extern Input mainInput;
+
+#endif // TELABRIUM_MAIN_H

@@ -6,7 +6,7 @@
                 "/usr/include",
                 "/usr/local/include",
                 "${workspaceFolder}",
-                "/home/hippo-o-matic/Source/repos/luarium/include"
+                "/home/hippo-o-matic/Source/repos/telabrium/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

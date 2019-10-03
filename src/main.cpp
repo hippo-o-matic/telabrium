@@ -1,23 +1,20 @@
-﻿#include "luarium/main.h"
+﻿#include "telabrium/main.h"
 
 std::unique_ptr<Camera> Camera::ACTIVE = nullptr;
 std::unique_ptr<Shader> Shader::ACTIVE = nullptr;
 Level* test = new Level;
+Input mainInput;
 
 // settings 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
-
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
-bool firstMouse = true;
 
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 int main(){
-	std::cout<<"Luarium b0.0.1"<<std::endl;
+	std::cout<<"Telabrium b0.0.1"<<std::endl;
 
 	GLFWwindow* window = init_main_window();
 
@@ -26,7 +23,7 @@ int main(){
 	
 	std::cout<<glGetString(GL_VERSION)<<std::endl;
 
-	#ifdef LUARIUM_MODE_DEBUG
+	#ifdef TELABRIUM_MODE_DEBUG
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 	GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
@@ -57,11 +54,11 @@ int main(){
 	float aspect = ((float)SCR_WIDTH/(float)SCR_HEIGHT);
 	Camera::ACTIVE->Aspect = (aspect >= 1) ? aspect : ((float)SCR_HEIGHT/(float)SCR_WIDTH); // Set the default aspect to the window aspect
 
-	setInputBinds();
+	setupInputBinds();
 
 	// load models
 
-	test->load("levels/test/index.json");
+	// test->load("levels/test/index.json");
 
 	Model plant("models/nanosuit/nanosuit.obj", glm::vec3(2,1,0));
 	// Model plont("models/nanosuit/nanosuit.obj", glm::vec3(10,1,0));
@@ -69,7 +66,7 @@ int main(){
 	// Model bip("models/untitled.dae", glm::vec3(20, 0, 0));
 
 	// std::string heck = "textures";
-	// Mesh bab(calcVertex(Luarium::cubeVerts), Luarium::cubeIndices, loadTexture("shadertest.png", heck));
+	// Mesh bab(calcVertex(Telabrium::cubeVerts), Telabrium::cubeIndices, loadTexture("shadertest.png", heck));
 
 	// DirLight someLight(glm::vec3(70.0f, 0.0f, 20.0f));
 	// PointLight ee(glm::vec3(4,0,0));
@@ -102,8 +99,7 @@ int main(){
 
 		// input
 		// -----
-		Input::process(window);
-		// test->load("levels/test/foo.json");
+		// Input::process(window);
 
 		// render
 		// ------
@@ -139,34 +135,47 @@ int main(){
 	return 0;
 }
 
-void setInputBinds() {
+void setupInputBinds() {
+	GLFWwindow* w = window;
 	std::unique_ptr<Camera>& c = Camera::ACTIVE;
-	Input::addBind(GLFW_KEY_ESCAPE, [](GLFWwindow* w){ glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL); });
-	
-	// Input::addBind(GLFW_KEY_W, [&c](GLFWwindow* w){ c->pos += c->Front * c->Speed * deltaTime; });
-	// Input::addBind(GLFW_KEY_S, [&c](GLFWwindow* w){ c->pos -= c->Front * c->Speed * deltaTime; });
-	// Input::addBind(GLFW_KEY_A, [&c](GLFWwindow* w){ c->pos -= c->Right * c->Speed * deltaTime; });
-	// Input::addBind(GLFW_KEY_D, [&c](GLFWwindow* w){ c->pos += c->Right * c->Speed * deltaTime; });
 
-	Input::addBind(GLFW_KEY_W, [&c](GLFWwindow* w){
-		c->pos += glm::normalize(glm::vec3(c->Front.x, 0, c->Front.z)) * c->Speed * deltaTime; });
-	Input::addBind(GLFW_KEY_S, [&c](GLFWwindow* w){ 
-		c->pos -= glm::normalize(glm::vec3(c->Front.x, 0, c->Front.z)) * c->Speed * deltaTime; });
-	Input::addBind(GLFW_KEY_A, [&c](GLFWwindow* w){
-		c->pos -= glm::vec3(c->Right.x, 0, c->Right.z) * c->Speed * deltaTime; });
-	Input::addBind(GLFW_KEY_D, [&c](GLFWwindow* w){
-		c->pos += glm::vec3(c->Right.x, 0, c->Right.z) * c->Speed * deltaTime; });
+	mainInput.addBind("pause", [w](){ glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL); }, GLFW_KEY_ESCAPE);
 	
-	Input::addBind(GLFW_KEY_SPACE, [&c](GLFWwindow* w){ c->pos.y += c->Speed * deltaTime; });
-	Input::addBind(GLFW_KEY_LEFT_CONTROL, [&c](GLFWwindow* w){ c->pos.y -= c->Speed * deltaTime; });
-	Input::addBind(GLFW_KEY_LEFT_SHIFT, [&c](GLFWwindow* w){ c->Speed = 5; });
-	Input::addBind(GLFW_KEY_LEFT_SHIFT, [&c](GLFWwindow* w){ c->Speed = 2.5; }, GLFW_RELEASE);
-	Input::addBind(GLFW_KEY_GRAVE_ACCENT, [](GLFWwindow* w){
+	// Input.addBind(GLFW_KEY_W, [&c](GLFWwindow* w){ c->pos += c->Front * c->Speed * deltaTime; });
+	// Input.addBind(GLFW_KEY_S, [&c](GLFWwindow* w){ c->pos -= c->Front * c->Speed * deltaTime; });
+	// Input.addBind(GLFW_KEY_A, [&c](GLFWwindow* w){ c->pos -= c->Right * c->Speed * deltaTime; });
+	// Input.addBind(GLFW_KEY_D, [&c](GLFWwindow* w){ c->pos += c->Right * c->Speed * deltaTime; });
+
+	mainInput.addBind("forward", [&c]() {
+		c->pos += glm::normalize(glm::vec3(c->Front.x, 0, c->Front.z)) * c->Speed * deltaTime;
+	}, GLFW_KEY_W);
+
+	mainInput.addBind("back", [&c]() { 
+		c->pos -= glm::normalize(glm::vec3(c->Front.x, 0, c->Front.z)) * c->Speed * deltaTime;
+	}, GLFW_KEY_S);
+
+	mainInput.addBind("left", [&c]() {
+		c->pos -= glm::vec3(c->Right.x, 0, c->Right.z) * c->Speed * deltaTime;
+	}, GLFW_KEY_A);
+
+	mainInput.addBind("right", [&c]() {
+		c->pos += glm::vec3(c->Right.x, 0, c->Right.z) * c->Speed * deltaTime;
+	}, GLFW_KEY_D);
+	
+	mainInput.addBind("up", [&c](){ c->pos.y += c->Speed * deltaTime; }, GLFW_KEY_SPACE);
+
+	mainInput.addBind("sprint", [&c](){ c->pos.y -= c->Speed * deltaTime; }, GLFW_KEY_LEFT_CONTROL);
+
+	mainInput.addBind("sprint_start", [&c](){ c->Speed = 5; }, GLFW_KEY_LEFT_SHIFT);
+
+	mainInput.addBind("sprint_stop", [&c](){ c->Speed = 2.5; }, GLFW_KEY_LEFT_SHIFT, GLFW_RELEASE);
+	
+	mainInput.addBind("console", [w](){
 		glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		simpleConsole();
-	});
+	}, GLFW_KEY_GRAVE_ACCENT);
 
-	Input::addBind(GLFW_KEY_LEFT_BRACKET, [](GLFWwindow* w){test->load("levels/test/foo.json");});
+	mainInput.addBind("test", [](){test->load("levels/test/index.json");}, GLFW_KEY_LEFT_BRACKET);
 }
 
 
@@ -186,13 +195,17 @@ GLFWwindow* init_main_window() {
  	// --------------------
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "hippotest", NULL, NULL);
 	if (window == NULL) {
-		LuariumLog("Failed to create GLFW window", 4);
+		TelabriumLog("Failed to create GLFW window", 4);
 		std::cin.get();
 		glfwTerminate();
 		return nullptr;
 	}
+
 	glfwMakeContextCurrent(window);
+
+	// Set glfw callbacks
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	// glfwSetKeyCallback(window, mainInput.key_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetScrollCallback(window, scroll_callback);
@@ -200,7 +213,7 @@ GLFWwindow* init_main_window() {
 	// glad: load all OpenGL function pointers
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		LuariumLog("Failed to initialize GLAD", 4);
+		TelabriumLog("Failed to initialize GLAD", 4);
 		return nullptr;
 	}
 	
@@ -216,21 +229,21 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	Camera::ACTIVE->Aspect = (aspect >= 1) ? aspect : ((float)height/(float)width);
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-	if (firstMouse)	{
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
-	}
+// void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+// 	// if (firstMouse)	{
+// 	// 	lastX = xpos;
+// 	// 	lastY = ypos;
+// 	// 	firstMouse = false;
+// 	// }
 
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+// 	float xoffset = xpos - lastX;
+// 	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
-	lastX = xpos;
-	lastY = ypos;
-	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
-		Camera::ACTIVE->ProcessMouseMovement(xoffset, yoffset);
-}
+// 	lastX = xpos;
+// 	lastY = ypos;
+// 	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
+// 		Camera::ACTIVE->ProcessMouseMovement(xoffset, yoffset);
+// }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
 	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
@@ -281,7 +294,7 @@ void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsi
     //     case GL_DEBUG_SEVERITY_NOTIFICATION: sev = 1; break;
     // }
 
-	LuariumLog(output, 2);
+	TelabriumLog(output, 2);
 	glGetError();
 }
 
@@ -302,7 +315,7 @@ void simpleConsole() {
 	if (in == "\0") // Do nothing if nothing is input
 		return;
 
-	std::vector<std::string> command = Luarium::segment(in, ' '); // Split the input string into a vector of strings
+	std::vector<std::string> command = Telabrium::segment(in, ' '); // Split the input string into a vector of strings
 
 	if (command[0] == "rshader"){
 		glUseProgram(0);

@@ -11,7 +11,7 @@
 #include "json/json.h"
 #include "json/json-forwards.h"
 
-#include "luarium/utility.h"
+#include "telabrium/utility.h"
 
 class Object {
 public:
@@ -79,13 +79,13 @@ private:
 };
 
 /* Creates a register function for the object and calls it, place inside class definition
-* luarium_obj_create(): A function that returns a new NAME
+* telabrium_obj_create(): A function that returns a new NAME
 * VALUE_F(Object::ptr*, Json::Value): A function address of a function that fills out an object based off of a Json::Value,
 * should take a pointer to a unique pointer of an object (Object::ptr*) and a Json::Value
-* luarium_obj_reg: a trick using static initialization order to register the type before main()*/
+* telabrium_obj_reg: a trick using static initialization order to register the type before main()*/
 #define LUARIUM_REGISTER_OBJECT(NAME) \
-    inline static Object::ptr luarium_obj_create() { return std::make_unique<NAME>(); }; \
-    inline static bool luarium_obj_reg = ObjFactory::registerType (#NAME, NAME::luarium_obj_create)
+    inline static Object::ptr telabrium_obj_create() { return std::make_unique<NAME>(); }; \
+    inline static bool telabrium_obj_reg = ObjFactory::registerType (#NAME, NAME::telabrium_obj_create)
 
 
 class BlankObject : public Object {

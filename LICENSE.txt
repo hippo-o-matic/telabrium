@@ -1,4 +1,4 @@
-Luarium is licensed under the MIT License. As long as the copyright below is included somewhere in your product or documentation, you are free to use this library with no cost or permission from us.
+Telabrium is licensed under the MIT License. As long as the copyright below is included somewhere in your product or documentation, you are free to use this library with no cost or permission from us.
 
 ------------------------------------------
 

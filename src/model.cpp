@@ -1,5 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include "luarium/model.h"
+#include "telabrium/model.h"
 
 // Static initialization
 Task<Model, Shader&> Model::drawT(&Model::Draw);
@@ -33,7 +33,7 @@ void Model::loadModel(std::string const &path){
 	// check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 	{
-		LuariumLog(importer.GetErrorString(), 2);
+		TelabriumLog(importer.GetErrorString(), 2);
 		return;
 	}
 	// retrieve the directory path of the filepath
@@ -213,7 +213,7 @@ Texture loadTexture(const char* path, std::string &directory){
 		if((err = glGetError()) != GL_NO_ERROR){
 			std::cerr << "GL Error: \"" << err << "\"" << std::endl;
 		}
-		LuariumLog("Texture failed to load at path: \"" + filename + "\"", 2);
+		TelabriumLog("Texture failed to load at path: \"" + filename + "\"", 2);
     }
 
 	stbi_image_free(data);
@@ -238,7 +238,7 @@ Texture loadCubemap(std::vector<std::string> faces, std::string path) {
 		}
 		else
 		{
-			LuariumLog("Cubemap texture failed to load at path: \"" + path + "/" + faces[i] + "\"", 2);
+			TelabriumLog("Cubemap texture failed to load at path: \"" + path + "/" + faces[i] + "\"", 2);
 			stbi_image_free(data);
 		}
 	}

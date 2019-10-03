@@ -10,8 +10,8 @@
 #include "json/json.h"
 #include "json/json-forwards.h"
 
-#include "luarium/object.h"
-#include "luarium/utility.h"
+#include "telabrium/object.h"
+#include "telabrium/utility.h"
 #include "micropak.hpp"
 
 namespace Map {
@@ -23,7 +23,7 @@ namespace Map {
 	void clear_cache();
 	void clear_cache(std::string path); // Clears specified entry from cache, if blank clears whole cache
 
-	void cleanup(std::string options = ""); // Cleanup function for Luarium::cleanup()
+	void cleanup(std::string options = ""); // Cleanup function for Telabrium::cleanup()
 
 	extern std::vector<std::string> map_cache;
 
