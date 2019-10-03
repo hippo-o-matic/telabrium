@@ -23,5 +23,4 @@ if(BUILD_EXTRA)
     add_subdirectory(generic)
 endif()
 
-add_library(libtelabrium ${telabrium_CORE_SOURCES})
-target_compile_options(libtelabrium PUBLIC "-Wall -g -std=c++17")
+add_library(telabrium ${telabrium_CORE_SOURCES})
