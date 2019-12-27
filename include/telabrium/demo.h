@@ -1,5 +1,4 @@
-#ifndef TELABRIUM_MAIN_H
-#define TELABRIUM_MAIN_H
+#pragma once
 
 //#define _GLIBCXX_USE_CXX11_ABI 0
 
@@ -24,6 +23,7 @@
 #include "telabrium/skybox.h"
 #include "telabrium/input.h"
 #include "telabrium/level.h"
+#include "telabrium/generic/freecam.h"
 
 #define TELABRIUM_MODE_DEBUG
 
@@ -59,7 +59,3 @@ void cleanup();
 void simpleConsole();
 
 extern Level* test;
-
-extern Input mainInput;
-
-#endif // TELABRIUM_MAIN_H
