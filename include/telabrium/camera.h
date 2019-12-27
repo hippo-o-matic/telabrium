@@ -21,7 +21,7 @@
 // };
 
 // A Camera object that processes a view for displaying in OpenGL. 
-class Camera : public Object{
+class Camera : public Object {
 public:
 	static std::unique_ptr<Camera> ACTIVE;
 
@@ -32,33 +32,17 @@ public:
 	glm::vec3 WorldUp;
 
 	// Camera options
-	float Speed;
-	float MouseSensitivity;
-	float fov;
+	float fov = 60;
 	float Aspect;
 
-	//Default Camera settings
-	static float YAW;
-	static float PITCH;
-	static float ROLL;
-	static float SPEED;
-	static float SENSITIVTY;
-	static float FOV;
-
 	// Constructor with vectors
-	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH, float roll = ROLL);
+	Camera(glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));
 	// Constructor with scalar values
 	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, float roll);
 
 	// Returns the view matrix calculated using Eular Angles and the LookAt Matrix
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjectionMatrix();
-
-	// void ProcessKeyboard(Camera_Movement direction, float deltaTime);
-
-	void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-
-	void ProcessMouseScroll(float yoffset);
 
 protected:
 	void updateCameraVectors();
