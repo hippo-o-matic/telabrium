@@ -21,13 +21,11 @@ public:
     void removeObj(T*);
     void removeObj(std::vector<T*>);
 
-
     void setObjFunc(std::function<void(Args... args)>); // Assign the obj_func
     void setObjFunc(void (T::*f)(Args...));
 
     void setTaskFunc(std::function<void(Args... args)>); // Assign the task_func
     void setTaskFunc(void (*f)(Args...));
-
 
     void exec(Args...);
 

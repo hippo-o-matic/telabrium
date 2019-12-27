@@ -15,7 +15,7 @@ void Map::load(std::string path, std::string options) {
     if(path.back() != '/' && !path.empty()) // Make sure the path is valid
         path += "/";
 
-    std::vector<micropak::meta_entry> tags = micropak::unpack(path, LUARIUM_CACHE_PATH + "mapdata/"); // Unpack the map into the cache
+    std::vector<micropak::meta_entry> tags = micropak::unpack(path, TELABRIUM_CACHE_PATH + "mapdata/"); // Unpack the map into the cache
     
     std::string index_path = (*std::find_if(tags.begin(), tags.end(), find_tag("index_level"))).value; // Look at the tags for an index map override
     if(index_path.empty())

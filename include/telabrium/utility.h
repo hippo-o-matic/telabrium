@@ -8,7 +8,8 @@
 #include <fstream>
 #include <time.h>
 
-const std::string LUARIUM_CACHE_PATH = "tests/cache/";
+const std::string TELABRIUM_CACHE_PATH = "demo/cache/";
+const std::string TELABRIUM_CONFIG_PATH = "demo/config/";
 
 namespace Telabrium{
 	// Seperates a string into a vector of strings, separated by [seperator] (input string, seperator)
@@ -65,6 +66,7 @@ namespace Telabrium{
 	};
 }
 
+// This is a hack, TODO redo logging 
 #define TelabriumLog(MESSAGE, SEVERITY) \
 Telabrium::log(MESSAGE, __FILE__, __LINE__)
 
