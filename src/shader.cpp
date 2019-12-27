@@ -1,5 +1,7 @@
 #include "telabrium/shader.h"
 
+std::unique_ptr<Shader> Shader::ACTIVE = nullptr;
+
 Shader::Shader(const char* vPath, const char* fPath, const char* gPath){
 	vertexPath = vPath;
 	fragmentPath = fPath;
