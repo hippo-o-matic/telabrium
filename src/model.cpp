@@ -6,20 +6,20 @@ Task<Model, Shader&> Model::drawT(&Model::Draw);
 
 // constructor, expects a filepath to a 3D model.
 Model::Model(std::string const &p, glm::vec3 pos, glm::vec3 rot, glm::vec3 scl, bool gamma) : gammaCorrection(gamma){
+	Object(pos, rot, scl);
 	loadModel(p);
 	path = p;
-	pos = pos; rot = rot; scl = scl;
 	drawT.addObj(this);
 }
 
 // draws the model, and thus all its meshes
 void Model::Draw(Shader &shader){
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, pos);
-	model = glm::rotate(model, glm::radians(rot.x), glm::vec3(1, 0, 0));
-	model = glm::rotate(model, glm::radians(rot.y), glm::vec3(0, 1, 0));
-	model = glm::rotate(model, glm::radians(rot.z), glm::vec3(0, 0, 1));
-	model = glm::scale(model, scl);
+	model = glm::translate(model, getPos());
+	model = glm::rotate(model, glm::radians(getRot().x), glm::vec3(1, 0, 0));
+	model = glm::rotate(model, glm::radians(getRot().y), glm::vec3(0, 1, 0));
+	model = glm::rotate(model, glm::radians(getRot().z), glm::vec3(0, 0, 1));
+	model = glm::scale(model, getScl());
 	shader.set("model", model);
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].Draw(shader);

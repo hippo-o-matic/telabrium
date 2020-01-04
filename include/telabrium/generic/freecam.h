@@ -25,14 +25,14 @@ private:
 
         xoffset *= MouseSensitivity;
 	    yoffset *= MouseSensitivity;
+        glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-        rot.x += yoffset;
-        rot.y += xoffset;
+        setRot(getRot() + glm::vec3(yoffset, xoffset, 0));
 
-        if (rot.x > 89.0f)
-            rot.x = 89.0f;
-        if (rot.x < -89.0f)
-            rot.x = -89.0f;
+        if (getRot().x > 89.0f)
+            setRot(glm::vec3(89, getRot().y, getRot().z)); // Oh god we need a better interface than this. Hopefully we figure out how to do setRot.x() or something in the future. This is bad
+        if (getRot().x < -89.0f)
+            setRot(glm::vec3(-89, getRot().y, getRot().z));
 
         // Update Front, Right and Up Vectors using the updated Eular angles
         updateCameraVectors();

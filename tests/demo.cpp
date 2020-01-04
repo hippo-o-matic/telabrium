@@ -51,13 +51,30 @@ int main(){
 	float aspect = ((float)SCR_WIDTH/(float)SCR_HEIGHT);
 	Camera::ACTIVE->Aspect = (aspect >= 1) ? aspect : ((float)SCR_HEIGHT/(float)SCR_WIDTH); // Set the default aspect to the window aspect
 
-	
-
 	// load models
 
 	// test->load("levels/test/index.json");
 
-	Model test("models/test.dae", glm::vec3(2,1,0));
+	Model test("shadetest.dae", glm::vec3(2,1,0));
+
+	Model vest("origin.dae", glm::vec3(3,0,0));
+	// std::unique_ptr<Model> vestptr = std::make_unique<Model>(vest);
+	// test.add<Model>(vestptr);
+
+	Input baz;
+	bool buzz = true;
+
+	baz.addBind("temp_rotate", [&test, &buzz](){
+		if(buzz) {
+			test.setRot(test.getRot()+glm::vec3(0,0.1,0));
+			buzz = true;
+		}
+	}, GLFW_KEY_F);
+	baz.addBind("temp_rotate_stop", [&test, &buzz](){
+		buzz = true;
+	}, GLFW_KEY_F, GLFW_RELEASE);
+	baz.activate();
+
 	// Model plont("models/nanosuit/nanosuit.obj", glm::vec3(10,1,0));
 	// Model bop("models/g.dae", glm::vec3(3,0,1));
 	// Model bip("models/untitled.dae", glm::vec3(20, 0, 0));
@@ -95,11 +112,6 @@ int main(){
 
 		Input::processActive(window);
 
-
-		// input
-		// -----
-		// Input::process(window);
-
 		// render
 		// ------
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -107,7 +119,7 @@ int main(){
 
 		// don't forget to enable shader before setting uniforms
 		Shader::ACTIVE->use();
-		Shader::ACTIVE->set("ViewPos", Camera::ACTIVE->pos);
+		Shader::ACTIVE->set("ViewPos", Camera::ACTIVE->getPos());
 
 		// view/projection transformations
 		Shader::ACTIVE->set("projection", Camera::ACTIVE->GetProjectionMatrix());
@@ -134,48 +146,12 @@ int main(){
 	return 0;
 }
 
-// void setupInputBinds() {
-// 	GLFWwindow* w = window;
-// 	std::unique_ptr<Camera>& c = Camera::ACTIVE;
 
-// 	mainInput.addBind("pause", [w](){ glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL); }, GLFW_KEY_ESCAPE);
-	
-// 	// Input.addBind(GLFW_KEY_W, [&c](GLFWwindow* w){ c->pos += c->Front * c->Speed * deltaTime; });
-// 	// Input.addBind(GLFW_KEY_S, [&c](GLFWwindow* w){ c->pos -= c->Front * c->Speed * deltaTime; });
-// 	// Input.addBind(GLFW_KEY_A, [&c](GLFWwindow* w){ c->pos -= c->Right * c->Speed * deltaTime; });
-// 	// Input.addBind(GLFW_KEY_D, [&c](GLFWwindow* w){ c->pos += c->Right * c->Speed * deltaTime; });
 
-// 	mainInput.addBind("forward", [&c]() {
-// 		c->pos += glm::normalize(glm::vec3(c->Front.x, 0, c->Front.z)) * c->Speed * deltaTime;
-// 	}, GLFW_KEY_W);
-
-// 	mainInput.addBind("back", [&c]() { 
-// 		c->pos -= glm::normalize(glm::vec3(c->Front.x, 0, c->Front.z)) * c->Speed * deltaTime;
-// 	}, GLFW_KEY_S);
-
-// 	mainInput.addBind("left", [&c]() {
-// 		c->pos -= glm::vec3(c->Right.x, 0, c->Right.z) * c->Speed * deltaTime;
-// 	}, GLFW_KEY_A);
-
-// 	mainInput.addBind("right", [&c]() {
-// 		c->pos += glm::vec3(c->Right.x, 0, c->Right.z) * c->Speed * deltaTime;
-// 	}, GLFW_KEY_D);
-	
-// 	mainInput.addBind("up", [&c](){ c->pos.y += c->Speed * deltaTime; }, GLFW_KEY_SPACE);
-
-// 	mainInput.addBind("sprint", [&c](){ c->pos.y -= c->Speed * deltaTime; }, GLFW_KEY_LEFT_CONTROL);
-
-// 	mainInput.addBind("sprint_start", [&c](){ c->Speed = 5; }, GLFW_KEY_LEFT_SHIFT);
-
-// 	mainInput.addBind("sprint_stop", [&c](){ c->Speed = 2.5; }, GLFW_KEY_LEFT_SHIFT, GLFW_RELEASE);
-	
 // 	mainInput.addBind("console", [w](){
 // 		glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 // 		simpleConsole();
 // 	}, GLFW_KEY_GRAVE_ACCENT);
-
-// 	mainInput.addBind("test", [](){test->load("levels/test/index.json");}, GLFW_KEY_LEFT_BRACKET);
-// }
 
 
 GLFWwindow* init_main_window() {
@@ -227,33 +203,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	float aspect = ((float)width/(float)height);
 	Camera::ACTIVE->Aspect = (aspect >= 1) ? aspect : ((float)height/(float)width);
 }
-
-// void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-// 	// if (firstMouse)	{
-// 	// 	lastX = xpos;
-// 	// 	lastY = ypos;
-// 	// 	firstMouse = false;
-// 	// }
-
-// 	float xoffset = xpos - lastX;
-// 	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-// 	lastX = xpos;
-// 	lastY = ypos;
-// 	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
-// 		Camera::ACTIVE->ProcessMouseMovement(xoffset, yoffset);
-// }
-
-// void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-// 	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
-// 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-// 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-// 	}
-// }
-
-// void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-// 	Camera::ACTIVE->ProcessMouseScroll(yoffset);
-// }
 
 void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam){
     // useless error codes

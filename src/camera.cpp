@@ -7,15 +7,15 @@ std::unique_ptr<Camera> Camera::ACTIVE = nullptr;
 
 // Vector Constructor
 Camera::Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 up) {
-	pos = position;
+	setPos(position);
 	WorldUp = up;
-	rot = rotation;
+	setRot(rotation);
 	updateCameraVectors();
 }
 
 // Returns the view matrix calculated using Eular Angles and the LookAt Matrix
 glm::mat4 Camera::GetViewMatrix(){
-	return glm::lookAt(pos, pos + Front, Up);
+	return glm::lookAt(getPos(), getPos() + Front, Up);
 }
 
 glm::mat4 Camera::GetProjectionMatrix(){
@@ -25,9 +25,9 @@ glm::mat4 Camera::GetProjectionMatrix(){
 void Camera::updateCameraVectors(){
 	// Calculate the new Front vector
 	glm::vec3 front;
-	front.x = cos(glm::radians(rot.y)) * cos(glm::radians(rot.x));
-	front.y = sin(glm::radians(rot.x));
-	front.z = sin(glm::radians(rot.y)) * cos(glm::radians(rot.x));
+	front.x = cos(getRotRad().x) * cos(getRotRad().x);
+	front.y = sin(getRotRad().y);
+	front.z = sin(getRotRad().z) * cos(getRotRad().x);
 	
 	Front = glm::normalize(front);
 	// Also re-calculate the Right and Up vector
