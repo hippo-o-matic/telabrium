@@ -22,8 +22,8 @@
 		{
 			"label": "build",
 			"type" : "shell",
-			"command" : "make",
-			"args" : ["${workspaceDirectory}"],
+			"command" : "ninja",
+			"args" : ["-C", "build"],
 			"group": {
                 "kind": "build",
                 "isDefault": true

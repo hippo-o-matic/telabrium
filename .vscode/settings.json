@@ -1,4 +1,6 @@
 {
 	"C_Cpp.dimInactiveRegions": false,
-	"cmake.configureOnOpen": true
+	"files.associations": {
+		"typeinfo": "cpp"
+	},
 }
