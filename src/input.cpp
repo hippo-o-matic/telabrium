@@ -1,12 +1,13 @@
 #include "telabrium/input.h"
 
-double Input::mouse_lastX;
-double Input::mouse_lastY;
 std::vector<Input*> Input::active_profiles;
 
 Input::Input(std::string path) {
-    if(!path.empty())
-        loadConfigFile(path);
+    loadConfigFile(path);
+ 
+}
+
+Input::Input() {
 }
 
 void Input::loadConfigFile(std::string path) {
@@ -54,7 +55,7 @@ void Input::addBind(const char* name, std::function<void()> func, int key, int a
 
     // If the bind doesn't already exist, push a new one to the binds vector
     if(std::find_if(binds.begin(), binds.end(), [name](bind b){ return b.name == name; }) == binds.end()) { // Find the bind by name
-        binds.push_back({name, func, key, action,});
+        binds.push_back({name, func, key, action});
     } else {
         TelabriumLog("A bind with the id \"" + std::string(name) + "\" already exists", 2);
     }
@@ -169,7 +170,8 @@ void Input::mouse_button_callback(GLFWwindow* window, int button, int action, in
 void Input::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     if(glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) { // Only run mouse events if the window is focused
         for(auto it = active_profiles.begin(); it != active_profiles.end(); it++) { // Iterate through all active profiles
-            (*it)->mouse_c(window, xpos, ypos);
+            if((*it)->mouse_c)
+                (*it)->mouse_c(window, xpos, ypos);
         }
     }
 }
@@ -177,7 +179,8 @@ void Input::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 void Input::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     if(glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) { // Only run mouse events if the window is focused
         for(auto it = active_profiles.begin(); it != active_profiles.end(); it++) { // Iterate through all active profiles
-            (*it)->scroll_c(window, xoffset, yoffset);
+            if((*it)->scroll_c)
+                (*it)->scroll_c(window, xoffset, yoffset);
         }
     }
 }

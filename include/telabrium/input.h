@@ -18,7 +18,8 @@ public:
         int action;
     };
 
-    Input(std::string path = "");
+    Input(std::string path);
+    Input();
 
     /*  loadConfig(Json::Value& j) 
         Loads a json configuration from (j).

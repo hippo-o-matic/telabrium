@@ -1,5 +1,6 @@
 project('telabrium', 'cpp', 'c',
     version : '0.3.0',
+    debug : true,
     default_options : ['cpp_std=c++17'],
     license : 'MIT')
 
