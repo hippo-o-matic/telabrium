@@ -26,7 +26,7 @@ void Light::jload(Json::Value j) {
 
 // Directional Light: Provides light from one direction
 DirLight::DirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec) {
-	setRot(dir); Ambient = amb; Diffuse = dif; Specular = spec;
+	rot = dir; Ambient = amb; Diffuse = dif; Specular = spec;
 	nid = nidStep++;
 	updateT.addObj(this);
 }
@@ -42,7 +42,7 @@ void DirLight::updateTF(Shader& s) {
 
 void DirLight::updateOF(Shader& s) {
 	std::string s_nid = std::to_string(nid);
-	s.set("dirLights[" + s_nid + "].direction", getRotRad());
+	s.set("dirLights[" + s_nid + "].direction", glm::radians(rot()));
 	s.set("dirLights[" + s_nid + "].ambient", Ambient);
 	s.set("dirLights[" + s_nid + "].diffuse", Diffuse);
 	s.set("dirLights[" + s_nid + "].specular", Specular);
@@ -54,8 +54,8 @@ void DirLight::jload(Json::Value j) {
 
 
 // Point Light: Creates a spherical light originating from a single point
-PointLight::PointLight(glm::vec3 pos, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad){
-	setPos(pos); Ambient = amb; Diffuse = dif; Specular = spec;
+PointLight::PointLight(glm::vec3 position, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad){
+	pos = position; Ambient = amb; Diffuse = dif; Specular = spec;
 	Constant = constant; Linear = lin; Quadratic = quad;
 	nid = nidStep++;
 	updateT.addObj(this);
@@ -80,7 +80,7 @@ void PointLight::updateTF(Shader& s) {
 
 void PointLight::updateOF(Shader& s) {
 	std::string s_nid = std::to_string(nid);
-	s.set("pointLights[" + s_nid + "].pos", getPos());
+	s.set("pointLights[" + s_nid + "].pos", pos());
 	s.set("pointLights[" + s_nid + "].ambient", Ambient);
 	s.set("pointLights[" + s_nid + "].diffuse", Diffuse);
 	s.set("pointLights[" + s_nid + "].specular", Specular);
@@ -91,8 +91,8 @@ void PointLight::updateOF(Shader& s) {
 
 
 // Spot Light: Creates a conic light originating from a single point
-SpotLight::SpotLight(glm::vec3 pos, glm::vec3 rot, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad, float cut, float ocut){
-	setPos(pos); setRot(rot); 
+SpotLight::SpotLight(glm::vec3 position, glm::vec3 rotation, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad, float cut, float ocut){
+	pos = position; rot = rotation; 
 	Ambient = amb; Diffuse = dif; Specular = spec;
 	Constant = constant; Linear = lin; Quadratic = quad;
 	CutOff = cut; OuterCutOff = ocut;
@@ -123,8 +123,8 @@ void SpotLight::updateTF(Shader& s) {
 
 void SpotLight::updateOF(Shader& s) {
 	std::string s_nid = std::to_string(nid);
-	s.set("spotLights[" + s_nid + "].pos", getPos());
-	s.set("spotLights[" + s_nid + "].direction", getRotRad());
+	s.set("spotLights[" + s_nid + "].pos", pos());
+	s.set("spotLights[" + s_nid + "].direction", glm::radians(rot()));
 	s.set("spotLights[" + s_nid + "].ambient", Ambient);
 	s.set("spotLights[" + s_nid + "].diffuse", Diffuse);
 	s.set("spotLights[" + s_nid + "].specular", Specular);

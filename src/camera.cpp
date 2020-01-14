@@ -6,16 +6,21 @@ std::unique_ptr<Camera> Camera::ACTIVE = nullptr;
 //--------------------
 
 // Vector Constructor
-Camera::Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 up) {
-	setPos(position);
+Camera::Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 up) : Object(position, rotation) {
+	rot.setFuncs(
+		std::function<glm::vec3()>([this](){ return this->getRot(); }), 
+		std::function<glm::vec3(glm::vec3)>([this](glm::vec3 val) {
+			updateCameraVectors(); // Recalculate rotation vectors whenever the rotation is modified
+			return this->setRot(val);
+		})
+	);
+
 	WorldUp = up;
-	setRot(rotation);
-	updateCameraVectors();
 }
 
 // Returns the view matrix calculated using Eular Angles and the LookAt Matrix
 glm::mat4 Camera::GetViewMatrix(){
-	return glm::lookAt(getPos(), getPos() + Front, Up);
+	return glm::lookAt(pos(), pos() + Front, Up);
 }
 
 glm::mat4 Camera::GetProjectionMatrix(){
@@ -25,9 +30,10 @@ glm::mat4 Camera::GetProjectionMatrix(){
 void Camera::updateCameraVectors(){
 	// Calculate the new Front vector
 	glm::vec3 front;
-	front.x = cos(getRotRad().x) * cos(getRotRad().x);
-	front.y = sin(getRotRad().y);
-	front.z = sin(getRotRad().z) * cos(getRotRad().x);
+	glm::vec3 rad = glm::radians(rot());
+	front.x = cos(rad.y) * cos(rad.x);
+	front.y = sin(rad.x);
+	front.z = sin(rad.y) * cos(rad.x);
 	
 	Front = glm::normalize(front);
 	// Also re-calculate the Right and Up vector

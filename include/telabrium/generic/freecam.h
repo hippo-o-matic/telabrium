@@ -25,17 +25,8 @@ private:
 
         xoffset *= MouseSensitivity;
 	    yoffset *= MouseSensitivity;
-        glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-        setRot(getRot() + glm::vec3(yoffset, xoffset, 0));
-
-        if (getRot().x > 89.0f)
-            setRot(glm::vec3(89, getRot().y, getRot().z)); // Oh god we need a better interface than this. Hopefully we figure out how to do setRot.x() or something in the future. This is bad
-        if (getRot().x < -89.0f)
-            setRot(glm::vec3(-89, getRot().y, getRot().z));
-
-        // Update Front, Right and Up Vectors using the updated Eular angles
-        updateCameraVectors();
+        rot += glm::vec3(yoffset, xoffset, 0);
     };
 
     const std::function<void(GLFWwindow*, double, double)> scroll_control = [this](GLFWwindow* w, double xoff, double yoff) {

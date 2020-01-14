@@ -13,30 +13,22 @@
 #include "json/json.h"
 #include "json/json-forwards.h"
 
+#include "telabrium/safe_val.h"
 #include "telabrium/utility.h"
 
-struct spatial {
+
+
+struct spatial : public safe_val<glm::vec3> {
     spatial(
-        Object* o,
-        glm::vec3 (Object::*getter_func)(),
-        glm::vec3 (Object::*setter_func)(glm::vec3)
+        std::function<glm::vec3()> getter_f = nullptr,
+	    std::function<glm::vec3(glm::vec3)> setter_f = nullptr
     );
 
-    Object* obj;
-    // Getter and setter function pointers, given by the constructor
-    glm::vec3 (Object::*get)();
-    glm::vec3 (Object::*set)(glm::vec3);
+    glm::vec3 operator=(glm::vec3 val);
 
-    glm::vec3 relative(spatial);
-    glm::vec3 relative(spatial, glm::vec3);
-
-    float x();
-    float y();
-    float z();
-
-    float x(float);
-    float y(float);
-    float z(float);
+    safe_val<double> x;
+    safe_val<double> y;
+    safe_val<double> z;
 };
 
 class Object {
@@ -54,33 +46,13 @@ public:
 	std::string id;
     std::string type;
 
-    glm::vec3 pos(); // Returns the objects position
-    glm::vec3 pos(glm::vec3); // Sets the objects position
+    /// Interfaces for handling spatial values
 
-    // The reason both the getter/setters are the same name as this spatial struct is for ease of use. This way thing.pos() and thing.pos.x() both are valid
-    // spatial pos;
+    spatial pos;
+    spatial rot;
+    spatial scl;
 
-    glm::vec3 getPos();
-    glm::vec3 getRelativePos();
-    void setPos(glm::vec3);
-    void setRelativePos(glm::vec3);
-
-    glm::vec3 getRot();
-    glm::vec3 getRotRad();
-    glm::vec3 getRelativeRot();
-    void setRot(glm::vec3);
-    void setRelativeRot(glm::vec3);
-    void setRotX(float);
-    void setRotY(float);
-    void setRotZ(float);
-
-    glm::vec3 getScl();
-    glm::vec3 getRelativeScale();
-    void setScl(glm::vec3);
-    void setRelativeScale(glm::vec3);
-    void setSclX(float);
-    void setSclY(float);
-    void setSclZ(float);
+    /// Component handling
 
 	void operator+=(Object::ptr &o); // Move an object from one parent to another
 
@@ -107,10 +79,21 @@ protected:
 	Object* parent; // Raw pointer to the objects parent
 	std::vector<Object::ptr> components; // Vector of the objects sub-components
 
+    /// Functions for updating spatial values
+
+    glm::vec3 getPos();
+    glm::vec3 setPos(glm::vec3);
+
+    glm::vec3 getRot();
+    glm::vec3 setRot(glm::vec3);
+
+    glm::vec3 getScl();
+    glm::vec3 setScl(glm::vec3);
+
     virtual void jload(Json::Value j);
 
 private:
-    // Spatial properties relative to parent
+    /// Spatial properties
     glm::vec3 position = glm::vec3(0);
 	glm::vec3 rotation = glm::vec3(0);
 	glm::vec3 scale = glm::vec3(1);
