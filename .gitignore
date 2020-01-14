@@ -1,18 +1,7 @@
-**/tests/models/*
-**/tests/glCaptures/*
-**/tests/archive/*
-
 **.directory
-**/build/*
+build/*
+builddir/*
 **/.vscode/ipch/**
 
 *.kate-swp
-*.log
-*.o
-builddir/meson-logs/meson-log.txt
-builddir/meson-private/meson.lock
-telabrium.code-workspace
-.vscode/c_cpp_properties.json
-.vscode/launch.json
-.vscode/tasks.json
-tests/camBinds.json
+
