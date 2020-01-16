@@ -55,9 +55,9 @@ int main(){
 
 	// test->load("levels/test/index.json");
 
-	Model test("shadetest.dae", glm::vec3(2,1,0));
+	Model test("models/shadertest.obj", glm::vec3(2,1,0));
 
-	Model vest("origin.dae", glm::vec3(3,0,0));
+	Model vest("models/origin.obj", glm::vec3(3,0,0));
 	// std::unique_ptr<Model> vestptr = std::make_unique<Model>(vest);
 	// test.add<Model>(vestptr);
 
@@ -66,7 +66,7 @@ int main(){
 
 	baz.addBind("temp_rotate", [&test, &buzz](){
 		if(buzz) {
-			test.setRot(test.getRot()+glm::vec3(0,0.1,0));
+			test.rot.x += 0.1;
 			buzz = true;
 		}
 	}, GLFW_KEY_F);
@@ -75,6 +75,11 @@ int main(){
 	}, GLFW_KEY_F, GLFW_RELEASE);
 	baz.activate();
 
+    baz.addBind("console", [window](){
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		simpleConsole();
+	}, GLFW_KEY_GRAVE_ACCENT);
+
 	// Model plont("models/nanosuit/nanosuit.obj", glm::vec3(10,1,0));
 	// Model bop("models/g.dae", glm::vec3(3,0,1));
 	// Model bip("models/untitled.dae", glm::vec3(20, 0, 0));
@@ -82,7 +87,7 @@ int main(){
 	// std::string heck = "textures";
 	// Mesh bab(calcVertex(Telabrium::cubeVerts), Telabrium::cubeIndices, loadTexture("shadertest.png", heck));
 
-	// DirLight someLight(glm::vec3(70.0f, 0.0f, 20.0f));
+	DirLight someLight(glm::vec3(70.0f, 30.0f, 20.0f));
 	// PointLight ee(glm::vec3(4,0,0));
 
 	std::vector<std::string> skyFaces = {
@@ -119,7 +124,7 @@ int main(){
 
 		// don't forget to enable shader before setting uniforms
 		Shader::ACTIVE->use();
-		Shader::ACTIVE->set("ViewPos", Camera::ACTIVE->getPos());
+		Shader::ACTIVE->set("ViewPos", Camera::ACTIVE->pos());
 
 		// view/projection transformations
 		Shader::ACTIVE->set("projection", Camera::ACTIVE->GetProjectionMatrix());
