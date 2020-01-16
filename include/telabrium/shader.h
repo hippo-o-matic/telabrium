@@ -9,6 +9,9 @@
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
+
+#include <assimp/material.h>
+
 #include "telabrium/utility.h"
 
 /// A class for interacting with an OpenGL shader
@@ -54,6 +57,9 @@ public:
 
     void set(const std::string &name, const glm::mat4 &mat) const; // mat4
 
+    void set(const std::string &name, const aiColor3D &vec) const; // assimp data type
+
+    void set(const std::string &name, const aiColor4D &vec) const; // assimp data type
 
 private:
     // utility function for checking shader compilation/linking errors.

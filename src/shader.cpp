@@ -146,6 +146,13 @@ void Shader::set(const std::string &name, const glm::mat4 &mat) const{
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
+void Shader::set(const std::string &name, const aiColor3D &vec) const { 
+	glUniform3f(glGetUniformLocation(ID, name.c_str()), vec.r, vec.g, vec.b); 
+}
+void Shader::set(const std::string &name, const aiColor4D &vec) const { 
+	glUniform4f(glGetUniformLocation(ID, name.c_str()), vec.r, vec.g, vec.b, vec.a); 
+}
+
 // utility function for checking shader compilation/linking errors.
 // ------------------------------------------------------------------------
 void Shader::checkCompileErrors(GLuint shader, std::string type) {
