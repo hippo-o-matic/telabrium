@@ -32,6 +32,7 @@ spatial::spatial(
 ) {
 	safe_val(getter_f, setter_f);
 	
+    // Sets the functions the .x, .y and .z components will use when getting or setting values
 	x = safe_val<double>(
 		std::function<double()>( [this](){ return this->get().x; } ), 
 		std::function<double(double)>( [this](double val){ return this->set(glm::vec3(val, this->get().y, this->get().z)).x; } )
@@ -48,6 +49,7 @@ spatial::spatial(
 	);
 }
 
+// Override the safe_val operator
 glm::vec3 spatial::operator=(glm::vec3 val) {
 	return set(val);
 }
@@ -78,8 +80,9 @@ glm::vec3 Object::getRot(){
 	return rotation;
 }
 
+// Sets the objects rotation in degrees and updates all its components rotations
 glm::vec3 Object::setRot(glm::vec3 in) {
-	rotation = glm::mod(in, glm::vec3(360));
+	rotation = glm::mod(in, glm::vec3(360)); // Keep measurement between 0 and 360 degrees
 
 	for(auto& i : components) {
 		i->setRot(i->getRot() + rotation); // Set the components new rotation
@@ -101,6 +104,7 @@ glm::vec3 Object::getScl() {
 	return scale;
 }
 
+// Sets the objects scale and updates its components scales
 glm::vec3 Object::setScl(glm::vec3 in) {
 	scale = in;
 	for(auto& i : components) {
@@ -119,6 +123,7 @@ void Object::operator+=(Object::ptr &o) {
 	components.push_back(std::move(o));
 }
 
+// Moves several objects from one parent to another
 void Object::operator+=(std::vector<Object::ptr> &o_vec){
 	for(auto it = o_vec.begin(); it != o_vec.end(); it++){
 		(*it)->parent = this;

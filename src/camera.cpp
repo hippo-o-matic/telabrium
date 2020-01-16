@@ -5,7 +5,6 @@ std::unique_ptr<Camera> Camera::ACTIVE = nullptr;
 //Generic Camera Class
 //--------------------
 
-// Vector Constructor
 Camera::Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 up) : Object(position, rotation) {
 	rot.setFuncs(
 		std::function<glm::vec3()>([this](){ return this->getRot(); }), 

@@ -12,6 +12,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include <assimp/material.h>
+
 #include "telabrium/shader.h"
 #include "telabrium/object.h"
 
@@ -35,13 +37,13 @@ struct Texture {
 };
 
 struct RenderMat {
-	glm::vec3 diffuse_color = glm::vec3(0,0,0);
-	glm::vec3 specular_color = glm::vec3(0,0,0);
-	glm::vec3 ambient_color = glm::vec3(0,0,0);
+	aiColor3D diffuse_color;
+	aiColor3D specular_color;
+	aiColor3D ambient_color;
 
-	float shininess = 0;
-	float IOR = 0;
-	float opacity = 0;
+	float shininess;
+	float IOR;
+	float opacity;
 };
 
 /// A class for storing vertex, texture, and material data to be drawn as a 3d object
