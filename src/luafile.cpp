@@ -1,9 +1,9 @@
-#include "luarium/luafile.h"
+#include "telabrium/luafile.h"
 
 LuaFile::LuaFile(std::string path){
 	L = luaL_newstate(); //Create a new Luastate
 	if (luaL_loadfile(L, path.c_str()) || lua_pcall(L, 0, 0, 0)) {
-		Luarium::log("Lua Error: Script \"" + path + "\" failed to load", 2);
+		TelabriumLog("Lua Error: Script \"" + path + "\" failed to load", 2);
 		lua_close(L);
 		L = nullptr;
 	}
@@ -13,7 +13,7 @@ LuaFile::~LuaFile(){
 }
 
 void LuaFile::printError(std::string name, std::string reason) {
-	Luarium::log("Lua Error: couldn't get [" + name + "]: " + reason, 2);
+	TelabriumLog("Lua Error: couldn't get [" + name + "]: " + reason, 2);
 }
 
 void LuaFile::clean(){

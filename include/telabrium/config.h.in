@@ -1,0 +1,4 @@
+#pragma once
+
+#cmakedefine TELABRIUM_CONFIG_PATH "@CONFIG_PATH@"
+#cmakedefine TELABRIUM_CACHE_PATH "@CACHE_PATH@"

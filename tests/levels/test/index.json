@@ -1,0 +1,26 @@
+{
+    "id" : "root",
+    "type" : "Level",
+    "position" : [0,0,0],
+    "rotation" : [0,0,0],
+    "scale" : [0,0,0],
+    "components" : [
+        // {
+        //     "id" : "jeff",
+        //     "type" : "Model",
+        //     "position" : [0,5,0],
+        //     "rotation" : [0,2,40],
+        //     "scale" : [0,0,0],
+        //     "path" : "models/g.dae"
+        // },
+        {
+            "id":"mainlight",
+            "type":"DirLight",
+            "rot":[70,1,20],
+
+            "ambient":[0.01,0.01,0],
+            "diffuse":[0.8,0.8,0.8],
+            "specular":[1,1,1]  
+        }
+    ]
+}   

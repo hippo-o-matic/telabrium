@@ -19,7 +19,7 @@ void CalculateBoxInertia(BoxShape *boxShape) {
 
 // Two dimensional rigid body
 typedef struct {
-    Vector2 position;
+    Vector2 pos;
     Vector2 linearVelocity;
     float angle;
     float angularVelocity;
@@ -31,21 +31,21 @@ typedef struct {
 // Global array of rigid bodies.
 RigidBody rigidBodies[NUM_RIGID_BODIES];
 
-// Prints the position and angle of each body on the output.
+// Prints the pos and angle of each body on the output.
 // We could instead draw them on screen.
 void PrintRigidBodies() {
     for (int i = 0; i < NUM_RIGID_BODIES; ++i) {
         RigidBody *rigidBody = &rigidBodies[i];
-        printf("body[%i] p = (%.2f, %.2f), a = %.2f\n", i, rigidBody->position.x, rigidBody->position.y, rigidBody->angle);
+        printf("body[%i] p = (%.2f, %.2f), a = %.2f\n", i, rigidBody->pos.x, rigidBody->pos.y, rigidBody->angle);
     }
 }
 
-// Initializes rigid bodies with random positions and angles and zero linear and angular velocities.
+// Initializes rigid bodies with random poss and angles and zero linear and angular velocities.
 // They're all initialized with a box shape of random dimensions.
 void InitializeRigidBodies() {
     for (int i = 0; i < NUM_RIGID_BODIES; ++i) {
         RigidBody *rigidBody = &rigidBodies[i];
-        rigidBody->position = (Vector2){arc4random_uniform(50), arc4random_uniform(50)};
+        rigidBody->pos = (Vector2){arc4random_uniform(50), arc4random_uniform(50)};
         rigidBody->angle = arc4random_uniform(360)/360.f * M_PI * 2;
         rigidBody->linearVelocity = (Vector2){0, 0};
         rigidBody->angularVelocity = 0;
@@ -85,8 +85,8 @@ void RunRigidBodySimulation() {
             Vector2 linearAcceleration = (Vector2){rigidBody->force.x / rigidBody->shape.mass, rigidBody->force.y / rigidBody->shape.mass};
             rigidBody->linearVelocity.x += linearAcceleration.x * dt;
             rigidBody->linearVelocity.y += linearAcceleration.y * dt;
-            rigidBody->position.x += rigidBody->linearVelocity.x * dt;
-            rigidBody->position.y += rigidBody->linearVelocity.y * dt;
+            rigidBody->pos.x += rigidBody->linearVelocity.x * dt;
+            rigidBody->pos.y += rigidBody->linearVelocity.y * dt;
             float angularAcceleration = rigidBody->torque / rigidBody->shape.momentOfInertia;
             rigidBody->angularVelocity += angularAcceleration * dt;
             rigidBody->angle += rigidBody->angularVelocity * dt;

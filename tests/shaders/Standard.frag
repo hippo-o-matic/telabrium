@@ -91,19 +91,19 @@ void main() {
 		lighting += CalcDirLight(dirLights[i], norm, ViewDir);
 	}
 	for (int i = 0; i < pointLight_AMT; i++) {
-		lighting += CalcPointLight(pointLights[i], norm, FragPos, ViewDir);
+//		lighting += CalcPointLight(pointLights[i], norm, FragPos, ViewDir);
 	}
 	for (int i = 0; i < spotLight_AMT; i++) {
-		lighting += CalcSpotLight(spotLights[i], norm, FragPos, ViewDir);
+//		lighting += CalcSpotLight(spotLights[i], norm, FragPos, ViewDir);
 	}
 
 	vec4 texColor = vec4(pow((vec4(lighting, 1.0)), vec4(1.0 / gamma)));
 
-//	vec3 reflection = CalcReflection(norm, FragPos, ViewPos, mat.shininess);
-//	vec3 refraction = CalcRefraction(norm, FragPos, ViewPos, mat.IOR);
+	vec3 reflection = CalcReflection(norm, FragPos, ViewPos, mat.shininess);
+	vec3 refraction = CalcRefraction(norm, FragPos, ViewPos, mat.IOR);
 
-	FragColor = texColor;
-//  FragColor.rgb = texColor.rgb * texColor.a + reflection.rgb;
+	// FragColor = texColor;
+    FragColor.rgb = texColor.rgb * texColor.a;
 }
 
 // calculates the color when using a directional light.
@@ -115,10 +115,11 @@ vec3 CalcDirLight(dirLight light, vec3 normal, vec3 viewDir) {
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess);
     // combine results
-    vec3 ambient = light.ambient + mat.ambient_color;
-    vec3 diffuse = light.diffuse * diff * (vec3(texture(mat.texture_diffuse, TexCoords)) + mat.diffuse_color);
-    vec3 specular = light.specular * spec * (vec3(texture(mat.texture_specular, TexCoords)) + mat.specular_color);
-    return (ambient + diffuse + specular);
+    vec3 ambient = mix(light.ambient, mat.ambient_color, 0.5);
+    vec3 diffuse = vec3(0.8) * diff * mix(vec3(texture(mat.texture_diffuse, TexCoords)), mat.diffuse_color, .5);
+    vec3 specular = light.specular * spec * mix(vec3(texture(mat.texture_specular, TexCoords)), mat.specular_color, .5);
+
+    return (diffuse + specular);
 }
 
 // calculates the color when using a point light.

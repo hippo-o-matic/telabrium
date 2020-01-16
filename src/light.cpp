@@ -1,111 +1,143 @@
-#include "luarium/light.h"
+#include "telabrium/light.h"
+
+// Static initialization
+Task<DirLight, Shader&> DirLight::updateT(&DirLight::updateOF, &DirLight::updateTF);
+int DirLight::nidStep = 0;
+
+Task<PointLight, Shader&> PointLight::updateT(&PointLight::updateOF, &PointLight::updateTF);
+int PointLight::nidStep = 0;
+
+Task<SpotLight, Shader&> SpotLight::updateT(&SpotLight::updateOF, &SpotLight::updateTF);
+int SpotLight::nidStep = 0;
 
 Light::Light(){};
 
+void Light::jload(Json::Value j) {
+	this->Object::jload(j);
+
+	Json::Value jAmbient = j["ambient"];
+	Json::Value jDiffuse = j["diffuse"];
+	Json::Value jSpecular = j["specular"];
+
+	this->Ambient = glm::vec3(jAmbient[0].asFloat(), jAmbient[1].asFloat(), jAmbient[2].asFloat());
+	this->Diffuse = glm::vec3(jDiffuse[0].asFloat(), jDiffuse[1].asFloat(), jDiffuse[2].asFloat());
+	this->Specular = glm::vec3(jSpecular[0].asFloat(), jSpecular[1].asFloat(), jSpecular[2].asFloat());
+}
+
 // Directional Light: Provides light from one direction
-DirLight::DirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec){
-	Rotation = dir; Ambient = amb; Diffuse = dif; Specular = spec;
-	id = idStep++;
-	list.push_back(this);
+DirLight::DirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec) {
+	rot = dir; Ambient = amb; Diffuse = dif; Specular = spec;
+	nid = nidStep++;
+	updateT.addObj(this);
 }
 
 DirLight::~DirLight() {
-	list.erase(list.begin() + id); // Remove refrence from the list so the shader doesn't recieve outdated or garbage data
+	updateT.removeObj(this);
 }
 
-std::vector<DirLight*> DirLight::list; // Declare the list and idStep out here so it becomes static fully
-int DirLight::idStep = 0;
+void DirLight::updateTF(Shader& s) {
+	s.use();
+	s.set("dirLight_AMT", (int) updateT.getObjCount()); // Tell the shader how many lights to expect
+}
+
+void DirLight::updateOF(Shader& s) {
+	std::string s_nid = std::to_string(nid);
+	s.set("dirLights[" + s_nid + "].direction", glm::radians(rot()));
+	s.set("dirLights[" + s_nid + "].ambient", Ambient);
+	s.set("dirLights[" + s_nid + "].diffuse", Diffuse);
+	s.set("dirLights[" + s_nid + "].specular", Specular);
+}
+
+void DirLight::jload(Json::Value j) {
+	this->Light::jload(j);
+}
 
 
 // Point Light: Creates a spherical light originating from a single point
-PointLight::PointLight(glm::vec3 pos, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad){
-	Position = pos; Ambient = amb; Diffuse = dif; Specular = spec;
+PointLight::PointLight(glm::vec3 position, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad){
+	pos = position; Ambient = amb; Diffuse = dif; Specular = spec;
 	Constant = constant; Linear = lin; Quadratic = quad;
-	id = idStep++;
-	list.push_back(this);
-	bulb = new Model("model/cube.obj");
+	nid = nidStep++;
+	updateT.addObj(this);
 }
 
 PointLight::~PointLight() {
-	list.erase(list.begin() + id);
-	delete bulb;
+	updateT.removeObj(this);
 }
 
-std::vector<PointLight*> PointLight::list;
-int PointLight::idStep = 0;
+void PointLight::jload(Json::Value j) {
+	this->Light::jload(j);
+
+	this->Constant = j.get("constant", 1.0).asFloat();
+	this->Linear = j.get("linear", 0.9f).asFloat();
+	this->Quadratic = j.get("quadratic", 0.032f).asFloat();
+}
+
+void PointLight::updateTF(Shader& s) {
+	s.use();
+	s.set("pointLight_AMT", (int) updateT.getObjCount()); // Tell the shader how many lights to expect
+}
+
+void PointLight::updateOF(Shader& s) {
+	std::string s_nid = std::to_string(nid);
+	s.set("pointLights[" + s_nid + "].pos", pos());
+	s.set("pointLights[" + s_nid + "].ambient", Ambient);
+	s.set("pointLights[" + s_nid + "].diffuse", Diffuse);
+	s.set("pointLights[" + s_nid + "].specular", Specular);
+	s.set("pointLights[" + s_nid + "].constant", Constant);
+	s.set("pointLights[" + s_nid + "].linear", Linear);
+	s.set("pointLights[" + s_nid + "].quadratic", Quadratic);
+}
 
 
 // Spot Light: Creates a conic light originating from a single point
-SpotLight::SpotLight(glm::vec3 pos, glm::vec3 rot, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad, float cut, float ocut){
-	Position = pos; Rotation = rot; 
+SpotLight::SpotLight(glm::vec3 position, glm::vec3 rotation, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad, float cut, float ocut){
+	pos = position; rot = rotation; 
 	Ambient = amb; Diffuse = dif; Specular = spec;
 	Constant = constant; Linear = lin; Quadratic = quad;
 	CutOff = cut; OuterCutOff = ocut;
 
-	id = idStep++;
-	list.push_back(this);
+	nid = nidStep++;
+	updateT.addObj(this);
 }
 
 SpotLight::~SpotLight() {
-	list.erase(list.begin() + id);
+	updateT.removeObj(this);
 }
 
-std::vector<SpotLight*> SpotLight::list;
-int SpotLight::idStep = 0;
+void SpotLight::jload(Json::Value j) {
+	this->Light::jload(j);
+
+	this->Constant = j.get("constant", 1).asFloat();
+	this->Linear = j.get("linear", 0.9f).asFloat();
+	this->Quadratic = j.get("quadratic", 0.032f).asFloat();
+
+	this->CutOff = j.get("cutoff", 12.5f).asFloat();
+	this->OuterCutOff = j.get("outercutoff", 15).asFloat();
+}
+
+void SpotLight::updateTF(Shader& s) {
+	s.use();
+	s.set("spotLight_AMT", (int) updateT.getObjCount()); // Tell the shader how many lights to expect
+}
+
+void SpotLight::updateOF(Shader& s) {
+	std::string s_nid = std::to_string(nid);
+	s.set("spotLights[" + s_nid + "].pos", pos());
+	s.set("spotLights[" + s_nid + "].direction", glm::radians(rot()));
+	s.set("spotLights[" + s_nid + "].ambient", Ambient);
+	s.set("spotLights[" + s_nid + "].diffuse", Diffuse);
+	s.set("spotLights[" + s_nid + "].specular", Specular);
+	s.set("spotLights[" + s_nid + "].constant", Constant);
+	s.set("spotLights[" + s_nid + "].linear", Linear);
+	s.set("spotLights[" + s_nid + "].quadratic", Quadratic);
+	s.set("spotLights[" + s_nid + "].cutOff", glm::cos(glm::radians(CutOff)));
+	s.set("spotLights[" + s_nid + "].outerCutOff", glm::cos(glm::radians(OuterCutOff)));
+}
 
 
-// Gather all the lights and send them to the shader
-void updateLights(Shader &shader, Shader* bulbShader) {
-	shader.use();
-
-	shader.set("dirLight_AMT", (int) DirLight::list.size()); // Tell the shader how many lights to expect
-	shader.set("pointLight_AMT", (int) PointLight::list.size());
-	shader.set("spotLight_AMT", (int) SpotLight::list.size());
-
-	// Go through each light in the vector and set the attributes to its corresponding id in the shader's array of lights
-	for (auto& e : SpotLight::list) { 
-		std::string id = std::to_string(e->id);
-		shader.set("spotLights[" + id + "].position", e->Position);
-		shader.set("spotLights[" + id + "].direction", glm::radians(e->Rotation));
-		shader.set("spotLights[" + id + "].ambient", e->Ambient);
-		shader.set("spotLights[" + id + "].diffuse", e->Diffuse);
-		shader.set("spotLights[" + id + "].specular", e->Specular);
-		shader.set("spotLights[" + id + "].constant", e->Constant);
-		shader.set("spotLights[" + id + "].linear", e->Linear);
-		shader.set("spotLights[" + id + "].quadratic", e->Quadratic);
-		shader.set("spotLights[" + id + "].cutOff", glm::cos(glm::radians(e->CutOff)));
-		shader.set("spotLights[" + id + "].outerCutOff", glm::cos(glm::radians(e->OuterCutOff)));
-	}
-
-	for (auto& e : DirLight::list) {
-		std::string id = std::to_string(e->id);
-		shader.set("dirLights[" + id + "].direction", glm::radians(e->Rotation));
-		shader.set("dirLights[" + id + "].ambient", e->Ambient);
-		shader.set("dirLights[" + id + "].diffuse", e->Diffuse);
-		shader.set("dirLights[" + id + "].specular", e->Specular);
-	}
-
-	for (auto& e : PointLight::list) {
-		std::string id = std::to_string(e->id);
-		shader.set("pointLights[" + id + "].position", e->Position);
-		shader.set("pointLights[" + id + "].ambient", e->Ambient);
-		shader.set("pointLights[" + id + "].diffuse", e->Diffuse);
-		shader.set("pointLights[" + id + "].specular", e->Specular);
-		shader.set("pointLights[" + id + "].constant", e->Constant);
-		shader.set("pointLights[" + id + "].linear", e->Linear);
-		shader.set("pointLights[" + id + "].quadratic", e->Quadratic);
-
-		// Update the model for the light
-		if (bulbShader){
-			e->bulb->Position = e->Position;
-			e->bulb->Rotation = e->Rotation;
-			e->bulb->Scale = e->Scale * glm::vec3(0.05);
-			bulbShader->set("color", glm::vec3(1));
-			e->bulb->Draw(*bulbShader);
-		}
-	}
-	GLenum err;
-	if((err = glGetError()) != GL_NO_ERROR){
-		std::cerr << "GL Error: \"" << err << "\"" << std::endl;
-	}
-} 
+void Light::updateLights(Shader& s) {
+	DirLight::updateT.exec(s);
+	PointLight::updateT.exec(s);
+	SpotLight::updateT.exec(s);
+}

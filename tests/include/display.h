@@ -1,6 +1,6 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
-#include "luarium/object.h"
+#include "telabrium/object.h"
 
 class Display : public Object{
 	Display() {
