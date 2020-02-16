@@ -12,9 +12,7 @@ int SpotLight::nidStep = 0;
 
 Light::Light(){};
 
-void Light::jload(Json::Value j) {
-	this->Object::jload(j);
-
+Light::Light(Json::Value j) : Object(j) {
 	Json::Value jAmbient = j["ambient"];
 	Json::Value jDiffuse = j["diffuse"];
 	Json::Value jSpecular = j["specular"];
@@ -48,8 +46,9 @@ void DirLight::updateOF(Shader& s) {
 	s.set("dirLights[" + s_nid + "].specular", Specular);
 }
 
-void DirLight::jload(Json::Value j) {
-	this->Light::jload(j);
+DirLight::DirLight(Json::Value j) : Light(j) {
+	nid = nidStep++;
+	updateT.addObj(this);
 }
 
 
@@ -65,12 +64,13 @@ PointLight::~PointLight() {
 	updateT.removeObj(this);
 }
 
-void PointLight::jload(Json::Value j) {
-	this->Light::jload(j);
-
+PointLight::PointLight(Json::Value j) : Light(j) {
 	this->Constant = j.get("constant", 1.0).asFloat();
 	this->Linear = j.get("linear", 0.9f).asFloat();
 	this->Quadratic = j.get("quadratic", 0.032f).asFloat();
+
+	nid = nidStep++;
+	updateT.addObj(this);
 }
 
 void PointLight::updateTF(Shader& s) {
@@ -105,15 +105,16 @@ SpotLight::~SpotLight() {
 	updateT.removeObj(this);
 }
 
-void SpotLight::jload(Json::Value j) {
-	this->Light::jload(j);
-
+SpotLight::SpotLight(Json::Value j) : Light(j) {
 	this->Constant = j.get("constant", 1).asFloat();
 	this->Linear = j.get("linear", 0.9f).asFloat();
 	this->Quadratic = j.get("quadratic", 0.032f).asFloat();
 
 	this->CutOff = j.get("cutoff", 12.5f).asFloat();
 	this->OuterCutOff = j.get("outercutoff", 15).asFloat();
+
+	nid = nidStep++;
+	updateT.addObj(this);
 }
 
 void SpotLight::updateTF(Shader& s) {

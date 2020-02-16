@@ -5,10 +5,15 @@
 Task<Model, Shader&> Model::drawT(&Model::Draw);
 
 // constructor, expects a filepath to a 3D model.
-Model::Model(std::string const &p, glm::vec3 pos, glm::vec3 rot, glm::vec3 scl, bool gamma) : gammaCorrection(gamma){
-	Object(pos, rot, scl);
-	loadModel(p);
-	path = p;
+Model::Model(std::string const &path, glm::vec3 _pos, glm::vec3 _rot, glm::vec3 _scl, bool gamma) : Object(_pos, _rot, _scl) {
+	this->path = path;
+	loadModel(path);
+	drawT.addObj(this);
+}
+
+Model::Model(Json::Value j) : Object(j) {
+	this->path = j["path"].asString();
+	loadModel(path);
 	drawT.addObj(this);
 }
 
@@ -248,13 +253,4 @@ Texture loadCubemap(std::vector<std::string> faces, std::string path) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return tex;
-}
-
-
-void Model::jload(Json::Value j) {
-	this->Object::jload(j);
-
-	this->path = j["path"].asString();
-	loadModel(path);
-	drawT.addObj(this);
 }

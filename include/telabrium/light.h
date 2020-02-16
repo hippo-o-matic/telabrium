@@ -12,6 +12,7 @@
 class Light : public Object {
 public:
 	Light();
+	Light(Json::Value);
 
 	Shader* shader;
 	glm::mat4 model;
@@ -23,10 +24,8 @@ public:
 	// Gather all the lights and send them to the shader
 	static void updateLights(Shader& shader);
 
-	virtual void jload(Json::Value j);
-
 private:
-	LUARIUM_REGISTER_OBJECT(Light);
+	TELABRIUM_REGISTER_OBJECT(Light);
 };
 
 // Directional Light: Provides light from one direction
@@ -39,6 +38,7 @@ public:
 		glm::vec3 spec = glm::vec3(1.0f));
 
 	DirLight(const DirLight &obj);
+	DirLight(Json::Value);
 
 	~DirLight();
 
@@ -48,10 +48,8 @@ public:
 	static void updateTF(Shader&); // Task function for updateT
 	void updateOF(Shader&); // Object function for updateT
 
-	virtual void jload(Json::Value j);
-
 private:
-	LUARIUM_REGISTER_OBJECT(DirLight);
+	TELABRIUM_REGISTER_OBJECT(DirLight);
 
 	static int nidStep; // Remember where we left off when assigning nid's
 };
@@ -69,6 +67,7 @@ public:
 		float quad = 0.032f);
 
 	PointLight(const PointLight &obj);
+	PointLight(Json::Value);
 
 	~PointLight();
 
@@ -82,10 +81,8 @@ public:
 	static void updateTF(Shader& s); // Task function for updateT
 	void updateOF(Shader&); // Object function for updateT
 
-	virtual void jload(Json::Value j);
-
 private:
-	LUARIUM_REGISTER_OBJECT(PointLight);
+	TELABRIUM_REGISTER_OBJECT(PointLight);
 
 	static int nidStep;
 };
@@ -107,6 +104,7 @@ public:
 	);
 
 	SpotLight(const SpotLight &obj);
+	SpotLight(Json::Value);
 
 	~SpotLight();
 
@@ -122,10 +120,8 @@ public:
 	static void updateTF(Shader& s); // Task function for updateT
 	void updateOF(Shader&); // Object function for updateT
 
-	virtual void jload(Json::Value j);
-
 private:
-	LUARIUM_REGISTER_OBJECT(SpotLight);
+	TELABRIUM_REGISTER_OBJECT(SpotLight);
 
 	static int nidStep;
 }; 

@@ -16,8 +16,6 @@
 #include "telabrium/safe_val.h"
 #include "telabrium/utility.h"
 
-
-
 struct spatial : public safe_val<glm::vec3> {
     spatial(
         std::function<glm::vec3()> getter_f = nullptr,
@@ -36,10 +34,12 @@ public:
     typedef std::unique_ptr<Object> ptr;
 
 	Object(
-        glm::vec3 pos = glm::vec3(0.0f),
-        glm::vec3 rot = glm::vec3(0.0f),
-        glm::vec3 scl = glm::vec3(1.0f)
+        glm::vec3 _pos = glm::vec3(0.0f),
+        glm::vec3 _rot = glm::vec3(0.0f),
+        glm::vec3 _scl = glm::vec3(1.0f)
     );
+
+	Object(Json::Value);
 
 	virtual ~Object();
 
@@ -70,14 +70,18 @@ public:
     template<class T> std::unique_ptr<T>&  operator[](std::string id); // Operator that returns the component in this object's vector that matches the id
     
     template<class T>
-    std::unique_ptr<T>& to() { return dynamic_cast<std::unique_ptr<T>&>(*this); } // Method for casting a type back to it's native type, [TODO] make automatic when any Object::ptr is refrenced
+    T* to() { return dynamic_cast<T*>(this); } // Method for casting a type back to it's native type, [TODO] make automatic when any Object::ptr is refrenced
 
     // A vector that holds objects with no parent, in practice shouldn't hold anything other than Level objects
     // static std::vector<Object::ptr> global;
+	
+	std::vector<std::unique_ptr<std::string>> test;
+
 
 protected:
 	Object* parent; // Raw pointer to the objects parent
 	std::vector<Object::ptr> components; // Vector of the objects sub-components
+	void createComponents(Json::Value items);
 
     /// Functions for updating spatial values
 
@@ -90,25 +94,29 @@ protected:
     glm::vec3 getScl();
     glm::vec3 setScl(glm::vec3);
 
-    virtual void jload(Json::Value j);
-
 private:
     /// Spatial properties
     glm::vec3 position = glm::vec3(0);
 	glm::vec3 rotation = glm::vec3(0);
 	glm::vec3 scale = glm::vec3(1);
+
+	void setupSpatialFunctions();
 };
 
 // A class that registers, creates, and defines new Objects
 class ObjFactory {
-    typedef Object::ptr (*createFunc)(); // A function pointer for the creation functions
-    typedef std::map<std::string, createFunc> map_type;
-    // typedef void (Object::*mfptr)(Object::ptr*, Json::Value); // Member function pointer for the value function
+    typedef std::map<std::string, std::function<Object::ptr(Json::Value)>> map_type;
 
 public:
-    static Object::ptr createObject(std::string const& s); // Creates a registered object and returns its unique pointer
+    static Object::ptr createObject(std::string const& s, Json::Value json = Json::Value()); // Creates a registered object and returns its unique pointer
 
-    static bool const registerType(const char* name, Object::ptr (*create_f)());
+	template<class T>
+	static bool const registerType(const char* name) {
+    	std::function<Object::ptr(Json::Value)> create_f([](Json::Value j){ return std::make_unique<T>(j); });
+
+		getMap()->emplace(name, create_f);
+		return true;
+	}
 	
 private:
     static std::shared_ptr<map_type> getMap();
@@ -116,23 +124,17 @@ private:
 };
 
 /* Creates a register function for the object and calls it, place inside class definition
-* telabrium_obj_create(): A function that returns a new NAME
-* VALUE_F(Object::ptr*, Json::Value): A function address of a function that fills out an object based off of a Json::Value,
-* should take a pointer to a unique pointer of an object (Object::ptr*) and a Json::Value
 * telabrium_obj_reg: a trick using static initialization order to register the type before main()*/
-#define LUARIUM_REGISTER_OBJECT(NAME) \
-    inline static Object::ptr telabrium_obj_create() { return std::make_unique<NAME>(); }; \
-    inline static bool telabrium_obj_reg = ObjFactory::registerType (#NAME, NAME::telabrium_obj_create)
+#define TELABRIUM_REGISTER_OBJECT(NAME) inline static bool telabrium_obj_reg = ObjFactory::registerType<NAME>(#NAME)
 
 
 class BlankObject : public Object {
 public:
-    BlankObject() = default;
-
-    void jload(Json::Value j);
+	BlankObject() = default;
+	BlankObject(Json::Value);
 
 private:
-    LUARIUM_REGISTER_OBJECT(BlankObject);
+	TELABRIUM_REGISTER_OBJECT(BlankObject);
 };
 
 #endif

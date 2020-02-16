@@ -1,28 +1,33 @@
 #include "telabrium/object.h"
 
-Object::Object(glm::vec3 positon, glm::vec3 rotation, glm::vec3 scale) {
-	pos.setFuncs(
-		std::function<glm::vec3()>([this](){ return this->getPos(); }), 
-		std::function<glm::vec3(glm::vec3)>([this](glm::vec3 val){ return this->setPos(val); })
-	);
-	
-	rot.setFuncs(
-		std::function<glm::vec3()>([this](){ return this->getRot(); }), 
-		std::function<glm::vec3(glm::vec3)>([this](glm::vec3 val){ return this->setRot(val); })
-	);
+Object::Object(glm::vec3 _pos, glm::vec3 _rot, glm::vec3 _scl) {
+	setPos(_pos);
+	setRot(_rot);
+	setScl(_scl);
 
-	scl.setFuncs(
-		std::function<glm::vec3()>([this](){ return this->getScl(); }), 
-		std::function<glm::vec3(glm::vec3)>([this](glm::vec3 val){ return this->setScl(val); })
-	);
+	setupSpatialFunctions();
+}
 
-    pos = position;
-    rot = rotation;
-    scl = scale;
+Object::Object(Json::Value j) {
+	this->id = j.get("id", "").asString();
+	this->type = j.get("type", "BlankObject").asString();
+
+	Json::Value jPos = j["pos"];
+	Json::Value jRot = j["rot"];
+	Json::Value jScl = j["scl"];
+
+	setPos(glm::vec3(jPos[0].asFloat(), jPos[1].asFloat(), jPos[2].asFloat()));
+	setRot(glm::vec3(jRot[0].asFloat(), jRot[1].asFloat(), jRot[2].asFloat()));
+	setScl(glm::vec3(jScl[0].asFloat(), jScl[1].asFloat(), jScl[2].asFloat()));
+
+	setupSpatialFunctions();
+	createComponents(j["components"]);
 }
 
 Object::~Object() {
 	parent = nullptr;
+	for(auto& it : components)
+		std::remove(components.begin(), components.end(), it);
 }
 
 // Constructor for the spatial functors
@@ -114,6 +119,23 @@ glm::vec3 Object::setScl(glm::vec3 in) {
 	return scale;
 }
 
+void Object::setupSpatialFunctions() {
+	pos.setFuncs(
+		std::function<glm::vec3()>([this](){ return this->getPos(); }), 
+		std::function<glm::vec3(glm::vec3)>([this](glm::vec3 val){ return this->setPos(val); })
+	);
+	
+	rot.setFuncs(
+		std::function<glm::vec3()>([this](){ return this->getRot(); }), 
+		std::function<glm::vec3(glm::vec3)>([this](glm::vec3 val){ return this->setRot(val); })
+	);
+
+	scl.setFuncs(
+		std::function<glm::vec3()>([this](){ return this->getScl(); }), 
+		std::function<glm::vec3(glm::vec3)>([this](glm::vec3 val){ return this->setScl(val); })
+	);
+}
+
 
 // Moves an object from one parent into another (Destination << Input)
 void Object::operator+=(Object::ptr &o) {
@@ -157,41 +179,23 @@ template<class T> std::unique_ptr<T>& Object::operator[](std::string id) {
 	return dynamic_cast<T&>(*components.at(index));
 }
 
-void Object::jload(Json::Value j) {
-	this->id = j.get("id", "").asString();
-	this->type = j.get("type", "BlankObject").asString();
-
-	Json::Value jPos = j["pos"];
-	Json::Value jRot = j["rot"];
-	Json::Value jScl = j["scl"];
-
-	setPos(glm::vec3(jPos[0].asFloat(), jPos[1].asFloat(), jPos[2].asFloat()));
-	setRot(glm::vec3(jRot[0].asFloat(), jRot[1].asFloat(), jRot[2].asFloat()));
-	setScl(glm::vec3(jScl[0].asFloat(), jScl[1].asFloat(), jScl[2].asFloat()));
-
-	Json::Value items = j["components"];
-
-    for(unsigned i = 0; i < items.size(); i++) {
-		Object::ptr o = ObjFactory::createObject(items[i]["type"].asString());
-		o->jload(items[i]);
+void Object::createComponents(Json::Value items) {
+	for(unsigned i = 0; i < items.size(); i++) {
+		Object::ptr o = ObjFactory::createObject(items[i]["type"].asString(), items[i]);
 		o->parent = this;
 		components.push_back(std::move(o));
 	}
 }
 
 
-Object::ptr ObjFactory::createObject(std::string const& s) {
-	ObjFactory::map_type::iterator it = getMap()->find(s);
-	if(it == getMap()->end()) {
+
+Object::ptr ObjFactory::createObject(std::string const& s, Json::Value json) {
+	ObjFactory::map_type::iterator it = getMap()->find(s); // Find the creation function by key
+	if(it == getMap()->end()) { // Check if it exists
 		TelabriumLog("Could not find object type \"" + s + "\", type not registered", 2);
 		return nullptr;
 	}
-	return it->second();
-}
-
-bool const ObjFactory::registerType(const char* name, Object::ptr (*create_f)()) {
-	getMap()->emplace(name, create_f);	
-	return true;
+	return it->second(json); // Create an object
 }
 
 std::shared_ptr<ObjFactory::map_type> ObjFactory::getMap() {
@@ -199,6 +203,4 @@ std::shared_ptr<ObjFactory::map_type> ObjFactory::getMap() {
 	return typemap;
 }
 
-void BlankObject::jload(Json::Value j) {
-	Object::jload(j);
-}
+BlankObject::BlankObject(Json::Value j) : Object(j) {}
