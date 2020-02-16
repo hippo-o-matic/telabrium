@@ -1,5 +1,5 @@
-#ifndef LUARIUM_COLLIDER_H
-#define LUARIUM_COLLIDER_H
+#ifndef TELABRIUM_COLLIDER_H
+#define TELABRIUM_COLLIDER_H
 
 #include "telabrium/object.h"
 #include "telabrium/mesh.h"

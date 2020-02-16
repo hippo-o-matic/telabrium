@@ -1,5 +1,5 @@
-#ifndef LUARIUM_SKYBOX
-#define LUARIUM_SKYBOX
+#ifndef TELABRIUM_SKYBOX
+#define TELABRIUM_SKYBOX
 
 #include "telabrium/utility.h"
 #include "telabrium/camera.h"

@@ -1,5 +1,5 @@
-#ifndef LUARIUM_RIGIDBODY_H
-#define LUARIUM_RIGIDBODY_H
+#ifndef TELABRIUM_RIGIDBODY_H
+#define TELABRIUM_RIGIDBODY_H
 
 #include <vector>
 

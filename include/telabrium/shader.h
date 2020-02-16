@@ -1,5 +1,5 @@
-#ifndef LUARIUM_SHADER_H
-#define LUARIUM_SHADER_H
+#ifndef TELABRIUM_SHADER_H
+#define TELABRIUM_SHADER_H
 
 #include <string>
 #include <fstream>

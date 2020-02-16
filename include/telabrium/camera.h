@@ -1,5 +1,5 @@
-#ifndef LUARIUM_CAMERA_H
-#define LUARIUM_CAMERA_H
+#ifndef TELABRIUM_CAMERA_H
+#define TELABRIUM_CAMERA_H
 
 #include <vector>
 #include <memory>

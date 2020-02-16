@@ -9,9 +9,9 @@ public:
 
     float Speed = 2.5;
 	float MouseSensitivity = 0.1;
+	Input* controls;
 
 private:
-    Input* controls;
 
     static double mouse_lastX;
     static double mouse_lastY;

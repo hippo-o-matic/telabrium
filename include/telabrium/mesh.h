@@ -1,5 +1,5 @@
-#ifndef LUARIUM_MESH_H
-#define LUARIUM_MESH_H
+#ifndef TELABRIUM_MESH_H
+#define TELABRIUM_MESH_H
 
 #include <string>
 #include <fstream>
