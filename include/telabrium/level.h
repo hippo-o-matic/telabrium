@@ -1,5 +1,5 @@
-#ifndef LUARIUM_LEVEL_H
-#define LUARIUM_LEVEL_H
+#ifndef TELABRIUM_LEVEL_H
+#define TELABRIUM_LEVEL_H
 
 #include <string>
 #include <vector>
@@ -32,12 +32,16 @@ namespace Map {
 
 class Level : public Object {
 public:
-	Level(); // Get the parent map path and the path inside the map file
+	// Level(std::string); // Get the parent map path and the path inside the map file
+	Level(Json::Value);
 	~Level() = default;
 
-	void load(std::string path);
-	virtual void jload(Json::Value lvl);
+	static Json::Value getFileContents(std::string path);
+	void load();
 	void unload();
+
+private:
+	Json::Value contents;
 };
 
 #endif

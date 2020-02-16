@@ -1,5 +1,5 @@
-#ifndef LUARIUM_LUAFILE_H
-#define LUARIUM_LUAFILE_H
+#ifndef TELABRIUM_LUAFILE_H
+#define TELABRIUM_LUAFILE_H
 
 #include <iostream>
 #include <string>

@@ -1,5 +1,5 @@
-#ifndef LUARIUM_MODEL_H
-#define LUARIUM_MODEL_H
+#ifndef TELABRIUM_MODEL_H
+#define TELABRIUM_MODEL_H
 
 #include <map>
 
@@ -26,8 +26,6 @@ public:
 	void Draw(Shader& shader = *Shader::ACTIVE);
 	static Task<Model, Shader&> drawT; // The render task that automatically renders the models
 
-	virtual void jload(Json::Value);
-
 	// constructor, expects a filepath to a 3D model.
 	Model(std::string const &p,
 		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -35,10 +33,12 @@ public:
 		glm::vec3 scl = glm::vec3(1.0f, 1.0f, 1.0f),
 		bool gamma = false);
 
+	Model(Json::Value);
+
 	Model() = default;
 
 private:
-	LUARIUM_REGISTER_OBJECT(Model);
+	TELABRIUM_REGISTER_OBJECT(Model);
 
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 	void loadModel(std::string const &path);

@@ -5,22 +5,30 @@
     "rotation" : [0,0,0],
     "scale" : [0,0,0],
     "components" : [
-        // {
-        //     "id" : "jeff",
-        //     "type" : "Model",
-        //     "position" : [0,5,0],
-        //     "rotation" : [0,2,40],
-        //     "scale" : [0,0,0],
-        //     "path" : "models/g.dae"
-        // },
+        {
+            "id" : "jeff",
+            "type" : "Model",
+            "pos" : [0,1,0],
+            "rot" : [0,2,40],
+            "scl" : [0,0,0],
+            "path" : "models/shadertest.obj"
+		},
+		{
+            "id" : "bill",
+            "type" : "Model",
+            "pos" : [5,5,5],
+            "rot" : [0,0,0],
+            "scl" : [0,0,0],
+            "path" : "models/origin.obj"
+        },
         {
             "id":"mainlight",
             "type":"DirLight",
-            "rot":[70,1,20],
+            "rot":[70,40,20],
 
-            "ambient":[0.01,0.01,0],
-            "diffuse":[0.8,0.8,0.8],
-            "specular":[1,1,1]  
+            "ambient":[0.0,0.0,0],
+            "diffuse":[0.0,1.0,0.0],
+            "specular":[0,0,0]  
         }
     ]
 }   

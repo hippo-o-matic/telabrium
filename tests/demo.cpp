@@ -1,6 +1,6 @@
 #include "telabrium/demo.h"
 
-Level* test = new Level;
+Level* lvltest;
 
 // settings 
 const unsigned int SCR_WIDTH = 1280;
@@ -51,43 +51,42 @@ int main(){
 	float aspect = ((float)SCR_WIDTH/(float)SCR_HEIGHT);
 	Camera::ACTIVE->Aspect = (aspect >= 1) ? aspect : ((float)SCR_HEIGHT/(float)SCR_WIDTH); // Set the default aspect to the window aspect
 
+	Camera::ACTIVE->to<FreeCam>()->controls->loadConfigFile("config/dvorak");
+
 	// load models
+	std::unique_ptr<Model> testt = std::make_unique<Model>("models/shadertest.obj", glm::vec3(0,1,10), glm::vec3(30));
 
-	// test->load("levels/test/index.json");
+    Level* lvltest = new Level("levels/test/index.json");
+	lvltest->load();
 
-	Model test("models/shadertest.obj", glm::vec3(2,1,0));
-
-	Model vest("models/origin.obj", glm::vec3(3,0,0));
+	Model vest("models/origin.obj", glm::vec3(0,0,0));
 	// std::unique_ptr<Model> vestptr = std::make_unique<Model>(vest);
 	// test.add<Model>(vestptr);
 
 	Input baz;
 	bool buzz = true;
 
-	baz.addBind("temp_rotate", [&test, &buzz](){
-		if(buzz) {
-			test.rot.x += 0.1;
-			buzz = true;
-		}
-	}, GLFW_KEY_F);
-	baz.addBind("temp_rotate_stop", [&test, &buzz](){
-		buzz = true;
-	}, GLFW_KEY_F, GLFW_RELEASE);
-	baz.activate();
-
-    baz.addBind("console", [window](){
+	// baz.addBind("temp_rotate", [&test, &buzz](){
+	// 	if(buzz) {
+	// 		test.rot.x += 0.1;
+	// 		buzz = true;
+	// 	}
+	// }, GLFW_KEY_F);
+	// baz.addBind("temp_rotate_stop", [&test, &buzz](){
+	// 	buzz = true;
+	// }, GLFW_KEY_F, GLFW_RELEASE);
+	baz.addBind("console", [window](){
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		simpleConsole();
 	}, GLFW_KEY_GRAVE_ACCENT);
+	baz.activate();
 
-	// Model plont("models/nanosuit/nanosuit.obj", glm::vec3(10,1,0));
-	// Model bop("models/g.dae", glm::vec3(3,0,1));
-	// Model bip("models/untitled.dae", glm::vec3(20, 0, 0));
+    
 
 	// std::string heck = "textures";
 	// Mesh bab(calcVertex(Telabrium::cubeVerts), Telabrium::cubeIndices, loadTexture("shadertest.png", heck));
 
-	DirLight someLight(glm::vec3(70.0f, 30.0f, 20.0f));
+	// DirLight someLight(glm::vec3(70.0f, 30.0f, 20.0f));
 	// PointLight ee(glm::vec3(4,0,0));
 
 	std::vector<std::string> skyFaces = {
@@ -102,6 +101,18 @@ int main(){
 	Skybox skybox(loadCubemap(skyFaces, "textures/skybox"));
 
 	gameState = 1;
+
+	std::vector< std::unique_ptr< std::string >> pointers;
+	pointers.push_back(std::make_unique<std::string>("foo"));
+	pointers.push_back(std::make_unique<std::string>("bar"));
+
+	auto aa = pointers.begin();
+	for( auto&& pointer : pointers ) {
+		std::cout << *pointer << std::endl;
+		std::cout << pointer->length() << std::endl;
+	}
+
+
 
 	// render loop
 	// -----------
@@ -150,13 +161,6 @@ int main(){
 	cleanup();
 	return 0;
 }
-
-
-
-// 	mainInput.addBind("console", [w](){
-// 		glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-// 		simpleConsole();
-// 	}, GLFW_KEY_GRAVE_ACCENT);
 
 
 GLFWwindow* init_main_window() {
@@ -270,7 +274,7 @@ void simpleConsole() {
 
 	std::vector<std::string> command = Telabrium::segment(in, ' '); // Split the input string into a vector of strings
 
-	if (command[0] == "rshader"){
+	if (command[0] == "rlshader"){
 		glUseProgram(0);
 		Shader::ACTIVE->build();
 		printf("[?] DEBUG: Reloaded core shader\n");
@@ -287,10 +291,9 @@ void simpleConsole() {
 	} else if(command[0] == "aspect") {
 		Camera::ACTIVE->Aspect = std::stof(command[1]);
 	} else if(command[0] == "load") {
-		test->load(command[1]);
-		std::cout << "Done" << std::endl;
+			lvltest->load();
 	} else if(command[0] == "unload") {
-		test->unload();
+			lvltest->unload();
 	} else {
 		printf("[?] DEBUG: Command not recognized :/\n");
 	}
