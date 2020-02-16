@@ -10,6 +10,7 @@ core_source = [
     'mesh.cpp',
     'model.cpp',
     'object.cpp',
+	'safe_val.cpp',
     'shader.cpp',
     'skybox.cpp',
     'task.cpp',
