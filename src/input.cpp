@@ -7,8 +7,7 @@ Input::Input(std::string path) {
  
 }
 
-Input::Input() {
-}
+Input::Input() {}
 
 void Input::loadConfigFile(std::string path) {
     std::ifstream file(path);
