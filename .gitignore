@@ -5,3 +5,8 @@ builddir/*
 
 *.kate-swp
 
+tests/models/Material.001 Base Color.png
+tests/models/rat.dae
+tests/models/rat.mtl
+tests/models/rat.obj
+tests/models/shadertest.mtl
