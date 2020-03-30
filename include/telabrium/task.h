@@ -31,10 +31,11 @@ public:
 
     size_t getObjCount();
 
+	std::vector<T*> task_objects; // Vector of objects that will run the obj function as a member function
+
 private:
     std::function<void(T*, Args... args)> obj_func; // Function to be run on every object in task_objects
     std::function<void(Args... args)> task_func; // Function to be run only once when the task is executed
-    std::vector<T*> task_objects; // Vector of objects that will run the obj function as a member function
 };
 
 // Constructors for assigning functions
@@ -70,7 +71,7 @@ void Task<T, Args...>::addObj(T* obj) {
 
 template <class T, typename... Args>
 void Task<T, Args...>::addObj(std::vector<T*> objs) {
-    for (auto it = objs.begin(); it != objs.end(); it++) {
+    for (auto it : objs) {
         task_objects.push_back(objs[it]);
     }
 }
@@ -82,7 +83,7 @@ void Task<T, Args...>::removeObj(T* obj) {
 
 template <class T, typename... Args>
 void Task<T, Args...>::removeObj(std::vector<T*> objs) {
-    for (auto it = objs.begin(); it != objs.end(); it++) {
+    for (auto it : objs) {
         task_objects.erase(std::find(task_objects.begin(), task_objects.end(), objs));
     }
 }
@@ -120,9 +121,9 @@ void Task<T, Args...>::setTaskFunc(void (*f)(Args...)) {
 template <class T, typename... Args>
 void Task<T, Args...>::exec(Args... args) {
     if (task_func != nullptr) task_func(args...); // Execute the per-execution function
-    for (auto it = task_objects.begin(); it != task_objects.end(); it++) {
-        if (*it != nullptr && obj_func != nullptr){
-            obj_func(*it, args...); // Execute the per-object function
+    for (auto it : task_objects) {
+        if (it != nullptr && obj_func != nullptr){
+            obj_func(it, args...); // Execute the per-object function
         } 
     }
 }
