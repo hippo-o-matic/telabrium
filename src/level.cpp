@@ -29,28 +29,26 @@ void Map::load(std::string path, std::string options) {
     
 }
 
-// Level::Level(std::string path) {
-// 	Object(getContents(path));
-// }
 
-Level::Level(Json::Value j) : Object() {
-	// If the level is actually just a link to another file, grab the file
+Level::Level(Json::Value j) : Object(){
 	try {
+		// If a path is specified, go and get the level from that path
 		if(j.get("path", "").asString() != "") {
 			j = getFileContents(j["path"].asString());
 
 			if(j.get("path", "").asString() != "") { // The level object redirected to can't be another redirect
 				TelabriumLog("Level path cannot lead to another level path object", 3);
+				return;
 			}
 		}
-	} catch(Json::LogicError e) { // If it can't read the json object, it's possible it's actually a path, so try to load it straight from the path
+	} catch(const Json::LogicError& e) { // If it can't read the json object, it's possible <j> is just a string, so try to load it straight from that as a path
 		std::string path = j.asString();
 		j = getFileContents(path);
 	}
 
 	// Extract object traits without creating components yet
 	this->id = j.get("id", "").asString();
-	this->type = j.get("type", "BlankObject").asString();
+	this->type = j.get("type", "Level").asString();
 
 	Json::Value jPos = j["pos"];
 	Json::Value jRot = j["rot"];
@@ -60,7 +58,12 @@ Level::Level(Json::Value j) : Object() {
 	setRot(glm::vec3(jRot[0].asFloat(), jRot[1].asFloat(), jRot[2].asFloat()));
 	setScl(glm::vec3(jScl[0].asFloat(), jScl[1].asFloat(), jScl[2].asFloat()));
 
-	contents = j;
+	contents = j["components"];
+}
+
+void Level::loadFile(std::string path) {
+	contents = getFileContents(path)["components"];
+	reload();
 }
 
 Json::Value Level::getFileContents(std::string path) {
@@ -71,7 +74,12 @@ Json::Value Level::getFileContents(std::string path) {
 	}
 
 	Json::Value json;
-	try { file >> json; } catch(const Json::RuntimeError& e) {
+	try { 
+		file >> json; 
+	} catch(const Json::RuntimeError& e) {
+		TelabriumLog(std::string("Json Error: ") + e.what(), 3);
+		return "";
+	} catch(const Json::LogicError& e) {
 		TelabriumLog(std::string("Json Error: ") + e.what(), 3);
 		return "";
 	}
@@ -84,17 +92,12 @@ Json::Value Level::getFileContents(std::string path) {
 	return json;
 }
 
-void Level::load() {
+void Level::reload() {
 	unload();
-	createComponents(contents["components"]);
+	createComponents(contents);
 }
 
 void Level::unload() {
-		test.push_back(std::make_unique<std::string>("SCREEEcH"));
-
-	for(auto&& it : test) {
-		std::cout << *it;
-	}
 	for(auto&& it : components)
 		std::remove(components.begin(), components.end(), it);
     components.clear();

@@ -37,7 +37,8 @@ public:
 	~Level() = default;
 
 	static Json::Value getFileContents(std::string path);
-	void load();
+	void loadFile(std::string path); // Gets the data from the specified path
+	void reload(); // Loads the level with the data already in this->contents
 	void unload();
 
 private:
