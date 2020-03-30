@@ -2,6 +2,7 @@
 build/*
 builddir/*
 **/.vscode/ipch/**
+subprojects/*/
 
 *.kate-swp
 

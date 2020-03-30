@@ -1,0 +1,10 @@
+[wrap-file]
+directory = jsoncpp-1.9.2
+
+source_url = https://github.com/open-source-parsers/jsoncpp/archive/1.9.2.tar.gz
+source_filename = jsoncpp-1.9.2.tar.gz
+source_hash = 77a402fb577b2e0e5d0bdc1cf9c65278915cdb25171e3452c68b6da8a561f8f0
+
+patch_url = https://wrapdb.mesonbuild.com/v1/projects/jsoncpp/1.9.2/get_zip
+patch_filename = jsoncpp-1.9.2-wrap.zip
+patch_hash = 4503fcbfd31ee903a6bcfc898fdb4be1ebc3e2a71add8f24eecbd390dcf386a9

@@ -12,7 +12,6 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "json/json.h"
-#include "json/json-forwards.h"
 
 #include "telabrium/safe_val.h"
 #include "telabrium/utility.h"

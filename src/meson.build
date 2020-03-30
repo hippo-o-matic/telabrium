@@ -3,7 +3,6 @@ core_source = [
     'camera.cpp',
     'config.cpp',
     'input.cpp',
-    'jsoncpp.cpp',
     'level.cpp',
     'light.cpp',
     'luafile.cpp',
@@ -34,9 +33,13 @@ core_dep = [
 micropak_proj = subproject('micropak')
 core_dep += micropak_proj.get_variable('micropak_dep')
 
+jsoncpp_proj = subproject('jsoncpp')
+core_dep += jsoncpp_proj.get_variable('jsoncpp_dep')
+
 subdir('generic')
 
-add_project_link_arguments(['-ldl','-lstdc++fs','-lglfw'], language : 'cpp')
+add_project_link_arguments(['-ldl','-lstdc++fs','-lglfw', '-ljsoncpp'], language : 'cpp')
+
 telabrium = shared_library('telabrium', 
                 core_source,
                 include_directories : include,

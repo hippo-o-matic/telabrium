@@ -4,7 +4,9 @@
 #include <functional>
 
 #include "GLFW/glfw3.h"
+
 #include "json/json.h"
+#include "json/value.h"
 
 #include "telabrium/utility.h"
 

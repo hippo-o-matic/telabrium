@@ -8,7 +8,6 @@
 #include <experimental/filesystem>
 
 #include "json/json.h"
-#include "json/json-forwards.h"
 
 #include "telabrium/object.h"
 #include "telabrium/utility.h"
