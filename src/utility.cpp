@@ -40,6 +40,6 @@ void Telabrium::log(std::string message, const char* f, int line, short int seve
 	}
 
 	file << "<" << t << "> " << sev << message << "\n";
-	std::cout << "<" << t << "> " << "[" << f << ", " << line << "] " << sev << message << "\n";
+	std::cout << "[" << f << ", " << line << "] " << sev << message << "\n";
 	file.close();
 }
