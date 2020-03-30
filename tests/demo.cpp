@@ -21,17 +21,16 @@ int main(){
 	std::cout<<glGetString(GL_VERSION)<<std::endl;
 
 	#ifdef TELABRIUM_MODE_DEBUG
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
-	GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-	if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) // Only enable debug output if our version of GL supports it
-	{
-		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
-		glDebugMessageCallback(debug_callback, nullptr);
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-	}
-	
+		GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+		if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) // Only enable debug output if our version of GL supports it
+		{
+			glEnable(GL_DEBUG_OUTPUT);
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
+			glDebugMessageCallback(debug_callback, nullptr);
+			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+		}
 	#endif
 
 	// configure global opengl state
@@ -51,13 +50,12 @@ int main(){
 	float aspect = ((float)SCR_WIDTH/(float)SCR_HEIGHT);
 	Camera::ACTIVE->Aspect = (aspect >= 1) ? aspect : ((float)SCR_HEIGHT/(float)SCR_WIDTH); // Set the default aspect to the window aspect
 
-	Camera::ACTIVE->to<FreeCam>()->controls->loadConfigFile("config/dvorak");
-
 	// load models
-	std::unique_ptr<Model> testt = std::make_unique<Model>("models/shadertest.obj", glm::vec3(0,1,10), glm::vec3(30));
+	// DirLight aiee(glm::vec3(0), glm::vec3(10,0,0), glm::vec3(0,100,0));
+	std::unique_ptr<Model> testt = std::make_unique<Model>("models/rat.obj", glm::vec3(0,1,10), glm::vec3(30));
 
-    Level* lvltest = new Level("levels/test/index.json");
-	lvltest->load();
+    lvltest = new Level("levels/test/index.json");
+	lvltest->reload();
 
 	Model vest("models/origin.obj", glm::vec3(0,0,0));
 	// std::unique_ptr<Model> vestptr = std::make_unique<Model>(vest);
@@ -66,15 +64,18 @@ int main(){
 	Input baz;
 	bool buzz = true;
 
-	// baz.addBind("temp_rotate", [&test, &buzz](){
-	// 	if(buzz) {
-	// 		test.rot.x += 0.1;
-	// 		buzz = true;
-	// 	}
-	// }, GLFW_KEY_F);
-	// baz.addBind("temp_rotate_stop", [&test, &buzz](){
-	// 	buzz = true;
-	// }, GLFW_KEY_F, GLFW_RELEASE);
+	baz.addBind("temp_rotate", [&buzz](){
+		if(buzz) {
+			glUseProgram(0);
+			Shader::ACTIVE->build();
+			printf("[?] DEBUG: Reloaded core shader\n");
+			buzz = false;
+		}
+	}, GLFW_KEY_LEFT_BRACKET);
+	baz.addBind("temp_rotate_stop", [&buzz](){
+		buzz = true;
+	}, GLFW_KEY_LEFT_BRACKET, GLFW_RELEASE);
+
 	baz.addBind("console", [window](){
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		simpleConsole();
@@ -86,7 +87,7 @@ int main(){
 	// std::string heck = "textures";
 	// Mesh bab(calcVertex(Telabrium::cubeVerts), Telabrium::cubeIndices, loadTexture("shadertest.png", heck));
 
-	// DirLight someLight(glm::vec3(70.0f, 30.0f, 20.0f));
+	DirLight someLight(glm::vec3(70.0f, 30.0f, 20.0f), glm::vec3(0), glm::vec3(0,.8,0));
 	// PointLight ee(glm::vec3(4,0,0));
 
 	std::vector<std::string> skyFaces = {
@@ -101,18 +102,6 @@ int main(){
 	Skybox skybox(loadCubemap(skyFaces, "textures/skybox"));
 
 	gameState = 1;
-
-	std::vector< std::unique_ptr< std::string >> pointers;
-	pointers.push_back(std::make_unique<std::string>("foo"));
-	pointers.push_back(std::make_unique<std::string>("bar"));
-
-	auto aa = pointers.begin();
-	for( auto&& pointer : pointers ) {
-		std::cout << *pointer << std::endl;
-		std::cout << pointer->length() << std::endl;
-	}
-
-
 
 	// render loop
 	// -----------
@@ -189,10 +178,7 @@ GLFWwindow* init_main_window() {
 
 	// Set glfw callbacks
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetKeyCallback(window, Input::key_callback);
-	glfwSetCursorPosCallback(window, Input::mouse_callback);
-	glfwSetMouseButtonCallback(window, Input::mouse_button_callback);
-	glfwSetScrollCallback(window, Input::scroll_callback);
+	Input::assignCallbacks(window);
 
 	// glad: load all OpenGL function pointers
 
@@ -291,7 +277,7 @@ void simpleConsole() {
 	} else if(command[0] == "aspect") {
 		Camera::ACTIVE->Aspect = std::stof(command[1]);
 	} else if(command[0] == "load") {
-			lvltest->load();
+			lvltest->loadFile("levels/test/index.json");
 	} else if(command[0] == "unload") {
 			lvltest->unload();
 	} else {

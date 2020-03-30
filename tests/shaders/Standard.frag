@@ -103,7 +103,12 @@ void main() {
 	vec3 refraction = CalcRefraction(norm, FragPos, ViewPos, mat.IOR);
 
 	// FragColor = texColor;
-    FragColor.rgb = texColor.rgb * texColor.a;
+    // FragColor.rgb = texColor.rgb * texColor.a;
+	if(dirLight_AMT == 2) {
+		FragColor.rgb = dirLights[2].specular;
+	} else {
+		FragColor.rgb = vec3(1,1,1);
+	}
 }
 
 // calculates the color when using a directional light.
@@ -116,10 +121,10 @@ vec3 CalcDirLight(dirLight light, vec3 normal, vec3 viewDir) {
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess);
     // combine results
     vec3 ambient = mix(light.ambient, mat.ambient_color, 0.5);
-    vec3 diffuse = vec3(0.8) * diff * mix(vec3(texture(mat.texture_diffuse, TexCoords)), mat.diffuse_color, .5);
+    vec3 diffuse = light.diffuse * diff * mix(vec3(texture(mat.texture_diffuse, TexCoords)), mat.diffuse_color, .5);
     vec3 specular = light.specular * spec * mix(vec3(texture(mat.texture_specular, TexCoords)), mat.specular_color, .5);
 
-    return (diffuse + specular);
+    return diffuse + specular;
 }
 
 // calculates the color when using a point light.
