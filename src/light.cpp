@@ -2,15 +2,14 @@
 
 // Static initialization
 Task<DirLight, Shader&> DirLight::updateT(&DirLight::updateOF, &DirLight::updateTF);
-int DirLight::nidStep = 0;
 
 Task<PointLight, Shader&> PointLight::updateT(&PointLight::updateOF, &PointLight::updateTF);
-int PointLight::nidStep = 0;
 
 Task<SpotLight, Shader&> SpotLight::updateT(&SpotLight::updateOF, &SpotLight::updateTF);
-int SpotLight::nidStep = 0;
 
-Light::Light(){};
+Light::Light(glm::vec3 amb, glm::vec3 dif, glm::vec3 spec) {
+	Ambient = amb; Diffuse = dif; Specular = spec;
+};
 
 Light::Light(Json::Value j) : Object(j) {
 	Json::Value jAmbient = j["ambient"];
@@ -25,7 +24,10 @@ Light::Light(Json::Value j) : Object(j) {
 // Directional Light: Provides light from one direction
 DirLight::DirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec) {
 	rot = dir; Ambient = amb; Diffuse = dif; Specular = spec;
-	nid = nidStep++;
+	updateT.addObj(this);
+}
+
+DirLight::DirLight(Json::Value j) : Light(j) {
 	updateT.addObj(this);
 }
 
@@ -39,38 +41,35 @@ void DirLight::updateTF(Shader& s) {
 }
 
 void DirLight::updateOF(Shader& s) {
-	std::string s_nid = std::to_string(nid);
-	s.set("dirLights[" + s_nid + "].direction", glm::radians(rot()));
-	s.set("dirLights[" + s_nid + "].ambient", Ambient);
-	s.set("dirLights[" + s_nid + "].diffuse", Diffuse);
-	s.set("dirLights[" + s_nid + "].specular", Specular);
-}
+	auto& lights = updateT.task_objects;
+	unsigned index = std::find(lights.begin(), lights.end(), this) - lights.begin();
+	std::string i = std::to_string(index);
 
-DirLight::DirLight(Json::Value j) : Light(j) {
-	nid = nidStep++;
-	updateT.addObj(this);
+	s.set("dirLights[" + i + "].direction", glm::radians(rot()));
+	s.set("dirLights[" + i + "].ambient", Ambient);
+	s.set("dirLights[" + i + "].diffuse", Diffuse);
+	s.set("dirLights[" + i + "].specular", Specular);
 }
 
 
 // Point Light: Creates a spherical light originating from a single point
-PointLight::PointLight(glm::vec3 position, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad){
+PointLight::PointLight(glm::vec3 position, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad) : Light(){
 	pos = position; Ambient = amb; Diffuse = dif; Specular = spec;
 	Constant = constant; Linear = lin; Quadratic = quad;
-	nid = nidStep++;
+
+	updateT.addObj(this);
+}
+
+PointLight::PointLight(Json::Value j) : Light(j) {
+	this->Constant = j.get("constant", default_constant).asFloat();
+	this->Linear = j.get("linear", default_lin).asFloat();
+	this->Quadratic = j.get("quadratic", default_quad).asFloat();
+
 	updateT.addObj(this);
 }
 
 PointLight::~PointLight() {
 	updateT.removeObj(this);
-}
-
-PointLight::PointLight(Json::Value j) : Light(j) {
-	this->Constant = j.get("constant", 1.0).asFloat();
-	this->Linear = j.get("linear", 0.9f).asFloat();
-	this->Quadratic = j.get("quadratic", 0.032f).asFloat();
-
-	nid = nidStep++;
-	updateT.addObj(this);
 }
 
 void PointLight::updateTF(Shader& s) {
@@ -79,14 +78,17 @@ void PointLight::updateTF(Shader& s) {
 }
 
 void PointLight::updateOF(Shader& s) {
-	std::string s_nid = std::to_string(nid);
-	s.set("pointLights[" + s_nid + "].pos", pos());
-	s.set("pointLights[" + s_nid + "].ambient", Ambient);
-	s.set("pointLights[" + s_nid + "].diffuse", Diffuse);
-	s.set("pointLights[" + s_nid + "].specular", Specular);
-	s.set("pointLights[" + s_nid + "].constant", Constant);
-	s.set("pointLights[" + s_nid + "].linear", Linear);
-	s.set("pointLights[" + s_nid + "].quadratic", Quadratic);
+	auto& lights = updateT.task_objects;
+	unsigned index = std::find(lights.begin(), lights.end(), this) - lights.begin();
+	std::string i = std::to_string(index);
+
+	s.set("pointLights[" + i + "].pos", pos());
+	s.set("pointLights[" + i + "].ambient", Ambient);
+	s.set("pointLights[" + i + "].diffuse", Diffuse);
+	s.set("pointLights[" + i + "].specular", Specular);
+	s.set("pointLights[" + i + "].constant", Constant);
+	s.set("pointLights[" + i + "].linear", Linear);
+	s.set("pointLights[" + i + "].quadratic", Quadratic);
 }
 
 
@@ -97,24 +99,22 @@ SpotLight::SpotLight(glm::vec3 position, glm::vec3 rotation, glm::vec3 amb, glm:
 	Constant = constant; Linear = lin; Quadratic = quad;
 	CutOff = cut; OuterCutOff = ocut;
 
-	nid = nidStep++;
+	updateT.addObj(this);
+}
+
+SpotLight::SpotLight(Json::Value j) : Light(j) {
+	this->Constant = j.get("constant", default_constant).asFloat();
+	this->Linear = j.get("linear", default_lin).asFloat();
+	this->Quadratic = j.get("quadratic", default_quad).asFloat();
+
+	this->CutOff = j.get("cutoff", default_cut).asFloat();
+	this->OuterCutOff = j.get("outercutoff", default_ocut).asFloat();
+
 	updateT.addObj(this);
 }
 
 SpotLight::~SpotLight() {
 	updateT.removeObj(this);
-}
-
-SpotLight::SpotLight(Json::Value j) : Light(j) {
-	this->Constant = j.get("constant", 1).asFloat();
-	this->Linear = j.get("linear", 0.9f).asFloat();
-	this->Quadratic = j.get("quadratic", 0.032f).asFloat();
-
-	this->CutOff = j.get("cutoff", 12.5f).asFloat();
-	this->OuterCutOff = j.get("outercutoff", 15).asFloat();
-
-	nid = nidStep++;
-	updateT.addObj(this);
 }
 
 void SpotLight::updateTF(Shader& s) {
@@ -123,17 +123,20 @@ void SpotLight::updateTF(Shader& s) {
 }
 
 void SpotLight::updateOF(Shader& s) {
-	std::string s_nid = std::to_string(nid);
-	s.set("spotLights[" + s_nid + "].pos", pos());
-	s.set("spotLights[" + s_nid + "].direction", glm::radians(rot()));
-	s.set("spotLights[" + s_nid + "].ambient", Ambient);
-	s.set("spotLights[" + s_nid + "].diffuse", Diffuse);
-	s.set("spotLights[" + s_nid + "].specular", Specular);
-	s.set("spotLights[" + s_nid + "].constant", Constant);
-	s.set("spotLights[" + s_nid + "].linear", Linear);
-	s.set("spotLights[" + s_nid + "].quadratic", Quadratic);
-	s.set("spotLights[" + s_nid + "].cutOff", glm::cos(glm::radians(CutOff)));
-	s.set("spotLights[" + s_nid + "].outerCutOff", glm::cos(glm::radians(OuterCutOff)));
+	auto& lights = updateT.task_objects;
+	unsigned index = std::find(lights.begin(), lights.end(), this) - lights.begin();
+	std::string i = std::to_string(index);
+
+	s.set("spotLights[" + i + "].pos", pos());
+	s.set("spotLights[" + i + "].direction", glm::radians(rot()));
+	s.set("spotLights[" + i + "].ambient", Ambient);
+	s.set("spotLights[" + i + "].diffuse", Diffuse);
+	s.set("spotLights[" + i + "].specular", Specular);
+	s.set("spotLights[" + i + "].constant", Constant);
+	s.set("spotLights[" + i + "].linear", Linear);
+	s.set("spotLights[" + i + "].quadratic", Quadratic);
+	s.set("spotLights[" + i + "].cutOff", glm::cos(glm::radians(CutOff)));
+	s.set("spotLights[" + i + "].outerCutOff", glm::cos(glm::radians(OuterCutOff)));
 }
 
 

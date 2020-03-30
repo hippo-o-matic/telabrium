@@ -1,5 +1,10 @@
 #include "telabrium/object.h"
 
+// Static initializaiton
+const glm::vec3 default_pos = glm::vec3(0);
+const glm::vec3 default_rot = glm::vec3(0);
+const glm::vec3 default_scl = glm::vec3(1);
+
 Object::Object(glm::vec3 _pos, glm::vec3 _rot, glm::vec3 _scl) {
 	setPos(_pos);
 	setRot(_rot);
@@ -111,7 +116,14 @@ glm::vec3 Object::getScl() {
 
 // Sets the objects scale and updates its components scales
 glm::vec3 Object::setScl(glm::vec3 in) {
-	scale = in;
+	// Scale can't be negative or 0
+	if(in.x > 0)
+		scale.x = in.x;
+	if(in.x > 0)
+		scale.y = in.y;
+	if(in.x > 0)
+		scale.z = in.z;
+	
 	for(auto& i : components) {
 		i->scl *= this->scl();
 	}

@@ -6,9 +6,10 @@
 #include <algorithm>
 #include <memory>
 
-#include "glm/glm.hpp"
+#define GLM_FORCE_PURE
+#include <glm/vec3.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
-#include "glm/gtx/rotate_vector.hpp"
+#include <glm/gtx/rotate_vector.hpp>
 
 #include "json/json.h"
 #include "json/json-forwards.h"
@@ -34,9 +35,9 @@ public:
     typedef std::unique_ptr<Object> ptr;
 
 	Object(
-        glm::vec3 _pos = glm::vec3(0.0f),
-        glm::vec3 _rot = glm::vec3(0.0f),
-        glm::vec3 _scl = glm::vec3(1.0f)
+        glm::vec3 _pos = default_pos,
+        glm::vec3 _rot = default_rot,
+        glm::vec3 _scl = default_scl
     );
 
 	Object(Json::Value);
@@ -74,9 +75,6 @@ public:
 
     // A vector that holds objects with no parent, in practice shouldn't hold anything other than Level objects
     // static std::vector<Object::ptr> global;
-	
-	std::vector<std::unique_ptr<std::string>> test;
-
 
 protected:
 	Object* parent; // Raw pointer to the objects parent
@@ -84,7 +82,6 @@ protected:
 	void createComponents(Json::Value items);
 
     /// Functions for updating spatial values
-
     glm::vec3 getPos();
     glm::vec3 setPos(glm::vec3);
 
@@ -94,11 +91,16 @@ protected:
     glm::vec3 getScl();
     glm::vec3 setScl(glm::vec3);
 
+	// Default values for spatial values
+	static constexpr glm::vec3 default_pos = glm::vec3(0);
+	static constexpr glm::vec3 default_rot = glm::vec3(0);
+	static constexpr glm::vec3 default_scl = glm::vec3(1);
+
 private:
     /// Spatial properties
-    glm::vec3 position = glm::vec3(0);
-	glm::vec3 rotation = glm::vec3(0);
-	glm::vec3 scale = glm::vec3(1);
+    glm::vec3 position;
+	glm::vec3 rotation;
+	glm::vec3 scale;
 
 	void setupSpatialFunctions();
 };
