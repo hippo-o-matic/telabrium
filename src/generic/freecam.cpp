@@ -1,8 +1,5 @@
 #include "telabrium/generic/freecam.h"
 
-double FreeCam::mouse_lastX;
-double FreeCam::mouse_lastY;
-
 extern float deltaTime;
 
 FreeCam::FreeCam(float &deltaTime, glm::vec3 position) : Camera(position) {
@@ -24,6 +21,10 @@ FreeCam::FreeCam(float &deltaTime, glm::vec3 position) : Camera(position) {
 
     controls->setMouseCallback(mouse_control);
     controls->setScrollCallback(scroll_control);
+
+	// TEST: see freecam.h
+	controls->setKeyCallback(key_callback);
+	controls->setMouseButtonCallback(mb_callback);
 
     controls->addBind("forward", [this, &deltaTime]() {
 		pos += glm::normalize(glm::vec3(Front.x, 0, Front.z)) * Speed * deltaTime;
