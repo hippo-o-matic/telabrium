@@ -17,6 +17,10 @@ Model::Model(Json::Value j) : Object(j) {
 	drawT.addObj(this);
 }
 
+Model::~Model() {
+	drawT.removeObj(this);
+}
+
 // draws the model, and thus all its meshes
 void Model::Draw(Shader &shader){
 	glm::mat4 model = glm::mat4(1.0f);
@@ -159,7 +163,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
 // checks all material textures of a given type and loads the textures if they're not loaded yet.
 // the required info is returned as a Texture struct.
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
+std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
 	std::vector<Texture> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
 		aiString str;

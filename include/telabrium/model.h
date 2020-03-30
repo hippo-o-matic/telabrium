@@ -37,6 +37,8 @@ public:
 
 	Model() = default;
 
+	~Model();
+
 private:
 	TELABRIUM_REGISTER_OBJECT(Model);
 
