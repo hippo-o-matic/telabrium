@@ -1,10 +1,10 @@
 #include "telabrium/input.h"
 
 std::vector<Input*> Input::active_profiles;
+bool Input::focused = false;
 
 Input::Input(std::string path) {
     loadConfigFile(path);
- 
 }
 
 Input::Input() {}
@@ -92,14 +92,22 @@ void Input::editBindKey(const char* name, int key, int action) {
     }
 }
 
-
+void Input::setKeyCallback(std::function<void(GLFWwindow*,int, int)> func) {
+	key_c = func;
+}
+void Input::setMouseButtonCallback(std::function<void(GLFWwindow*,int, int)> func) {
+	button_c = func;
+}
 void Input::setMouseCallback(std::function<void(GLFWwindow*, double, double)> func) {
     mouse_c = func;
 }
-
 void Input::setScrollCallback(std::function<void(GLFWwindow*, double, double)> func) {
     scroll_c = func;
 }
+void Input::setFocusCallback(std::function<void(GLFWwindow*, bool)> func){
+	focus_c = func;
+}
+
 
 
 // Check each bind and run its function
@@ -139,47 +147,61 @@ void Input::deactivate() {
 
 // NOTE: keys and mouse buttons should be handled with Input::process, as this callback doesn't continue running when keys are held
 void Input::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
-		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	}
-    // for(auto it = active_profiles.begin(); it != active_profiles.end(); it++) { // Iterate through all active profiles
-    //     for(auto bt = (*it)->binds.begin(); bt != (*it)->binds.end(); bt++) { // Iterate through that profiles binds
-    //         if(bt->key == key && bt->action == action)
-    //             bt->func();
-    //     }
-    // }
+	// TEST: Unfocus on escape
+    // if (focused) {
+	// 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	// 		focused = false;
+	// }
+
+    for(auto it : active_profiles) { // Iterate through all active profiles
+        if(it->key_c)
+			it->key_c(window, key, action);
+    }
 }
 
 void Input::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    // Focus the window on click
-    if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
-		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	}
+    // Focus the window on click (make mouse disappear)
+    // if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
+	// 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	// 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	// }
     
-    // for(auto it = active_profiles.begin(); it != active_profiles.end(); it++) { // Iterate through all active profiles
-    //     for(auto bt = (*it)->binds.begin(); bt != (*it)->binds.end(); bt++) { // Iterate through that profiles binds
-    //         if(bt->key == button && bt->action == action)
-    //             bt->func();
-    //     }
-    // }
+    for(auto it : active_profiles) { // Iterate through all active profiles
+        if(it->button_c)
+			it->button_c(window, button, action);
+    }
 }
 
 void Input::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    if(glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) { // Only run mouse events if the window is focused
-        for(auto it = active_profiles.begin(); it != active_profiles.end(); it++) { // Iterate through all active profiles
-            if((*it)->mouse_c)
-                (*it)->mouse_c(window, xpos, ypos);
+    if(focused) { // Only run mouse events if the window is focused
+        for(auto it : active_profiles) { // Iterate through all active profiles
+            if(it->mouse_c)
+                it->mouse_c(window, xpos, ypos);
         }
     }
 }
 
 void Input::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    if(glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) { // Only run mouse events if the window is focused
-        for(auto it = active_profiles.begin(); it != active_profiles.end(); it++) { // Iterate through all active profiles
-            if((*it)->scroll_c)
-                (*it)->scroll_c(window, xoffset, yoffset);
+    if(focused) { // Only run mouse events if the window is focused
+        for(auto it : active_profiles) { // Iterate through all active profiles
+            if(it->scroll_c)
+                it->scroll_c(window, xoffset, yoffset);
         }
     }
+}
+
+void Input::focus_callback(GLFWwindow* window, int glfwFocus) {
+	focused = glfwFocus == GLFW_TRUE ? true : false; // Avoid implicit conversion because it's icky, make 0 false and 1 true
+	for(auto it : active_profiles) { // Iterate through all active profiles
+            if(it->focus_c)
+                it->focus_c(window, focused);
+    }
+}
+
+void Input::assignCallbacks(GLFWwindow* window) {
+	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetWindowFocusCallback(window, focus_callback);
 }
