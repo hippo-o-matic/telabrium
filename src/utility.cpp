@@ -3,7 +3,7 @@
 //Parses strings into a vector of strings seperated by the seperator character
 std::vector<std::string> Telabrium::segment(std::string &in, char seperator) {
 	size_t last = 0;
-	size_t pos = 0; //Limits in to 512 characters, might want to change later
+	size_t pos = 0;
 	std::vector<std::string> output;
 
 	if (in.empty()) 
@@ -17,6 +17,20 @@ std::vector<std::string> Telabrium::segment(std::string &in, char seperator) {
 
 	return output;
 }
+
+// Replaces all instances of <target> with <result> in <input&>
+std::string Telabrium::replaceAll(std::string& input, const std::string& target, const std::string& result) {
+	if(target.empty())
+		return input;
+
+	size_t pos = 0;
+	while((pos = input.find(target, pos)) != std::string::npos) {
+		input.replace(pos, result.length(), result);
+		pos += result.length();
+	}
+	return input;
+}
+
 
 void Telabrium::log(std::string message, const char* f, int line, short int severity, const char* outputfile){
 	std::fstream file(outputfile, std::fstream::out);

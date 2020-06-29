@@ -11,9 +11,11 @@
 const std::string TELABRIUM_CACHE_PATH = "demo/cache/";
 const std::string TELABRIUM_CONFIG_PATH = "demo/config/";
 
-namespace Telabrium{
+namespace Telabrium {
 	// Seperates a string into a vector of strings, separated by [seperator] (input string, seperator)
 	std::vector<std::string> segment(std::string &in, char seperator);
+
+	std::string replaceAll(std::string& input, const std::string& target, const std::string& sub);
 
 	void log(std::string message, const char* file, int line, short int severity = 0, const char* outputfile = "tests/logs/log.txt");
 
