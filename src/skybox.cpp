@@ -1,8 +1,9 @@
 #include "telabrium/skybox.h"
 
 
-Skybox::Skybox(Texture cubemap) : Mesh(calcVertex(Telabrium::cubeVerts), Telabrium::cubeIndices, cubemap) {
+Skybox::Skybox(Texture cubemap) : Mesh(calcVertex(Telabrium::cubeVerts), Telabrium::cubeIndices, std::vector<Texture>(1, cubemap)) {
 	setupMesh();
+	this->cubemap = cubemap;
 }
 
 void Skybox::Draw(Shader &shader){
@@ -14,7 +15,7 @@ void Skybox::Draw(Shader &shader){
 
 	glBindVertexArray(VAO);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textures[0].id);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap.id);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 

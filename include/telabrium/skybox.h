@@ -10,6 +10,9 @@ public:
 	Skybox(Texture cubemap);
 
 	void Draw(Shader &shader);
+
+private:
+	Texture cubemap;
 };
 
 #endif
