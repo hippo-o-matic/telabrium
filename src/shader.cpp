@@ -51,6 +51,13 @@ void Shader::build(){
 	catch (const std::ifstream::failure &e){
 		TelabriumLog("Shader file was not sucessfully read", 3);
 	}
+
+	// Perform substitutions if any
+	for(auto it : substitution_map) {
+		Telabrium::replaceAll(vertexCode, it.first, it.second);
+		Telabrium::replaceAll(fragmentCode, it.first, it.second);
+		Telabrium::replaceAll(geometryCode, it.first, it.second);
+	}
 	
 	const char* vShaderCode = vertexCode.c_str();
 	const char * fShaderCode = fragmentCode.c_str();
