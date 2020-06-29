@@ -11,7 +11,7 @@
 - Text object
 - Make some fancy shaders
 - Add simple sound objects
-- Documentation (Doxygen???)
+- Documentation/Readme (Doxygen???)
 
 ### Longer term goals
 - Qt gui level editor

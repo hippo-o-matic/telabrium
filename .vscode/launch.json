@@ -10,7 +10,7 @@
 			"name": "(gdb) Launch",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${workspaceFolder}/build/meson-out/hippotest",
+			"program": "${workspaceFolder}/build/tests/hippotest",
 			"args": [],
 //			"additionalSOLibSearchPath": "/usr/lib : /usr/local/lib : /home/hippo-o-matic/Source/repos/telabrium/lib",
 			"stopAtEntry": false,

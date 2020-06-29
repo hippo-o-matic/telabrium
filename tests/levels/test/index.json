@@ -9,25 +9,38 @@
             "id" : "jeff",
             "type" : "Model",
             "pos" : [0,10,0],
-            "rot" : [0,2,40],
-            "scl" : [0,0,0],
-            "path" : "models/shadertest.obj"
+            "rot" : [0,0,50],
+            "scl" : [1,1,1],
+            "path" : "models/shadertest.dae"
 		},
 		{
             "id" : "bill",
             "type" : "Model",
             "pos" : [0,0,0],
-            "rot" : [0,20,0],
-            "scl" : [0,0,0],
+            "rot" : [0,0,0],
+            "scl" : [1,1,1],
             "path" : "models/origin.obj"
-        },
+		},
+		{
+			"id" : "rat",
+			"type" : "Model",
+			"pos" : [5,0,0],
+			"rot" : [0, 90, 0],
+			"path" : "models/nanosuit/nanosuit.obj"
+		},
+		{
+			"id" : "tab",
+			"type" : "Model",
+			"pos" : [-7,0,0],
+			"path" : "models/texturetest.dae"
+		},
         {
             "id":"mainlight",
             "type":"DirLight",
-            "rot":[0,0,0],
+            "rot":[-0.2, -1.0, -0.3],
 
-            "ambient":[0.0,0.0,0],
-            "diffuse":[0.0,0.0,0.8],
+            "ambient":[0.01,0.01,0.01],
+            "diffuse":[0.8,0.8,0.8],
             "specular":[1,1,1]  
         }
     ]

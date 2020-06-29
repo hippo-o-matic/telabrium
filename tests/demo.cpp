@@ -52,7 +52,7 @@ int main(){
 
 	// load models
 	// DirLight aiee(glm::vec3(0), glm::vec3(10,0,0), glm::vec3(0,100,0));
-	std::unique_ptr<Model> testt = std::make_unique<Model>("models/rat.obj", glm::vec3(0,1,10), glm::vec3(30));
+	// std::unique_ptr<Model> testt = std::make_unique<Model>("models/rat.obj", glm::vec3(0,1,10), glm::vec3(30));
 
     lvltest = new Level("levels/test/index.json");
 	lvltest->reload();
@@ -64,7 +64,7 @@ int main(){
 	Input baz;
 	bool buzz = true;
 
-	baz.addBind("temp_rotate", [&buzz](){
+	baz.addBind("shader", [&buzz](){
 		if(buzz) {
 			glUseProgram(0);
 			Shader::ACTIVE->build();
@@ -72,9 +72,16 @@ int main(){
 			buzz = false;
 		}
 	}, GLFW_KEY_LEFT_BRACKET);
-	baz.addBind("temp_rotate_stop", [&buzz](){
+	baz.addBind("shader_stop", [&buzz](){
 		buzz = true;
-	}, GLFW_KEY_LEFT_BRACKET, GLFW_RELEASE);
+	}, GLFW_KEY_PERIOD, GLFW_RELEASE);
+
+	baz.addBind("test", [&vest](){
+		vest.rotate(glm::vec3(deltaTime*20,0,0));
+	}, GLFW_KEY_PERIOD);
+	baz.addBind("test2", [&vest](){
+		vest.rotate(glm::vec3(0,deltaTime*20,0));
+	}, GLFW_KEY_COMMA);
 
 	baz.addBind("console", [window](){
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -82,12 +89,12 @@ int main(){
 	}, GLFW_KEY_GRAVE_ACCENT);
 	baz.activate();
 
-    
+    Camera::ACTIVE->position = glm::vec3(0,2,0);
 
 	// std::string heck = "textures";
 	// Mesh bab(calcVertex(Telabrium::cubeVerts), Telabrium::cubeIndices, loadTexture("shadertest.png", heck));
 
-	DirLight someLight(glm::vec3(70.0f, 30.0f, 20.0f), glm::vec3(0), glm::vec3(0,.8,0));
+	// DirLight someLight(glm::vec3(70.0f, 30.0f, 20.0f), glm::vec3(0), glm::vec3(0,.8,0));
 	// PointLight ee(glm::vec3(4,0,0));
 
 	std::vector<std::string> skyFaces = {
@@ -106,6 +113,10 @@ int main(){
 	// render loop
 	// -----------
 	while (gameState) {
+		std::cout<<"pos "<<Camera::ACTIVE->position.y<< " / "<<Camera::ACTIVE->getWorldPos().y<<std::endl;
+		std::cout<<"rot x "<<vest.rotation.x<< " / "<<vest.getWorldRotEuler().x<<std::endl;
+		std::cout<<"rot y "<<vest.rotation.y<< " / "<<vest.getWorldRotEuler().y<<std::endl;
+		
 		if(glfwWindowShouldClose(window))
 			gameState = 0;
 
@@ -124,7 +135,7 @@ int main(){
 
 		// don't forget to enable shader before setting uniforms
 		Shader::ACTIVE->use();
-		Shader::ACTIVE->set("ViewPos", Camera::ACTIVE->pos());
+		Shader::ACTIVE->set("ViewPos", Camera::ACTIVE->getWorldPos());
 
 		// view/projection transformations
 		Shader::ACTIVE->set("projection", Camera::ACTIVE->GetProjectionMatrix());
