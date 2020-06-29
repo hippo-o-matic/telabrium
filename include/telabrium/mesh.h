@@ -2,11 +2,8 @@
 #define TELABRIUM_MESH_H
 
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <vector>
-#include <memory>
+#include <variant>
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
@@ -37,36 +34,43 @@ struct Texture {
 };
 
 struct RenderMat {
-	aiColor3D diffuse_color;
-	aiColor3D specular_color;
-	aiColor3D ambient_color;
+	aiColor3D color_diffuse;
+	aiColor3D color_specular;
+	aiColor3D color_ambient;
+	aiColor3D color_transparent;
+	aiColor3D color_emissive;
 
-	float shininess;
-	float IOR;
+	float shine;
+	float ior;
 	float opacity;
+
+	bool twosided = false;
 };
+
 
 /// A class for storing vertex, texture, and material data to be drawn as a 3d object
 class Mesh {
 public:
-	/*  Mesh Data  */
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
-	RenderMat material;
+	shader_ublock block; // Uniform block of material data, colors, etc
+
 	unsigned int VAO;
+	glm::mat4 transform;
 
-	/*  Functions  */
 	// constructor
-	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, RenderMat mat = {});
-
-	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Texture tex = {}, RenderMat mat = {});
+	Mesh(std::vector<Vertex> vertices,
+		std::vector<unsigned int> indices,
+		std::vector<Texture> texs,
+		glm::mat4 transform = glm::mat4(),
+		shader_ublock block = {}
+	);
 
 	// render the mesh
 	void Draw(Shader &shader);
 
 protected:
-	/*  Render data  */
 	unsigned int VBO, EBO;
 
 	// initializes all the buffer objects/arrays
