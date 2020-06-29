@@ -8,7 +8,7 @@
 #include "telabrium/object.h"
 #include "telabrium/collider.h
 
-class Rigidbody : public Object {
+class Rigidbody : public Object3d {
 public:
 	Rigidbody(Object* p, Collider* col, float m = 1) {
 		parent = p;

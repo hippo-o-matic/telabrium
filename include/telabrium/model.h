@@ -9,11 +9,12 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
+#include "telabrium/object3d.hpp"
 #include "telabrium/mesh.h"
 #include "telabrium/task.h"
 
 /// A class for transitioning between the Assimp Model Loader and the native mesh class
-class Model : public Object {
+class Model : public Object3d {
 public:
 	/*  Model Data */
 	std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
@@ -38,6 +39,8 @@ public:
 	Model() = default;
 
 	~Model();
+	static Texture tesst;
+
 
 private:
 	TELABRIUM_REGISTER_OBJECT(Model);
@@ -48,15 +51,24 @@ private:
 	// processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
 	void processNode(aiNode *node, const aiScene *scene);
 
-	Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+	Mesh processMesh(aiMesh *mesh, const aiScene *scene, aiNode* node);
 
 	// checks all material textures of a given type and loads the textures if they're not loaded yet.
 	// the required info is returned as a Texture struct.
 	std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
+	static std::vector<Vertex> extractVertices(aiMesh* mesh);
+	std::vector<Texture> extractTextures(aiMesh* mesh, const aiScene* scene);
+	shader_ublock extractMaterial(aiMesh* mesh, const aiScene* scene);
 };
 
-Texture loadTexture(const char* path, std::string &directory);
+glm::vec3 aiVec3ToGlm(aiColor3D);
+glm::vec3 aiVec3ToGlm(aiVector3D);
+
+glm::mat4 aiMatrixToMat4(aiMatrix4x4);
+
+Texture loadTexture(std::string path, std::string directory);
 
 Texture loadCubemap(std::vector<std::string> faces, std::string path);
+
 
 #endif

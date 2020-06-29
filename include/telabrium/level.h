@@ -9,7 +9,7 @@
 
 #include "json/json.h"
 
-#include "telabrium/object.h"
+#include "telabrium/object3d.hpp"
 #include "telabrium/utility.h"
 #include "micropak.hpp"
 
@@ -29,7 +29,7 @@ namespace Map {
 	extern Object::ptr index_level;
 };
 
-class Level : public Object {
+class Level : public Object3d {
 public:
 	// Level(std::string); // Get the parent map path and the path inside the map file
 	Level(Json::Value);

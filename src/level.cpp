@@ -30,7 +30,7 @@ void Map::load(std::string path, std::string options) {
 }
 
 
-Level::Level(Json::Value j) : Object(){
+Level::Level(Json::Value j) : Object3d(){
 	try {
 		// If a path is specified, go and get the level from that path
 		if(j.get("path", "").asString() != "") {
@@ -42,6 +42,7 @@ Level::Level(Json::Value j) : Object(){
 			}
 		}
 	} catch(const Json::LogicError& e) { // If it can't read the json object, it's possible <j> is just a string, so try to load it straight from that as a path
+		// TODO: yeah this aint it chief
 		std::string path = j.asString();
 		j = getFileContents(path);
 	}
@@ -54,9 +55,9 @@ Level::Level(Json::Value j) : Object(){
 	Json::Value jRot = j["rot"];
 	Json::Value jScl = j["scl"];
 
-	setPos(glm::vec3(jPos[0].asFloat(), jPos[1].asFloat(), jPos[2].asFloat()));
-	setRot(glm::vec3(jRot[0].asFloat(), jRot[1].asFloat(), jRot[2].asFloat()));
-	setScl(glm::vec3(jScl[0].asFloat(), jScl[1].asFloat(), jScl[2].asFloat()));
+	position = glm::vec3(jPos[0].asFloat(), jPos[1].asFloat(), jPos[2].asFloat());
+	rotation = glm::vec3(jRot[0].asFloat(), jRot[1].asFloat(), jRot[2].asFloat());
+	scale = glm::vec3(jScl[0].asFloat(), jScl[1].asFloat(), jScl[2].asFloat());
 
 	contents = j["components"];
 }

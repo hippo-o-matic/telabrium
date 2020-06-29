@@ -8,7 +8,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "telabrium/object.h"
+#include "telabrium/object3d.hpp"
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 // enum Camera_Movement {
@@ -21,7 +21,7 @@
 // };
 
 // A Camera object that processes a view for displaying in OpenGL. 
-class Camera : public Object {
+class Camera : public Object3d {
 public:
 	static std::unique_ptr<Camera> ACTIVE;
 

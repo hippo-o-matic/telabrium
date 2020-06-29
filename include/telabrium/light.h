@@ -7,11 +7,11 @@
 #define GLM_FORCE_PURE
 #include <glm/vec3.hpp>
 
-#include "telabrium/object.h"
+#include "telabrium/object3d.hpp"
 #include "telabrium/shader.h"
 #include "telabrium/model.h"
 
-class Light : public Object {
+class Light : public Object3d {
 public:
 	Light(glm::vec3 amb = default_amb, glm::vec3 dif = default_dif, glm::vec3 spec = default_spec);
 	Light(Json::Value);
@@ -45,8 +45,6 @@ public:
 	DirLight(Json::Value);
 
 	~DirLight();
-
-	int nid = 0; // Numeric id for the shader
 
 	static Task<DirLight, Shader&> updateT; // Task for sending light data to the shader
 	static void updateTF(Shader&); // Task function for updateT
@@ -116,8 +114,6 @@ public:
 	float Quadratic;
 	float CutOff; // The start of the cutoff fade, in degrees
 	float OuterCutOff; // The edge of the cutoff fade, in degrees
-
-	int nid;
 
 	static Task<SpotLight, Shader&> updateT; // Task for sending light data to the shader
 	static void updateTF(Shader& s); // Task function for updateT

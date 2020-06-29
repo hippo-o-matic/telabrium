@@ -11,7 +11,7 @@ Light::Light(glm::vec3 amb, glm::vec3 dif, glm::vec3 spec) {
 	Ambient = amb; Diffuse = dif; Specular = spec;
 };
 
-Light::Light(Json::Value j) : Object(j) {
+Light::Light(Json::Value j) : Object3d(j) {
 	Json::Value jAmbient = j["ambient"];
 	Json::Value jDiffuse = j["diffuse"];
 	Json::Value jSpecular = j["specular"];
@@ -23,7 +23,7 @@ Light::Light(Json::Value j) : Object(j) {
 
 // Directional Light: Provides light from one direction
 DirLight::DirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec) {
-	rot = dir; Ambient = amb; Diffuse = dif; Specular = spec;
+	rotation = dir; Ambient = amb; Diffuse = dif; Specular = spec;
 	updateT.addObj(this);
 }
 
@@ -45,7 +45,13 @@ void DirLight::updateOF(Shader& s) {
 	unsigned index = std::find(lights.begin(), lights.end(), this) - lights.begin();
 	std::string i = std::to_string(index);
 
-	s.set("dirLights[" + i + "].direction", glm::radians(rot()));
+	// std::cout<<rot.x()<< ","<<glm::radians(rot.x())<<std::endl;
+	// std::cout<<rot.y()<< ","<<glm::radians(rot.y())<<std::endl;
+	// std::cout<<rot.z()<< ","<<glm::radians(rot.z())<<std::endl;
+	// std::cout<<"-------"<<std::endl;
+
+
+	s.set("dirLights[" + i + "].direction", getWorldRotEuler());
 	s.set("dirLights[" + i + "].ambient", Ambient);
 	s.set("dirLights[" + i + "].diffuse", Diffuse);
 	s.set("dirLights[" + i + "].specular", Specular);
@@ -53,8 +59,8 @@ void DirLight::updateOF(Shader& s) {
 
 
 // Point Light: Creates a spherical light originating from a single point
-PointLight::PointLight(glm::vec3 position, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad) : Light(){
-	pos = position; Ambient = amb; Diffuse = dif; Specular = spec;
+PointLight::PointLight(glm::vec3 _pos, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad) : Light(){
+	position = _pos; Ambient = amb; Diffuse = dif; Specular = spec;
 	Constant = constant; Linear = lin; Quadratic = quad;
 
 	updateT.addObj(this);
@@ -82,7 +88,7 @@ void PointLight::updateOF(Shader& s) {
 	unsigned index = std::find(lights.begin(), lights.end(), this) - lights.begin();
 	std::string i = std::to_string(index);
 
-	s.set("pointLights[" + i + "].pos", pos());
+	s.set("pointLights[" + i + "].pos", position);
 	s.set("pointLights[" + i + "].ambient", Ambient);
 	s.set("pointLights[" + i + "].diffuse", Diffuse);
 	s.set("pointLights[" + i + "].specular", Specular);
@@ -93,8 +99,18 @@ void PointLight::updateOF(Shader& s) {
 
 
 // Spot Light: Creates a conic light originating from a single point
-SpotLight::SpotLight(glm::vec3 position, glm::vec3 rotation, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float constant, float lin, float quad, float cut, float ocut){
-	pos = position; rot = rotation; 
+SpotLight::SpotLight(glm::vec3 _pos,
+					 glm::vec3 _rot,
+					 glm::vec3 amb,
+					 glm::vec3 dif,
+					 glm::vec3 spec,
+					 float constant,
+					 float lin,
+					 float quad, 
+					 float cut, 
+					 float ocut
+) {
+	position = _pos; rotation = _rot; 
 	Ambient = amb; Diffuse = dif; Specular = spec;
 	Constant = constant; Linear = lin; Quadratic = quad;
 	CutOff = cut; OuterCutOff = ocut;
@@ -127,8 +143,8 @@ void SpotLight::updateOF(Shader& s) {
 	unsigned index = std::find(lights.begin(), lights.end(), this) - lights.begin();
 	std::string i = std::to_string(index);
 
-	s.set("spotLights[" + i + "].pos", pos());
-	s.set("spotLights[" + i + "].direction", glm::radians(rot()));
+	s.set("spotLights[" + i + "].pos", position);
+	s.set("spotLights[" + i + "].direction", getWorldRotEuler());
 	s.set("spotLights[" + i + "].ambient", Ambient);
 	s.set("spotLights[" + i + "].diffuse", Diffuse);
 	s.set("spotLights[" + i + "].specular", Specular);

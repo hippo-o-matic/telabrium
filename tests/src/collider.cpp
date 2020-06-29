@@ -10,7 +10,7 @@ struct physMat {
 	float soft; //Softness(Collision tolerance)
 };
 
-class Collider : public Object {
+class Collider : public Object3d {
 public:
 	Collider(Mesh m, physMat p) {
 		mesh = m; mat = p;

@@ -9,6 +9,7 @@
 #define GLM_FORCE_PURE
 #include <glm/vec3.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/quaternion.hpp"
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "json/json.h"
@@ -33,24 +34,14 @@ class Object {
 public:
     typedef std::unique_ptr<Object> ptr;
 
-	Object(
-        glm::vec3 _pos = default_pos,
-        glm::vec3 _rot = default_rot,
-        glm::vec3 _scl = default_scl
-    );
+	Object();
 
 	Object(Json::Value);
 
 	virtual ~Object();
 
 	std::string id;
-    std::string type;
-
-    /// Interfaces for handling spatial values
-
-    spatial pos;
-    spatial rot;
-    spatial scl;
+    std::vector<std::string> types;
 
     /// Component handling
 
@@ -79,29 +70,6 @@ protected:
 	Object* parent; // Raw pointer to the objects parent
 	std::vector<Object::ptr> components; // Vector of the objects sub-components
 	void createComponents(Json::Value items);
-
-    /// Functions for updating spatial values
-    glm::vec3 getPos();
-    glm::vec3 setPos(glm::vec3);
-
-    glm::vec3 getRot();
-    glm::vec3 setRot(glm::vec3);
-
-    glm::vec3 getScl();
-    glm::vec3 setScl(glm::vec3);
-
-	// Default values for spatial values
-	static constexpr glm::vec3 default_pos = glm::vec3(0);
-	static constexpr glm::vec3 default_rot = glm::vec3(0);
-	static constexpr glm::vec3 default_scl = glm::vec3(1);
-
-private:
-    /// Spatial properties
-    glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
-
-	void setupSpatialFunctions();
 };
 
 // A class that registers, creates, and defines new Objects
