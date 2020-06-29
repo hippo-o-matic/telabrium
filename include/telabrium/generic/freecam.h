@@ -11,9 +11,13 @@ public:
 	float MouseSensitivity = 0.1;
 	Input* controls;
 
+	void updateCameraVectors();
+
 private:
-    double mouse_lastX;
-    double mouse_lastY;
+    double mouse_lastX = 0;
+    double mouse_lastY = 0;
+	float pitch = 0;
+	float yaw = 0;
 	bool last_focus;
 
     const std::function<void(GLFWwindow*, double, double)> mouse_control = [this](GLFWwindow* w, double xpos, double ypos) {
@@ -23,6 +27,8 @@ private:
 				mouse_lastY = ypos;
 				last_focus = false;
 			}
+			// glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			// last_focus = true;
 
 			float xoffset = xpos - mouse_lastX;
 			float yoffset = mouse_lastY - ypos; // reversed since y-coordinates go from bottom to top
@@ -33,7 +39,11 @@ private:
 			xoffset *= MouseSensitivity;
 			yoffset *= MouseSensitivity;
 
-			rot += glm::vec3(yoffset, xoffset, 0);
+			pitch += yoffset;
+			yaw += xoffset;
+			
+			rotate(glm::vec3(yoffset, xoffset, 0));
+			updateCameraVectors();
 		}
     };
 
@@ -46,7 +56,7 @@ private:
             fov = 60.0f;
     };
 
-	// TEST: This isn't ideal and should be a bind or function in Input:: or something, but for now there isnt a great way
+	// TODO: This isn't ideal and should be a bind or function in Input:: or something, but for now there isnt a great way
 	// to get access to the window and the camera at the same time
 	const std::function<void(GLFWwindow*, int, int)> mb_callback = [this](GLFWwindow* w, int button, int action) {
 		if (glfwGetInputMode(w, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
