@@ -17,17 +17,14 @@
 #include "telabrium/safe_val.h"
 #include "telabrium/utility.h"
 
-struct spatial : public safe_val<glm::vec3> {
-    spatial(
-        std::function<glm::vec3()> getter_f = nullptr,
-	    std::function<glm::vec3(glm::vec3)> setter_f = nullptr
-    );
+struct ObjectCastException : public std::exception {
+    std::string type;
 
-    glm::vec3 operator=(glm::vec3 val);
+    ObjectCastException(std::string _type = "") : type(_type) {}
 
-    safe_val<double> x;
-    safe_val<double> y;
-    safe_val<double> z;
+    const char* what() const throw() {
+        return ("Object does not inherit from class " + type).c_str();
+    }
 };
 
 class Object {
@@ -41,7 +38,7 @@ public:
 	virtual ~Object();
 
 	std::string id;
-    std::vector<std::string> types;
+    std::string type;
 
     /// Component handling
 
@@ -60,14 +57,15 @@ public:
     template<class T> std::unique_ptr<T>& operator[](size_t index); // Operator that returns a component in this object's vector by index
     template<class T> std::unique_ptr<T>&  operator[](std::string id); // Operator that returns the component in this object's vector that matches the id
     
-    template<class T>
-    T* to() { return dynamic_cast<T*>(this); } // Method for casting a type back to it's native type, [TODO] make automatic when any Object::ptr is refrenced
+    template<class T> T* to(); // Method for casting a type back to it's native type, [TODO] make automatic when any Object::ptr is refrenced
+    template<typename... Args> void runup(std::function<void(Object*, Args...)>, Args... args);
+
 
     // A vector that holds objects with no parent, in practice shouldn't hold anything other than Level objects
     // static std::vector<Object::ptr> global;
 
 protected:
-	Object* parent; // Raw pointer to the objects parent
+	Object* parent = nullptr; // Raw pointer to the objects parent
 	std::vector<Object::ptr> components; // Vector of the objects sub-components
 	void createComponents(Json::Value items);
 };
@@ -81,7 +79,7 @@ public:
 
 	template<class T>
 	static bool const registerType(const char* name) {
-    	std::function<Object::ptr(Json::Value)> create_f([](Json::Value j){ return std::make_unique<T>(j); });
+Profiler tick ended before path was fully popped (remainder: 'root.tick.levels.ServerLevel[bebb] minecraft:overworld.tick.entities.tick.tick.tick.tick.tick.tick'). Mismatched push/pop?    	std::function<Object::ptr(Json::Value)> create_f([](Json::Value j){ return std::make_unique<T>(j); });
 
 		getMap()->emplace(name, create_f);
 		return true;
@@ -105,5 +103,23 @@ public:
 private:
 	TELABRIUM_REGISTER_OBJECT(BlankObject);
 };
+
+
+template<class T> T* Object::to() {
+	T* out = dynamic_cast<T*>(this); // Attempt to cast this to T
+	if(out) { // If the object wasn't originally T, it will return a nullptr
+		return out;
+	} else {
+		throw ObjectCastException();
+	}
+}
+
+// Recursively runs a function (func) up the object hierarchy, each parent calls func(args) and then has their parent run func()
+template<typename... Args>
+void Object::runup(std::function<void(Object*, Args...)> func, Args... args) {
+    func(this, args...);
+    if(parent)
+        parent->runup<Args...>(func, args...);
+}
 
 #endif

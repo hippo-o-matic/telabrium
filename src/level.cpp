@@ -30,40 +30,40 @@ void Map::load(std::string path, std::string options) {
 }
 
 
-Level::Level(Json::Value j) : Object3d(){
+Level::Level(Json::Value j) : Object3d() {
 	try {
 		// If a path is specified, go and get the level from that path
 		if(j.get("path", "").asString() != "") {
-			j = getFileContents(j["path"].asString());
+			contents = getFileContents(j["path"].asString());
 
 			if(j.get("path", "").asString() != "") { // The level object redirected to can't be another redirect
 				TelabriumLog("Level path cannot lead to another level path object", 3);
 				return;
 			}
+		} else {
+			contents = j;
 		}
 	} catch(const Json::LogicError& e) { // If it can't read the json object, it's possible <j> is just a string, so try to load it straight from that as a path
-		// TODO: yeah this aint it chief
+		// TODO: not great
 		std::string path = j.asString();
-		j = getFileContents(path);
+		contents = getFileContents(path);
 	}
 
 	// Extract object traits without creating components yet
-	this->id = j.get("id", "").asString();
-	this->type = j.get("type", "Level").asString();
+	this->id = contents.get("id", "").asString();
+	this->type = contents.get("type", "Level").asString();
 
-	Json::Value jPos = j["pos"];
-	Json::Value jRot = j["rot"];
-	Json::Value jScl = j["scl"];
+	Json::Value jPos = contents["pos"];
+	Json::Value jRot = contents["rot"];
+	Json::Value jScl = contents["scl"];
 
 	position = glm::vec3(jPos[0].asFloat(), jPos[1].asFloat(), jPos[2].asFloat());
 	rotation = glm::vec3(jRot[0].asFloat(), jRot[1].asFloat(), jRot[2].asFloat());
 	scale = glm::vec3(jScl[0].asFloat(), jScl[1].asFloat(), jScl[2].asFloat());
-
-	contents = j["components"];
 }
 
 void Level::loadFile(std::string path) {
-	contents = getFileContents(path)["components"];
+	contents = getFileContents(path);
 	reload();
 }
 
@@ -95,7 +95,19 @@ Json::Value Level::getFileContents(std::string path) {
 
 void Level::reload() {
 	unload();
-	createComponents(contents);
+
+	this->id = contents.get("id", "").asString();
+	this->type = contents.get("type", "Level").asString();
+
+	Json::Value jPos = contents["position"];
+	Json::Value jRot = contents["rotation"];
+	Json::Value jScl = contents["scale"];
+
+	position = glm::vec3(jPos[0].asFloat(), jPos[1].asFloat(), jPos[2].asFloat());
+	rotation = glm::vec3(jRot[0].asFloat(), jRot[1].asFloat(), jRot[2].asFloat());
+	scale = glm::vec3(jScl[0].asFloat(), jScl[1].asFloat(), jScl[2].asFloat());
+
+	createComponents(contents["components"]);
 }
 
 void Level::unload() {

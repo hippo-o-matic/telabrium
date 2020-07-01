@@ -1,21 +1,19 @@
 #include "telabrium/object3d.hpp"
 
 Object3d::Object3d(glm::vec3 _pos, glm::vec3 _rot, glm::vec3 _scl) : position(_pos), scale(_scl) {
-	s_parent = nullptr;
 	rotation = glm::quat(glm::radians(_rot));
 }
 
-Object3d::Object3d(Object3d* _parent, glm::vec3 _pos, glm::vec3 _rot, glm::vec3 _scl) : position(_pos), scale(_scl), s_parent(_parent) {
+Object3d::Object3d(Object3d* _parent, glm::vec3 _pos, glm::vec3 _rot, glm::vec3 _scl) : position(_pos), scale(_scl) {
+	parent = _parent;
 	rotation = glm::quat(glm::radians(_rot));
 }
 
-Object3d::Object3d(glm::vec3 _pos, glm::quat _rot, glm::vec3 _scl) : position(_pos), rotation(_rot), scale(_scl) {
-	s_parent = nullptr;
-}
+Object3d::Object3d(glm::vec3 _pos, glm::quat _rot, glm::vec3 _scl) : position(_pos), rotation(_rot), scale(_scl) {}
 
-Object3d::Object3d(Object3d* _parent, glm::vec3 _pos, glm::quat _rot, glm::vec3 _scl) : position(_pos), rotation(_rot), scale(_scl), s_parent(_parent) {}
+Object3d::Object3d(Object3d* _parent, glm::vec3 _pos, glm::quat _rot, glm::vec3 _scl) : position(_pos), rotation(_rot), scale(_scl) { parent = _parent; }
 
-Object3d::Object3d(Json::Value j) {
+Object3d::Object3d(Json::Value j) : Object(j) {
 	Json::Value jPos = j["pos"];
 	Json::Value jRot = j["rot"];
 	Json::Value jScl = j["scl"];
@@ -40,7 +38,7 @@ Object3d::~Object3d() {}
 
 
 glm::vec3 Object3d::getWorldPos() {
-	return glm::vec3(getTransform()[3]);
+	return glm::vec3(getWorldTransform()[3]);
 }
 
 glm::vec3 Object3d::setWorldPos(glm::vec3 dest) {
@@ -49,11 +47,11 @@ glm::vec3 Object3d::setWorldPos(glm::vec3 dest) {
 
 
 glm::quat Object3d::getWorldRot() {
-	return glm::toQuat(getTransform());
+	return glm::toQuat(getWorldTransform());
 }
 
 glm::vec3 Object3d::getWorldRotEuler() {
-	return glm::degrees(glm::eulerAngles(glm::toQuat(getTransform())));
+	return glm::degrees(glm::eulerAngles(glm::toQuat(getWorldTransform())));
 }
 
 // Returns the objects rotation in euler angles in degrees
@@ -96,7 +94,7 @@ glm::quat Object3d::rotate(glm::quat in) {
 
 
 glm::vec3 Object3d::getWorldScl() {
-	glm::mat4 transform = getTransform();
+	glm::mat4 transform = getWorldTransform();
 	return glm::vec3(
 		glm::length(transform[0]),
 		glm::length(transform[1]),
@@ -108,16 +106,47 @@ glm::vec3 Object3d::setWorldScl(glm::vec3 dest) {
 	return scale = dest / getWorldScl();
 }
 
-
+// Returns an objects local transformation matrix
 glm::mat4 Object3d::getTransform() {
+	// Get matricies for each transformation
 	glm::mat4 translate_mat = glm::translate(glm::mat4(1), position);
 	glm::mat4 rotate_mat = glm::toMat4(rotation);
+
+	// Check that scale is nonzero
+	if(scale.x == 0)
+		scale.x = 1;
+	if(scale.y == 0)
+		scale.y = 1;
+	if(scale.z == 0)
+		scale.z = 1;
 	glm::mat4 scale_mat = glm::scale(glm::mat4(1), scale);
 
+	// Combine them all here
 	glm::mat4 transform = translate_mat * rotate_mat * scale_mat;
 
-	if(s_parent != nullptr)
-		transform = s_parent->getTransform() * transform;
+	return transform;
+}
+
+// Applies parent transformation matricies if any
+glm::mat4 Object3d::getWorldTransform() {
+	glm::mat4 transform = getTransform();
+
+	if(parent) {
+		// This function checks if a parent has a transform, and applies it if it does
+		std::function<void(Object*, glm::mat4&)> parentTransform = [](Object* _parent, glm::mat4& _transform) {
+			try { // Try to convert the parent to Object3d
+				Object3d* ptr_3d = _parent->to<Object3d>();
+				_transform = ptr_3d->getTransform() * _transform; // Apply the transformation if it worked
+			} catch(ObjectCastException &e) {
+				return; // If it failed, continue to the next parent
+			} 
+		};
+
+		// Now that the function is defined, run it for each parent in the hierarchy
+		parent->runup<glm::mat4&>(parentTransform, transform);
+		// The reason we use runup instead of regular recursion is that in the case
+		// one of the parents in the path upwards isn't Object3d, the recursion would stop
+	}
 
 	return transform;
 }

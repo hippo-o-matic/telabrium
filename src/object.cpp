@@ -4,7 +4,7 @@ Object::Object() {}
 
 Object::Object(Json::Value j) {
 	this->id = j.get("id", "").asString();
-	// this->types.push_back(j.get("type", "BlankObject").asString());
+	this->type = j.get("type", "BlankObject").asString();
 
 	createComponents(j["components"]);
 }
@@ -64,7 +64,6 @@ void Object::createComponents(Json::Value items) {
 		components.push_back(std::move(o));
 	}
 }
-
 
 Object::ptr ObjFactory::createObject(std::string const& s, Json::Value json) {
 	ObjFactory::map_type::iterator it = getMap()->find(s); // Find the creation function by key

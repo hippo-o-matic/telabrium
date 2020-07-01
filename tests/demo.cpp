@@ -58,6 +58,10 @@ int main(){
 	lvltest->reload();
 
 	Model vest("models/origin.obj", glm::vec3(0,0,0));
+	Object::ptr jest = std::make_unique<Model>("models/origin.obj", glm::vec3(0,5,0));
+
+	vest += jest;
+
 	// std::unique_ptr<Model> vestptr = std::make_unique<Model>(vest);
 	// test.add<Model>(vestptr);
 
@@ -82,6 +86,9 @@ int main(){
 	baz.addBind("test2", [&vest](){
 		vest.rotate(glm::vec3(0,deltaTime*20,0));
 	}, GLFW_KEY_COMMA);
+	baz.addBind("test3", [&vest](){
+		vest.rotate(glm::vec3(0,0,deltaTime*20));
+	}, GLFW_KEY_SLASH);
 
 	baz.addBind("console", [window](){
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -113,10 +120,6 @@ int main(){
 	// render loop
 	// -----------
 	while (gameState) {
-		std::cout<<"pos "<<Camera::ACTIVE->position.y<< " / "<<Camera::ACTIVE->getWorldPos().y<<std::endl;
-		std::cout<<"rot x "<<vest.rotation.x<< " / "<<vest.getWorldRotEuler().x<<std::endl;
-		std::cout<<"rot y "<<vest.rotation.y<< " / "<<vest.getWorldRotEuler().y<<std::endl;
-		
 		if(glfwWindowShouldClose(window))
 			gameState = 0;
 

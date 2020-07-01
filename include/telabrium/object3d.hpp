@@ -60,6 +60,7 @@ public:
 	// glm::vec3 scaleBy(glm::vec3);
 
 	glm::mat4 getTransform();
+	glm::mat4 getWorldTransform();
 	// glm::mat4 transformBy(glm::mat4);
 	// glm::mat4 transformBy(glm::vec3, glm::quat, glm::vec3);
 	// glm::mat4 transformBy(glm::vec3, glm::vec3, glm::vec3);
@@ -80,6 +81,4 @@ protected:
 	static constexpr glm::vec3 default_pos = glm::vec3(0);
 	static constexpr glm::vec3 default_rot = glm::vec3(0);
 	static constexpr glm::vec3 default_scl = glm::vec3(1);
-
-	Object3d* s_parent = nullptr;
 };

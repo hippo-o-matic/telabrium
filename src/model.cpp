@@ -25,7 +25,7 @@ Model::~Model() {
 // draws the model, and thus all its meshes
 void Model::Draw(Shader &shader){
 	for (auto it : meshes) {
-		shader.set("model", getTransform() * it.transform);
+		shader.set("model", getWorldTransform() * it.transform);
 		it.Draw(shader);
 	}
 }

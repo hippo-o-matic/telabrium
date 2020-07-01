@@ -120,9 +120,9 @@ void Task<T, Args...>::setTaskFunc(void (*f)(Args...)) {
 // Execute the stored functions
 template <class T, typename... Args>
 void Task<T, Args...>::exec(Args... args) {
-    if (task_func != nullptr) task_func(args...); // Execute the per-execution function
+    if (task_func) task_func(args...); // Execute the per-execution function
     for (auto it : task_objects) {
-        if (it != nullptr && obj_func != nullptr){
+        if (it && obj_func){
             obj_func(it, args...); // Execute the per-object function
         } 
     }
