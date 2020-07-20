@@ -33,7 +33,7 @@ void Object::operator+=(std::vector<Object::ptr> &o_vec){
 }
 
 // Deletes an object from the parent's vector 
-void Object::operator-=(Object::ptr &o) {
+void Object::operator-=(Object::ptr& o) {
 	std::vector<Object::ptr>* vec = &(this->components);
 	// auto it = std::find_if(vec->begin(), vec->end(), [&](std::unique_ptr<Object> &p){
 	// 	return p.get() == o.get();
@@ -54,7 +54,7 @@ template<class T> std::unique_ptr<T>& Object::operator[](size_t index) {
 // Same as above, but first searches for the component by id
 template<class T> std::unique_ptr<T>& Object::operator[](std::string id) { 
 	size_t index = std::find_if(components.begin(), components.end(), [id](const Object::ptr& o) -> bool { return o->id == id; });
-	return dynamic_cast<T&>(*components.at(index));
+	return dynamic_cast<T&>(*components.at(index)); // Try dynamic_cast<unique<T>>& if breaks
 }
 
 void Object::createComponents(Json::Value items) {

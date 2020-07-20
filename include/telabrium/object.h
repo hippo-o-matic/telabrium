@@ -46,19 +46,21 @@ public:
 
     // Moves an object from one parent into another (Destination << Input)
     template<class T>
-    void add(std::unique_ptr<T>& o) {
-        o->parent = this;
-        components.push_back(std::move(o));
-    }
+    void move(std::unique_ptr<T>& o);
+
+    template<class T>
+    void move(std::unique_ptr<T> o);
 
     void operator+=(std::vector<Object::ptr> &o_vec); // Move a vector of objects from one parent to another
 	void operator-=(Object::ptr &o); // Remove an object from an object's components
 
     template<class T> std::unique_ptr<T>& operator[](size_t index); // Operator that returns a component in this object's vector by index
-    template<class T> std::unique_ptr<T>&  operator[](std::string id); // Operator that returns the component in this object's vector that matches the id
+    template<class T> std::unique_ptr<T>& operator[](std::string id); // Operator that returns the component in this object's vector that matches the id
     
-    template<class T> T* to(); // Method for casting a type back to it's native type, [TODO] make automatic when any Object::ptr is refrenced
-    template<typename... Args> void runup(std::function<void(Object*, Args...)>, Args... args);
+    template<class T> T* as(); // Returns a pointer to the object as type T, if the object wasn't originally T, throws an ObjectCastException
+    
+    template<typename... Args> void runup(std::function<void(Object*, Args...)>, Args... args); // Runs a function for parent recursively, working up the tree
+    template<typename... Args> void rundown(std::function<void(Object*, Args...)>, Args... args); // Runs a function for each child object recursively, branching for each component. Use lightly
 
 
     // A vector that holds objects with no parent, in practice shouldn't hold anything other than Level objects
@@ -79,8 +81,7 @@ public:
 
 	template<class T>
 	static bool const registerType(const char* name) {
-Profiler tick ended before path was fully popped (remainder: 'root.tick.levels.ServerLevel[bebb] minecraft:overworld.tick.entities.tick.tick.tick.tick.tick.tick'). Mismatched push/pop?    	std::function<Object::ptr(Json::Value)> create_f([](Json::Value j){ return std::make_unique<T>(j); });
-
+        std::function<Object::ptr(Json::Value)> create_f([](Json::Value j){ return std::make_unique<T>(j); });
 		getMap()->emplace(name, create_f);
 		return true;
 	}
@@ -105,7 +106,19 @@ private:
 };
 
 
-template<class T> T* Object::to() {
+template<class T>
+void Object::move(std::unique_ptr<T>& o) {
+    o->parent = this;
+    components.push_back(std::move(o));
+}
+
+template<class T>
+void Object::move(std::unique_ptr<T> o) {
+    o->parent = this;
+    components.push_back(std::move(Telabrium::dynamic_unique_cast<T, Object>(std::move(o))));
+}
+
+template<class T> T* Object::as() {
 	T* out = dynamic_cast<T*>(this); // Attempt to cast this to T
 	if(out) { // If the object wasn't originally T, it will return a nullptr
 		return out;
@@ -120,6 +133,16 @@ void Object::runup(std::function<void(Object*, Args...)> func, Args... args) {
     func(this, args...);
     if(parent)
         parent->runup<Args...>(func, args...);
+}
+
+template<typename... Args>
+void Object::rundown(std::function<void(Object*, Args...)> func, Args... args) {
+    func(this, args...);
+    if(!components.empty()) {
+        for(auto& it : components) {
+            it->rundown<Args...>(func, args...);
+        }
+    }
 }
 
 #endif
