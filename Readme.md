@@ -8,7 +8,9 @@ The engine in its current form is primarily a hobby project and shouldn't be use
 Currently the engine can:
 - Load most models through assimp
 - Create, save, and load input binds through an external json file
+- Organize objects in a hierarchical system that allows them to inherit their parents spatial transformations
+- Load multiple objects from a file
 - Light and shade a scene using OpenGL and GLSL shaders
-- Organize it's objects in a hierarchical structure
+- Render meshes using multiple different customizable materials
 
 Documentation will be made available once the project is near a usable state
