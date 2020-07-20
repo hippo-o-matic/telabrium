@@ -73,11 +73,7 @@ glm::quat Object3d::setWorldRot(glm::quat dest) {
 
 
 glm::quat Object3d::rotate(glm::vec3 in) {
-	glm::vec3 inr = glm::radians(in);
-	glm::quat test = glm::quat(inr);
-	rotation = glm::normalize(glm::normalize(test) * glm::normalize(rotation));
-	return rotation;
-	// return rotation = glm::quat(glm::radians(in)) * rotation;
+	return rotation = glm::quat(glm::radians(in)) * rotation;
 }
 glm::quat Object3d::rotate(glm::quat in) {
 	return rotation = in * rotation;
@@ -135,7 +131,7 @@ glm::mat4 Object3d::getWorldTransform() {
 		// This function checks if a parent has a transform, and applies it if it does
 		std::function<void(Object*, glm::mat4&)> parentTransform = [](Object* _parent, glm::mat4& _transform) {
 			try { // Try to convert the parent to Object3d
-				Object3d* ptr_3d = _parent->to<Object3d>();
+				Object3d* ptr_3d = _parent->as<Object3d>();
 				_transform = ptr_3d->getTransform() * _transform; // Apply the transformation if it worked
 			} catch(ObjectCastException &e) {
 				return; // If it failed, continue to the next parent
@@ -150,6 +146,23 @@ glm::mat4 Object3d::getWorldTransform() {
 
 	return transform;
 }
+
+glm::mat4 Object3d::setTransform(glm::mat4 in) {
+	glm::vec3 skew; glm::vec4 perspective; // Unused components
+	glm::decompose(in, scale, rotation, position, skew, perspective);
+	rotation = glm::conjugate(rotation); // Conjugate rotation because glm does it wrong
+	return getTransform();
+}
+
+glm::mat4 Object3d::setWorldTransform(glm::mat4 in) {
+	glm::mat4 current = getWorldTransform();
+	return setTransform(in * glm::inverse(current) * current); // Multiply the current transform by itself, effectively setting it to 0, then multiply the new transform
+}
+
+glm::mat4 Object3d::transformBy(glm::mat4 in) {
+	return setTransform(in * getTransform());
+}
+
 
 void Object3d::updateVectors() {
 	// Potentially have this as a static? idk
