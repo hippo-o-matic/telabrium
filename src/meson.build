@@ -8,6 +8,8 @@ core_source = [
     'luafile.cpp',
     'mesh.cpp',
     'model.cpp',
+    'material.cpp',
+    'renderer.cpp',
     'object.cpp',
 	'object3d.cpp',
 	'safe_val.cpp',
