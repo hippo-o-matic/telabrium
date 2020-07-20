@@ -57,3 +57,24 @@ void Telabrium::log(std::string message, const char* f, int line, short int seve
 	std::cout << "[" << f << ", " << line << "] " << sev << message << "\n";
 	file.close();
 }
+
+Json::Value Telabrium::getJsonFile(std::string path) {
+	std::ifstream file(path.c_str());
+	if(!file) {
+		TelabriumLog("File \"" + path + "\" was not found", 3);
+		return "";
+	}
+
+	Json::Value json;
+	try { 
+		file >> json; 
+	} catch(const Json::RuntimeError& e) {
+		TelabriumLog(std::string("Json Error: ") + e.what(), 3);
+		return "";
+	} catch(const Json::LogicError& e) {
+		TelabriumLog(std::string("Json Error: ") + e.what(), 3);
+		return "";
+	}
+
+	return json;
+}

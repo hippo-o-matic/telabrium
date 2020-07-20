@@ -22,7 +22,7 @@ void Map::load(std::string path, std::string options) {
         index_path = "index.json"; // If there is no override, use index.json as the default
   
     if(!fsys::exists(path + index_path)) { // Make sure the file exists
-        index_level = ObjFactory::createObject("Level", Level::getFileContents(path + index_path));
+        index_level = ObjFactory::createObject("Level", Telabrium::getJsonFile(path + index_path));
     } else {
         TelabriumLog("Could not find the index level, can't load map" + path, 2);
     }
@@ -34,7 +34,7 @@ Level::Level(Json::Value j) : Object3d() {
 	try {
 		// If a path is specified, go and get the level from that path
 		if(j.get("path", "").asString() != "") {
-			contents = getFileContents(j["path"].asString());
+			contents = Telabrium::getJsonFile(j["path"].asString());
 
 			if(j.get("path", "").asString() != "") { // The level object redirected to can't be another redirect
 				TelabriumLog("Level path cannot lead to another level path object", 3);
@@ -46,7 +46,7 @@ Level::Level(Json::Value j) : Object3d() {
 	} catch(const Json::LogicError& e) { // If it can't read the json object, it's possible <j> is just a string, so try to load it straight from that as a path
 		// TODO: not great
 		std::string path = j.asString();
-		contents = getFileContents(path);
+		contents = Telabrium::getJsonFile(path);
 	}
 
 	// Extract object traits without creating components yet
@@ -63,34 +63,12 @@ Level::Level(Json::Value j) : Object3d() {
 }
 
 void Level::loadFile(std::string path) {
-	contents = getFileContents(path);
-	reload();
-}
-
-Json::Value Level::getFileContents(std::string path) {
-	std::ifstream file(path.c_str());
-	if(!file) {
-		TelabriumLog("File \"" + path + "\" was not found", 3);
-		return "";
-	}
-
-	Json::Value json;
-	try { 
-		file >> json; 
-	} catch(const Json::RuntimeError& e) {
-		TelabriumLog(std::string("Json Error: ") + e.what(), 3);
-		return "";
-	} catch(const Json::LogicError& e) {
-		TelabriumLog(std::string("Json Error: ") + e.what(), 3);
-		return "";
-	}
-
-	if(json["type"] != "Level") {
+	contents = Telabrium::getJsonFile(path);
+	if(contents["type"] != "Level") {
 		TelabriumLog("Could not load the level: root object isn't type 'Level'", 2);
-		return "";
+		return;
 	}
-
-	return json;
+	reload();
 }
 
 void Level::reload() {
