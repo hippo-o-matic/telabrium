@@ -6,51 +6,39 @@
 #include <algorithm>
 #include <memory>
 
-#include "glm/glm.hpp"
+#define GLM_FORCE_PURE
+#include <glm/vec3.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
-#include "glm/gtx/rotate_vector.hpp"
+#include "glm/gtx/quaternion.hpp"
+#include <glm/gtx/rotate_vector.hpp>
 
 #include "json/json.h"
-#include "json/json-forwards.h"
 
 #include "telabrium/safe_val.h"
 #include "telabrium/utility.h"
 
+struct ObjectCastException : public std::exception {
+    std::string type;
 
+    ObjectCastException(std::string _type = "") : type(_type) {}
 
-struct spatial : public safe_val<glm::vec3> {
-    spatial(
-        std::function<glm::vec3()> getter_f = nullptr,
-	    std::function<glm::vec3(glm::vec3)> setter_f = nullptr
-    );
-
-    glm::vec3 operator=(glm::vec3 val);
-
-    safe_val<double> x;
-    safe_val<double> y;
-    safe_val<double> z;
+    const char* what() const throw() {
+        return ("Object does not inherit from class " + type).c_str();
+    }
 };
 
 class Object {
 public:
     typedef std::unique_ptr<Object> ptr;
 
-	Object(
-        glm::vec3 pos = glm::vec3(0.0f),
-        glm::vec3 rot = glm::vec3(0.0f),
-        glm::vec3 scl = glm::vec3(1.0f)
-    );
+	Object();
+
+	Object(Json::Value);
 
 	virtual ~Object();
 
 	std::string id;
     std::string type;
-
-    /// Interfaces for handling spatial values
-
-    spatial pos;
-    spatial rot;
-    spatial scl;
 
     /// Component handling
 
@@ -58,57 +46,45 @@ public:
 
     // Moves an object from one parent into another (Destination << Input)
     template<class T>
-    void add(std::unique_ptr<T>& o) {
-        o->parent = this;
-        components.push_back(std::move(o));
-    }
+    void move(std::unique_ptr<T>& o);
+
+    template<class T>
+    void move(std::unique_ptr<T> o);
 
     void operator+=(std::vector<Object::ptr> &o_vec); // Move a vector of objects from one parent to another
 	void operator-=(Object::ptr &o); // Remove an object from an object's components
 
     template<class T> std::unique_ptr<T>& operator[](size_t index); // Operator that returns a component in this object's vector by index
-    template<class T> std::unique_ptr<T>&  operator[](std::string id); // Operator that returns the component in this object's vector that matches the id
+    template<class T> std::unique_ptr<T>& operator[](std::string id); // Operator that returns the component in this object's vector that matches the id
     
-    template<class T>
-    std::unique_ptr<T>& to() { return dynamic_cast<std::unique_ptr<T>&>(*this); } // Method for casting a type back to it's native type, [TODO] make automatic when any Object::ptr is refrenced
+    template<class T> T* as(); // Returns a pointer to the object as type T, if the object wasn't originally T, throws an ObjectCastException
+    
+    template<typename... Args> void runup(std::function<void(Object*, Args...)>, Args... args); // Runs a function for parent recursively, working up the tree
+    template<typename... Args> void rundown(std::function<void(Object*, Args...)>, Args... args); // Runs a function for each child object recursively, branching for each component. Use lightly
+
 
     // A vector that holds objects with no parent, in practice shouldn't hold anything other than Level objects
     // static std::vector<Object::ptr> global;
 
 protected:
-	Object* parent; // Raw pointer to the objects parent
+	Object* parent = nullptr; // Raw pointer to the objects parent
 	std::vector<Object::ptr> components; // Vector of the objects sub-components
-
-    /// Functions for updating spatial values
-
-    glm::vec3 getPos();
-    glm::vec3 setPos(glm::vec3);
-
-    glm::vec3 getRot();
-    glm::vec3 setRot(glm::vec3);
-
-    glm::vec3 getScl();
-    glm::vec3 setScl(glm::vec3);
-
-    virtual void jload(Json::Value j);
-
-private:
-    /// Spatial properties
-    glm::vec3 position = glm::vec3(0);
-	glm::vec3 rotation = glm::vec3(0);
-	glm::vec3 scale = glm::vec3(1);
+	void createComponents(Json::Value items);
 };
 
 // A class that registers, creates, and defines new Objects
 class ObjFactory {
-    typedef Object::ptr (*createFunc)(); // A function pointer for the creation functions
-    typedef std::map<std::string, createFunc> map_type;
-    // typedef void (Object::*mfptr)(Object::ptr*, Json::Value); // Member function pointer for the value function
+    typedef std::map<std::string, std::function<Object::ptr(Json::Value)>> map_type;
 
 public:
-    static Object::ptr createObject(std::string const& s); // Creates a registered object and returns its unique pointer
+    static Object::ptr createObject(std::string const& s, Json::Value json = Json::Value()); // Creates a registered object and returns its unique pointer
 
-    static bool const registerType(const char* name, Object::ptr (*create_f)());
+	template<class T>
+	static bool const registerType(const char* name) {
+        std::function<Object::ptr(Json::Value)> create_f([](Json::Value j){ return std::make_unique<T>(j); });
+		getMap()->emplace(name, create_f);
+		return true;
+	}
 	
 private:
     static std::shared_ptr<map_type> getMap();
@@ -116,23 +92,57 @@ private:
 };
 
 /* Creates a register function for the object and calls it, place inside class definition
-* telabrium_obj_create(): A function that returns a new NAME
-* VALUE_F(Object::ptr*, Json::Value): A function address of a function that fills out an object based off of a Json::Value,
-* should take a pointer to a unique pointer of an object (Object::ptr*) and a Json::Value
 * telabrium_obj_reg: a trick using static initialization order to register the type before main()*/
-#define LUARIUM_REGISTER_OBJECT(NAME) \
-    inline static Object::ptr telabrium_obj_create() { return std::make_unique<NAME>(); }; \
-    inline static bool telabrium_obj_reg = ObjFactory::registerType (#NAME, NAME::telabrium_obj_create)
+#define TELABRIUM_REGISTER_OBJECT(NAME) inline static bool telabrium_obj_reg = ObjFactory::registerType<NAME>(#NAME)
 
 
 class BlankObject : public Object {
 public:
-    BlankObject() = default;
-
-    void jload(Json::Value j);
+	BlankObject() = default;
+	BlankObject(Json::Value);
 
 private:
-    LUARIUM_REGISTER_OBJECT(BlankObject);
+	TELABRIUM_REGISTER_OBJECT(BlankObject);
 };
+
+
+template<class T>
+void Object::move(std::unique_ptr<T>& o) {
+    o->parent = this;
+    components.push_back(std::move(o));
+}
+
+template<class T>
+void Object::move(std::unique_ptr<T> o) {
+    o->parent = this;
+    components.push_back(std::move(Telabrium::dynamic_unique_cast<T, Object>(std::move(o))));
+}
+
+template<class T> T* Object::as() {
+	T* out = dynamic_cast<T*>(this); // Attempt to cast this to T
+	if(out) { // If the object wasn't originally T, it will return a nullptr
+		return out;
+	} else {
+		throw ObjectCastException();
+	}
+}
+
+// Recursively runs a function (func) up the object hierarchy, each parent calls func(args) and then has their parent run func()
+template<typename... Args>
+void Object::runup(std::function<void(Object*, Args...)> func, Args... args) {
+    func(this, args...);
+    if(parent)
+        parent->runup<Args...>(func, args...);
+}
+
+template<typename... Args>
+void Object::rundown(std::function<void(Object*, Args...)> func, Args... args) {
+    func(this, args...);
+    if(!components.empty()) {
+        for(auto& it : components) {
+            it->rundown<Args...>(func, args...);
+        }
+    }
+}
 
 #endif

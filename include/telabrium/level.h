@@ -1,5 +1,5 @@
-#ifndef LUARIUM_LEVEL_H
-#define LUARIUM_LEVEL_H
+#ifndef TELABRIUM_LEVEL_H
+#define TELABRIUM_LEVEL_H
 
 #include <string>
 #include <vector>
@@ -8,9 +8,8 @@
 #include <experimental/filesystem>
 
 #include "json/json.h"
-#include "json/json-forwards.h"
 
-#include "telabrium/object.h"
+#include "telabrium/object3d.hpp"
 #include "telabrium/utility.h"
 #include "micropak.hpp"
 
@@ -30,14 +29,18 @@ namespace Map {
 	extern Object::ptr index_level;
 };
 
-class Level : public Object {
+class Level : public Object3d {
 public:
-	Level(); // Get the parent map path and the path inside the map file
+	// Level(std::string); // Get the parent map path and the path inside the map file
+	Level(Json::Value);
 	~Level() = default;
 
-	void load(std::string path);
-	virtual void jload(Json::Value lvl);
+	void loadFile(std::string path); // Gets the data from the specified path
+	void reload(); // Loads the level with the data already in this->contents
 	void unload();
+
+private:
+	Json::Value contents;
 };
 
 #endif

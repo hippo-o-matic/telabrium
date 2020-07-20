@@ -1,69 +1,50 @@
 #include "telabrium/mesh.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, RenderMat mat){
+std::vector<Mesh*> Mesh::meshes{};
+
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> texs, std::vector<std::shared_ptr<Material>> mats, glm::mat4 transform){
 	this->vertices = vertices;
 	this->indices = indices;
-	this->textures = textures;
-	this->material = mat;
+	this->textures = texs;
+	this->materials = mats;
+	this->transform = transform;
+	setTransform(transform);
+
+	meshes.push_back(this);
 
 	// now that we have all the required data, set the vertex buffers and its attribute pointers.
 	setupMesh();
 }
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Texture tex, RenderMat mat){
-	this->vertices = vertices;
-	this->indices = indices;
-	this->textures.push_back(tex);
-	this->material = mat;
-
-	// now that we have all the required data, set the vertex buffers and its attribute pointers.
-	setupMesh();
+Mesh::~Mesh() {
+	meshes.erase(std::find(meshes.begin(), meshes.end(), this));
 }
 
 // render the mesh
 void Mesh::Draw(Shader &shader){
-	// bind appropriate textures
-	unsigned int diffuseNr = 0, specularNr = 0, normalNr = 0, heightNr = 0, cubemapNr = 0;
-	for (unsigned int i = 0; i < textures.size(); i++){
-		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
-		std::string number;// retrieve texture number (the N in diffuse_textureN)
-		// check the textures type
-		std::string type = textures[i].type;
-		if (type == "texture_diffuse")
-			number = std::to_string(diffuseNr++);
-		else if (type == "texture_specular")
-			number = std::to_string(specularNr++); 
-		else if (type == "texture_normal")
-			number = std::to_string(normalNr++); 
-		else if (type == "texture_height")
-			number = std::to_string(heightNr++); 
-		else if (type == "texture_cubemap"){
-			number = std::to_string(cubemapNr++);
+	// TODO: restructure using buffers or smthing so we can send multiple textures of one type, not just the last one
+	// Bind all textures
+	unsigned tex_unit = GL_TEXTURE0;
+	for(auto it : textures) {
+		glActiveTexture(tex_unit);
+		shader.set((it.type).c_str(), (int)tex_unit);
+		if(it.type == "texture_cubemap") {
+			glBindTexture(GL_TEXTURE_CUBE_MAP, it.glID);
+		} else {
+			glBindTexture(GL_TEXTURE_2D, it.glID);
 		}
-		// now set the sampler to the correct texture unit
-		shader.set(("mat." + type).c_str(), (int)i);
-		// and finally bind the texture
-		if (type != "texture_cubemap")
-			glBindTexture(GL_TEXTURE_2D, textures[i].id);
-		else
-			glBindTexture(GL_TEXTURE_CUBE_MAP, textures[i].id);
-//		glBindTexture(GL_TEXTURE_CUBE_MAP, *Skybox::env_map);
-	}	
+		tex_unit++;
+	}
 
-	// Set additonal material values
-	shader.set("mat.diffuse_color", material.diffuse_color);
-	shader.set("mat.specular_color", material.specular_color);
-	shader.set("mat.ambient_color", material.ambient_color);
-
-	shader.set("mat.shininess", material.shininess);
-	shader.set("mat.IOR", material.IOR);
+	// Send material data
+	shader.set("model", getWorldTransform());
 
 	// draw mesh
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	
+	// Cleanup
 	glBindVertexArray(0);
-
-	// always good practice to set everything back to defaults once configured.
 	glActiveTexture(GL_TEXTURE0);
 }
 
@@ -148,7 +129,7 @@ std::vector<Vertex> calcVertex(const std::vector<float> &verticies, const std::v
 		}
 	}
 
-	//Calculate the tangent and bitangents for each triangle
+	// Calculate the tangent and bitangents for each triangle
 	for(long unsigned int i=0; i + 2 < v.size(); i+=3){
 		glm::vec3 edge1 = v[i+1].pos - v[i].pos;
 		glm::vec3 edge2 = v[i+2].pos - v[i].pos;

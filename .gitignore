@@ -1,7 +1,10 @@
-**.directory
+*.directory
 build/*
 builddir/*
 **/.vscode/ipch/**
+subprojects/*/
 
 *.kate-swp
+
+tests/models/
 

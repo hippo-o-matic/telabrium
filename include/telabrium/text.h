@@ -42,7 +42,7 @@ private:
 	
 };
 
-class Text3d : public Object{
+class Text3d : public Object3d{
 
 };
 

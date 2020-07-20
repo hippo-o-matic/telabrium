@@ -1,24 +1,55 @@
 {
     "id" : "root",
     "type" : "Level",
-    "position" : [0,0,0],
-    "rotation" : [0,0,0],
-    "scale" : [0,0,0],
+    "pos" : [0,0,0],
+    "rot" : [0,0,0],
+    "scl" : [1,1,1],
     "components" : [
-        // {
-        //     "id" : "jeff",
-        //     "type" : "Model",
-        //     "position" : [0,5,0],
-        //     "rotation" : [0,2,40],
-        //     "scale" : [0,0,0],
-        //     "path" : "models/g.dae"
-        // },
+        {
+            "id" : "jeff",
+            "type" : "Model",
+            "pos" : [0,10,0],
+            "rot" : [0,0,50],
+            "scl" : [1,1,1],
+            "path" : "models/shadertest.dae"
+		},
+		{
+            "id" : "bill",
+            "type" : "Model",
+            "pos" : [0,0,10],
+            "rot" : [0,0,0],
+            "scl" : [1,1,5],
+            "path" : "models/origin.obj",
+            "components" : [
+                {
+                    "id" : "kiddo",
+                    "type" : "Model",
+                    "pos" : [0,5,0],
+                    "rot" : [0,0,0],
+                    "scl" : [1,1,5],
+                    "path" : "models/origin.obj"
+                }
+            ]
+		},
+		{
+			"id" : "rat",
+			"type" : "Model",
+			"pos" : [5,0,0],
+			"rot" : [0, 90, 0],
+			"path" : "models/nanosuit/nanosuit.obj"
+		},
+		{
+			"id" : "tab",
+			"type" : "Model",
+			"pos" : [-7,0,0],
+			"path" : "models/texturetest.dae"
+		},
         {
             "id":"mainlight",
             "type":"DirLight",
-            "rot":[70,1,20],
+            "rot":[1.0, -1.0, -1.0],
 
-            "ambient":[0.01,0.01,0],
+            "ambient":[0.01,0.01,0.01],
             "diffuse":[0.8,0.8,0.8],
             "specular":[1,1,1]  
         }

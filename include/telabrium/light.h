@@ -1,74 +1,73 @@
-#ifndef LIGHT_H
-#define LIGHT_H
+#pragma once
 
 #include <sstream>
 #include <vector>
 #include <memory>
 
-#include "telabrium/object.h"
+#define GLM_FORCE_PURE
+#include <glm/vec3.hpp>
+
+#include "telabrium/object3d.hpp"
 #include "telabrium/shader.h"
 #include "telabrium/model.h"
 
-class Light : public Object {
+class Light : public Object3d {
 public:
-	Light();
+	Light(glm::vec3 amb = default_amb, glm::vec3 dif = default_dif, glm::vec3 spec = default_spec);
+	Light(Json::Value);
 
 	Shader* shader;
 	glm::mat4 model;
 
-	glm::vec3 Ambient = glm::vec3(0.0f); 
-	glm::vec3 Diffuse = glm::vec3(0.8f);
-	glm::vec3 Specular = glm::vec3(1.0f);
+	glm::vec3 Ambient; 
+	glm::vec3 Diffuse;
+	glm::vec3 Specular;
 
 	// Gather all the lights and send them to the shader
 	static void updateLights(Shader& shader);
 
-	virtual void jload(Json::Value j);
-
-private:
-	LUARIUM_REGISTER_OBJECT(Light);
+protected:
+	static constexpr glm::vec3 default_amb = glm::vec3(0);
+	static constexpr glm::vec3 default_dif = glm::vec3(0.8);
+	static constexpr glm::vec3 default_spec = glm::vec3(1);
 };
 
 // Directional Light: Provides light from one direction
 class DirLight : public Light {
 public:
 	DirLight(
-		glm::vec3 dir = glm::vec3(0.0f),
-		glm::vec3 amb = glm::vec3(0.0f),
-		glm::vec3 dif = glm::vec3(0.8f),
-		glm::vec3 spec = glm::vec3(1.0f));
+		glm::vec3 dir = default_rot,
+		glm::vec3 amb = default_amb,
+		glm::vec3 dif = default_dif,
+		glm::vec3 spec = default_spec);
 
 	DirLight(const DirLight &obj);
+	DirLight(Json::Value);
 
 	~DirLight();
 
-	int nid = 0; // Numeric id for the shader
-
 	static Task<DirLight, Shader&> updateT; // Task for sending light data to the shader
 	static void updateTF(Shader&); // Task function for updateT
-	void updateOF(Shader&); // Object function for updateT
-
-	virtual void jload(Json::Value j);
+	void updateOF(Shader&); // Object function for updateT	
 
 private:
-	LUARIUM_REGISTER_OBJECT(DirLight);
-
-	static int nidStep; // Remember where we left off when assigning nid's
+	TELABRIUM_REGISTER_OBJECT(DirLight);
 };
 
 // Point Light: Creates a spherical light originating from a single point
 class PointLight : public Light {
 public:	
 	PointLight(
-		glm::vec3 pos = glm::vec3(0.0f),
-		glm::vec3 amb = glm::vec3(0.0f),
-		glm::vec3 dif = glm::vec3(0.8f),
-		glm::vec3 spec = glm::vec3(1.0f),
-		float constant = 1.0f,
-		float lin = 0.9f,
-		float quad = 0.032f);
+		glm::vec3 pos = default_pos,
+		glm::vec3 amb = default_amb,
+		glm::vec3 dif = default_dif,
+		glm::vec3 spec = default_spec,
+		float constant = default_constant,
+		float lin = default_lin,
+		float quad = default_quad);
 
 	PointLight(const PointLight &obj);
+	PointLight(Json::Value);
 
 	~PointLight();
 
@@ -76,37 +75,37 @@ public:
 	float Linear;
 	float Quadratic;
 
-	int nid = 0;
-
 	static Task<PointLight, Shader&> updateT; // Task for sending light data to the shader
 	static void updateTF(Shader& s); // Task function for updateT
 	void updateOF(Shader&); // Object function for updateT
 
-	virtual void jload(Json::Value j);
+protected:
+	static constexpr float default_constant = 1;
+	static constexpr float default_lin = 0.9;
+	static constexpr float default_quad = 0.032;
 
 private:
-	LUARIUM_REGISTER_OBJECT(PointLight);
-
-	static int nidStep;
+	TELABRIUM_REGISTER_OBJECT(PointLight);
 };
 
 // Spotlight: Creates a conic light originating from a single point
 class SpotLight : public Light {
 public:
 	SpotLight(
-		glm::vec3 pos = glm::vec3(0.0f),
-		glm::vec3 rot = glm::vec3(0.0f),
-		glm::vec3 amb = glm::vec3(0.0f),
-		glm::vec3 dif = glm::vec3(0.8f),
-		glm::vec3 spec = glm::vec3(1.0f),
-		float constant = 1.0f,
-		float lin = 0.9f,
-		float quad = 0.032f,
-		float cut = 12.5f,
-		float ocut = 15.0f
+		glm::vec3 pos = default_pos,
+		glm::vec3 dir = default_rot,
+		glm::vec3 amb = default_amb,
+		glm::vec3 dif = default_dif,
+		glm::vec3 spec = default_spec,
+		float constant = default_constant,
+		float lin = default_lin,
+		float quad = default_quad,
+		float cut = default_cut,
+		float ocut = default_ocut
 	);
 
 	SpotLight(const SpotLight &obj);
+	SpotLight(Json::Value);
 
 	~SpotLight();
 
@@ -116,18 +115,17 @@ public:
 	float CutOff; // The start of the cutoff fade, in degrees
 	float OuterCutOff; // The edge of the cutoff fade, in degrees
 
-	int nid;
-
 	static Task<SpotLight, Shader&> updateT; // Task for sending light data to the shader
 	static void updateTF(Shader& s); // Task function for updateT
 	void updateOF(Shader&); // Object function for updateT
 
-	virtual void jload(Json::Value j);
+protected:
+	static constexpr float default_constant = 1;
+	static constexpr float default_lin = 0.9;
+	static constexpr float default_quad = 0.032;
+	static constexpr float default_cut = 12.5;
+	static constexpr float default_ocut = 15;
 
 private:
-	LUARIUM_REGISTER_OBJECT(SpotLight);
-
-	static int nidStep;
-}; 
-
-#endif
+	TELABRIUM_REGISTER_OBJECT(SpotLight);
+};

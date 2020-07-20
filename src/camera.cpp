@@ -1,40 +1,38 @@
 #include "telabrium/camera.h"
 
-std::unique_ptr<Camera> Camera::ACTIVE = nullptr;
+std::vector<Camera*> Camera::cameras{};
 
-//Generic Camera Class
-//--------------------
-
-Camera::Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 up) : Object(position, rotation) {
-	rot.setFuncs(
-		std::function<glm::vec3()>([this](){ return this->getRot(); }), 
-		std::function<glm::vec3(glm::vec3)>([this](glm::vec3 val) {
-			updateCameraVectors(); // Recalculate rotation vectors whenever the rotation is modified
-			return this->setRot(val);
-		})
-	);
-
+Camera::Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 up) : Object3d(position, rotation) {
 	WorldUp = up;
+	cameras.push_back(this);
+}
+
+Camera::~Camera() {
+	cameras.erase(std::find(cameras.begin(), cameras.end(), this));
 }
 
 // Returns the view matrix calculated using Eular Angles and the LookAt Matrix
-glm::mat4 Camera::GetViewMatrix(){
-	return glm::lookAt(pos(), pos() + Front, Up);
+glm::mat4 Camera::getViewMatrix(){
+	return glm::lookAt(position, position + Front, Up);
 }
 
-glm::mat4 Camera::GetProjectionMatrix(){
-	return glm::perspective(glm::radians(fov), Aspect, 0.1f, 100.0f);
+glm::mat4 Camera::getProjectionMatrix(){
+	return glm::perspective(glm::radians(fov), getAspectRatio(), 0.1f, 100.0f);
 }
-	// Calculates the front vector from the Camera's (updated) Eular Angles
+
+glm::mat4 Camera::getOrthoMatrix() {
+	return glm::ortho(0.0f, (float)(*display_width), 0.0f, (float)(*display_height), -1.0f, 1.0f);
+}
+
+float Camera::getAspectRatio() {
+	float w = *display_width;
+	float h = *display_height;
+	return (w / h >= 1) ? w / h : h / w;
+}
+
 void Camera::updateCameraVectors(){
-	// Calculate the new Front vector
-	glm::vec3 front;
-	glm::vec3 rad = glm::radians(rot());
-	front.x = cos(rad.y) * cos(rad.x);
-	front.y = sin(rad.x);
-	front.z = sin(rad.y) * cos(rad.x);
-	
-	Front = glm::normalize(front);
+	// TODO: No fuckin clue if this works, just override for child classes for now
+	Front = glm::normalize(glm::vec3(0,0,1) * rotation);
 	// Also re-calculate the Right and Up vector
 	Right = glm::normalize(glm::cross(Front, WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
 	Up = glm::normalize(glm::cross(Right, Front));

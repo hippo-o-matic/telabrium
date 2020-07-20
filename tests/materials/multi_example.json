@@ -1,0 +1,15 @@
+{
+    "id" : "example_material",
+    "type" : "Material",
+    "shaders" : [
+		{"path" : "shaders/Standard/Standard.json"},
+		{
+			"id": "celshade",
+			"vpath": "default.vert",
+			"fpath": "border.frag",
+			"args": [
+				{"key": "thickness", "type": "float", "default": "2"}
+			]
+		}
+    ]
+}

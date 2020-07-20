@@ -1,0 +1,9 @@
+{
+	"id": "skybox",
+	"type": "Material",
+	"shader" : {
+		"id": "skyboxshaderaaaa",
+		"vpath": "shaders/skybox.vert",
+		"fpath": "shaders/skybox.frag"
+	}
+}

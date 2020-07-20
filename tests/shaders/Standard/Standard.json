@@ -1,0 +1,21 @@
+{
+	"id": "Standard",
+	"type": "Shader",
+	"vpath": "shaders/Standard/Standard.vert",
+	"fpath": "shaders/Standard/Standard.frag",
+	"args": [
+		{"key": "transform", "type": "mat4"},
+		{"key": "view", "type": "mat4"},
+		{"key": "projection", "type": "mat4"},
+
+		{"key": "color_diffuse", "type": "vec3"},
+		{"key": "color_specular", "type": "vec3"},
+		{"key": "color_ambient", "type": "vec3"},
+		{"key": "color_transparent", "type": "vec3"},
+		{"key": "color_emissive", "type": "vec3"},
+
+		{"key": "shine", "type": "float"},
+		{"key": "ior", "type": "float"},
+		{"key": "opacity", "type": "float"}
+	]
+}

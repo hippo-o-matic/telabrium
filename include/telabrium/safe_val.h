@@ -55,6 +55,7 @@ template<typename T>
 T safe_val<T>::operator=(const T& val) {
     if(!set) {
         TelabriumLog("Can't access value, has this safe_val been assigned functions?", 3);
+		return T();
     }
     return set(val);
 }
@@ -63,6 +64,7 @@ template<typename T>
 T safe_val<T>::operator()(const T& val) {
     if(!set) {
         TelabriumLog("Can't access value, has this safe_val been assigned functions?", 3);
+		return T();
     }
     return set(val);
 }
@@ -71,6 +73,7 @@ template<typename T>
 T safe_val<T>::operator()() {
     if(!get) {
         TelabriumLog("Can't access value, has this safe_val been assigned functions?", 3);
+		return T();
     }
     return get();
 }
@@ -80,6 +83,7 @@ template<typename T>
 T safe_val<T>::operator+=(const T& val) {
     if(!set) {
         TelabriumLog("Can't access value, has this safe_val been assigned functions?", 3);
+		return T();
     }
     return set(get() + val);
 }
@@ -88,6 +92,7 @@ template<typename T>
 T safe_val<T>::operator-=(const T& val) {
     if(!set) {
         TelabriumLog("Can't access value, has this safe_val been assigned functions?", 3);
+		return T();
     }
     return set(get() - val);
 }
@@ -96,6 +101,7 @@ template<typename T>
 T safe_val<T>::operator*=(const T& val) {
     if(!set) {
         TelabriumLog("Can't access value, has this safe_val been assigned functions?", 3);
+		return T();
     }
     return set(get() * val);
 }
@@ -104,6 +110,7 @@ template<typename T>
 T safe_val<T>::operator/=(const T& val) {
     if(!set) {
         TelabriumLog("Can't access value, has this safe_val been assigned functions?", 3);
+		return T();
     }
     return set(get() / val);
 }
@@ -113,6 +120,7 @@ template<typename T>
 T safe_val<T>::operator+(const T& val) {
     if(!get) {
         TelabriumLog("Can't access value, has this safe_val been assigned functions?", 3);
+		return T();
     }
     return get() + val;
 }
@@ -121,6 +129,7 @@ template<typename T>
 T safe_val<T>::operator-(const T& val) {
     if(!get) {
         TelabriumLog("Can't access value, has this safe_val been assigned functions?", 3);
+		return T();
     }
     return get() - val;
 }
@@ -129,6 +138,7 @@ template<typename T>
 T safe_val<T>::operator*(const T& val) {
     if(!get) {
         TelabriumLog("Can't access value, has this safe_val been assigned functions?", 3);
+		return T();
     }
     return get() * val;
 }
@@ -137,6 +147,7 @@ template<typename T>
 T safe_val<T>::operator/(const T& val) {
     if(!get) {
         TelabriumLog("Can't access value, has this safe_val been assigned functions?", 3);
+		return T();
     }
     return get() / val;
 }

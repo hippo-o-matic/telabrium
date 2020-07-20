@@ -1,14 +1,14 @@
-#ifndef LUARIUM_RIGIDBODY_H
-#define LUARIUM_RIGIDBODY_H
+#ifndef TELABRIUM_RIGIDBODY_H
+#define TELABRIUM_RIGIDBODY_H
 
 #include <vector>
 
 #include "glm/glm.hpp"
 
-#include "telabrium/object.h"
+#include "telabrium/object3d.hpp"
 #include "telabrium/collider.h"
 
-class Rigidbody : public Object {
+class Rigidbody : public Object3d {
 public:
 	Rigidbody(Object* p, Collider* col, float m = 1) {
 		parent = p;

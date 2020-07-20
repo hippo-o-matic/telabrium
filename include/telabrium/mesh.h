@@ -1,12 +1,8 @@
-#ifndef LUARIUM_MESH_H
-#define LUARIUM_MESH_H
+#pragma once
 
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <vector>
-#include <memory>
+#include <variant>
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
@@ -15,7 +11,8 @@
 #include <assimp/material.h>
 
 #include "telabrium/shader.h"
-#include "telabrium/object.h"
+#include "telabrium/object3d.hpp"
+#include "telabrium/material.h"
 
 struct Vertex {
 	// position
@@ -31,42 +28,38 @@ struct Vertex {
 };
 
 struct Texture {
-	unsigned int id;
+	unsigned int glID;
 	std::string type;
 	std::string path;
 };
 
-struct RenderMat {
-	aiColor3D diffuse_color;
-	aiColor3D specular_color;
-	aiColor3D ambient_color;
-
-	float shininess;
-	float IOR;
-	float opacity;
-};
-
-/// A class for storing vertex, texture, and material data to be drawn as a 3d object
-class Mesh {
+// A class for storing vertex, texture, and material data to be drawn as a 3d object
+class Mesh : public Object3d {
 public:
-	/*  Mesh Data  */
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
-	RenderMat material;
+	std::vector<std::shared_ptr<Material>> materials;
+
 	unsigned int VAO;
+	glm::mat4 transform;
 
-	/*  Functions  */
 	// constructor
-	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, RenderMat mat = {});
+	Mesh(std::vector<Vertex> vertices,
+		std::vector<unsigned int> indices,
+		std::vector<Texture> texs = std::vector<Texture>(),
+		std::vector<std::shared_ptr<Material>> mats = std::vector<std::shared_ptr<Material>>{Material::requestMaterial()},
+		glm::mat4 transform = glm::mat4()
+	);
 
-	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Texture tex = {}, RenderMat mat = {});
+	~Mesh();
 
 	// render the mesh
 	void Draw(Shader &shader);
 
+	static std::vector<Mesh*> meshes;
+
 protected:
-	/*  Render data  */
 	unsigned int VBO, EBO;
 
 	// initializes all the buffer objects/arrays
@@ -75,6 +68,3 @@ protected:
 
 // Translates a basic array of verticies into a format readable by the Mesh class
 std::vector<Vertex> calcVertex(const std::vector<float> &verticies, const std::vector<float> &texcoords = {});
-
-#endif
-
