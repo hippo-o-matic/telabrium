@@ -24,11 +24,12 @@
 #include "telabrium/input.h"
 #include "telabrium/level.h"
 #include "telabrium/generic/freecam.h"
+#include "telabrium/renderer.h"
 
 #define TELABRIUM_MODE_DEBUG
 
-const char* SHADER_PATH_V = "shaders/Standard.vert";
-const char* SHADER_PATH_F = "shaders/Standard.frag";
+// const char* SHADER_PATH_V = "shaders/Standard.vert";
+// const char* SHADER_PATH_F = "shaders/Standard.frag";
 
 //0-Game is not running; 1-Game is running
 int gameState;
