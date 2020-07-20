@@ -1,14 +1,23 @@
 #include "telabrium/mesh.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> texs, glm::mat4 transform, shader_ublock block){
+std::vector<Mesh*> Mesh::meshes{};
+
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> texs, std::vector<std::shared_ptr<Material>> mats, glm::mat4 transform){
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = texs;
-	this->block = block;
+	this->materials = mats;
 	this->transform = transform;
+	setTransform(transform);
+
+	meshes.push_back(this);
 
 	// now that we have all the required data, set the vertex buffers and its attribute pointers.
 	setupMesh();
+}
+
+Mesh::~Mesh() {
+	meshes.erase(std::find(meshes.begin(), meshes.end(), this));
 }
 
 // render the mesh
@@ -19,18 +28,16 @@ void Mesh::Draw(Shader &shader){
 	for(auto it : textures) {
 		glActiveTexture(tex_unit);
 		shader.set((it.type).c_str(), (int)tex_unit);
-		glBindTexture(GL_TEXTURE_2D, it.id);
+		if(it.type == "texture_cubemap") {
+			glBindTexture(GL_TEXTURE_CUBE_MAP, it.glID);
+		} else {
+			glBindTexture(GL_TEXTURE_2D, it.glID);
+		}
 		tex_unit++;
 	}
 
 	// Send material data
-	block.send_block(shader);
-
-	// if(material.twosided)
-	// 	glDisable(GL_CULL_FACE);
-	
-	// if(mat.wireframe)
-	// 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	shader.set("model", getWorldTransform());
 
 	// draw mesh
 	glBindVertexArray(VAO);
@@ -38,8 +45,6 @@ void Mesh::Draw(Shader &shader){
 	
 	// Cleanup
 	glBindVertexArray(0);
-	// if(material.twosided)
-	// 	glEnable(GL_CULL_FACE);
 	glActiveTexture(GL_TEXTURE0);
 }
 
@@ -124,7 +129,7 @@ std::vector<Vertex> calcVertex(const std::vector<float> &verticies, const std::v
 		}
 	}
 
-	//Calculate the tangent and bitangents for each triangle
+	// Calculate the tangent and bitangents for each triangle
 	for(long unsigned int i=0; i + 2 < v.size(); i+=3){
 		glm::vec3 edge1 = v[i+1].pos - v[i].pos;
 		glm::vec3 edge2 = v[i+2].pos - v[i].pos;

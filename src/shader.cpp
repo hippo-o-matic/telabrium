@@ -1,17 +1,55 @@
 #include "telabrium/shader.h"
 
-std::unique_ptr<Shader> Shader::ACTIVE = nullptr;
+std::vector<unsigned int> Shader::shader_draw_order{};
+std::map<unsigned int, std::shared_ptr<Shader>> Shader::shaders{};
 
-Shader::Shader(const char* vPath, const char* fPath, const char* gPath){
-	vertexPath = vPath;
-	fragmentPath = fPath;
-	geometryPath = gPath;
+std::shared_ptr<Shader> Shader::requestShader(std::string id, std::string vertexPath, std::string fragmentPath, std::string geometryPath) {
+	// Check for duplicate shaders
+	// If no id is provided, check to see if any shaders have matching paths, and use that instead
+	if(id == "") {
+		std::string vertexPath = vertexPath;
+		std::string fragmentPath = fragmentPath;
+		std::string geometryPath = geometryPath;
+
+		for(auto pair : shaders) {
+			if(pair.second->vertexPath == vertexPath && pair.second->fragmentPath == fragmentPath && pair.second->geometryPath == geometryPath) {
+				TelabriumLog("No shader id was given, however a shader already exists with the same paths (\"" + vertexPath + ", \"" + fragmentPath + ", \"" + geometryPath + "\") Please specify an id for the shader", 1);
+				return pair.second;
+			}
+		}
+	} else {
+		// If a shader with the same id string exists, return the id of that string
+		for(auto pair : shaders) {
+			if(pair.second->id == id) {
+				return pair.second;
+			}
+		}
+	}
+
+	auto shader = std::make_shared<Shader>(id, vertexPath, fragmentPath, geometryPath);
+
+	shaders.emplace(std::pair<unsigned int, std::shared_ptr<Shader>>(shader->glID, shader));
+	
+	shader_draw_order.push_back(shader->glID);
+	return shader;
+}
+
+Shader::Shader(std::string _id, std::string vPath, std::string fPath, std::string gPath) : id(_id), vertexPath(vPath), fragmentPath(fPath), geometryPath(gPath) {
 	build();
+	// shader_draw_order.push_back(glID);
+	// shaders.emplace(std::pair<unsigned int, Shader*>(glID, this));
+}
+
+Shader::~Shader() {
+	auto it = std::find(shader_draw_order.begin(), shader_draw_order.end(), glID);
+	if(it != shader_draw_order.end())
+		shader_draw_order.erase(it);
+	// shaders.erase(shaders.find(glID));
 }
 
 void Shader::build(){
-	if(ID)
-		glDeleteProgram(ID);
+	if(glID)
+		glDeleteProgram(glID);
 
 	// 1. retrieve the vertex/fragment source code from filePath
 	std::string vertexCode;
@@ -49,7 +87,8 @@ void Shader::build(){
 		}
 	}
 	catch (const std::ifstream::failure &e){
-		TelabriumLog("Shader file was not sucessfully read", 3);
+		TelabriumLog("Shader file was not sucessfully read. Paths given: \"" + vertexPath + "\", \"" + fragmentPath + "\", \"" + geometryPath + "\"", 3);
+		return;
 	}
 
 	// Perform substitutions if any
@@ -83,13 +122,13 @@ void Shader::build(){
 		checkCompileErrors(geometry, "GEOMETRY");
 	}
 	// shader Program
-	ID = glCreateProgram();
-	glAttachShader(ID, vertex);
-	glAttachShader(ID, fragment);
+	glID = glCreateProgram();
+	glAttachShader(glID, vertex);
+	glAttachShader(glID, fragment);
 	if(!geometryPath.empty())
-		glAttachShader(ID, geometry);
-	glLinkProgram(ID);
-	checkCompileErrors(ID, "PROGRAM");
+		glAttachShader(glID, geometry);
+	glLinkProgram(glID);
+	checkCompileErrors(glID, "PROGRAM");
 	// delete the shaders as they're linked into our program now and no longer necessery
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
@@ -97,67 +136,63 @@ void Shader::build(){
 		glDeleteShader(geometry);
 }
 
-Shader::~Shader(){
-//	if(ID)
-//		glDeleteProgram(ID); //Remove the program from memory
-}
 // activate the shader
 // ------------------------------------------------------------------------
 void Shader::use() { 
-	glUseProgram(ID); 
+	glUseProgram(glID); 
 }
 // utility uniform functions
 // ------------------------------------------------------------------------
 void Shader::set(const std::string &name, bool value) const{         
-	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value); 
+	glUniform1i(glGetUniformLocation(glID, name.c_str()), (int)value); 
 }
 // ------------------------------------------------------------------------
 void Shader::set(const std::string &name, int value) const{ 
-	glUniform1i(glGetUniformLocation(ID, name.c_str()), value); 
+	glUniform1i(glGetUniformLocation(glID, name.c_str()), value); 
 }
 // ------------------------------------------------------------------------
 void Shader::set(const std::string &name, float value) const{ 
-	glUniform1f(glGetUniformLocation(ID, name.c_str()), value); 
+	glUniform1f(glGetUniformLocation(glID, name.c_str()), value); 
 }
 // ------------------------------------------------------------------------
 void Shader::set(const std::string &name, const glm::vec2 &value) const{ 
-	glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); 
+	glUniform2fv(glGetUniformLocation(glID, name.c_str()), 1, &value[0]); 
 }
 void Shader::set(const std::string &name, float x, float y) const{ 
-	glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y); 
+	glUniform2f(glGetUniformLocation(glID, name.c_str()), x, y); 
 }
 // ------------------------------------------------------------------------
 void Shader::set(const std::string &name, const glm::vec3 &value) const{ 
-	glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); 
+	glUniform3fv(glGetUniformLocation(glID, name.c_str()), 1, &value[0]); 
 }
 void Shader::set(const std::string &name, float x, float y, float z) const{ 
-	glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z); 
+	glUniform3f(glGetUniformLocation(glID, name.c_str()), x, y, z); 
 }
 // ------------------------------------------------------------------------
 void Shader::set(const std::string &name, const glm::vec4 &value) const{ 
-	glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); 
+	glUniform4fv(glGetUniformLocation(glID, name.c_str()), 1, &value[0]); 
 }
 void Shader::set(const std::string &name, float x, float y, float z, float w) const{ 
-	glUniform4f(glGetUniformLocation(ID, name.c_str()), x, y, z, w); 
+	glUniform4f(glGetUniformLocation(glID, name.c_str()), x, y, z, w); 
 }
 // ------------------------------------------------------------------------
 void Shader::set(const std::string &name, const glm::mat2 &mat) const{
-	glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+	glUniformMatrix2fv(glGetUniformLocation(glID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 // ------------------------------------------------------------------------
 void Shader::set(const std::string &name, const glm::mat3 &mat) const{
-	glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+	glUniformMatrix3fv(glGetUniformLocation(glID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 // ------------------------------------------------------------------------
 void Shader::set(const std::string &name, const glm::mat4 &mat) const{
-	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(glID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
 void Shader::set(const std::string &name, const aiColor3D &vec) const { 
-	glUniform3f(glGetUniformLocation(ID, name.c_str()), vec.r, vec.g, vec.b); 
+	glUniform3f(glGetUniformLocation(glID, name.c_str()), vec.r, vec.g, vec.b); 
 }
 void Shader::set(const std::string &name, const aiColor4D &vec) const { 
-	glUniform4f(glGetUniformLocation(ID, name.c_str()), vec.r, vec.g, vec.b, vec.a); 
+	glUniform4f(glGetUniformLocation(glID, name.c_str()), vec.r, vec.g, vec.b, vec.a); 
 }
 
 // utility function for checking shader compilation/linking errors.

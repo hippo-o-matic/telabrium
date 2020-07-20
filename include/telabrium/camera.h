@@ -23,8 +23,6 @@
 // A Camera object that processes a view for displaying in OpenGL. 
 class Camera : public Object3d {
 public:
-	static std::unique_ptr<Camera> ACTIVE;
-
 	// Camera Attributes
 	glm::vec3 Front;
 	glm::vec3 Up;
@@ -33,14 +31,21 @@ public:
 
 	// Camera options
 	float fov = 60;
-	float Aspect;
+	unsigned int* display_height;
+	unsigned int* display_width;
 
 	// Constructor with vectors
 	Camera(glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));
-
+	~Camera();
+	
 	// Returns the view matrix calculated using Eular Angles and the LookAt Matrix
-	glm::mat4 GetViewMatrix();
-	glm::mat4 GetProjectionMatrix();
+	glm::mat4 getViewMatrix();
+	glm::mat4 getProjectionMatrix();
+	glm::mat4 getOrthoMatrix();
+
+	float getAspectRatio();
+
+	static std::vector<Camera*> cameras;
 
 protected:
 	void updateCameraVectors();

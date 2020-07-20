@@ -1,34 +1,22 @@
-#define STB_IMAGE_IMPLEMENTATION
+ #define STB_IMAGE_IMPLEMENTATION
 #include "telabrium/model.h"
 
 // Static initialization
-Task<Model, Shader&> Model::drawT(&Model::Draw);
 Texture Model::tesst;
 
 // constructor, expects a filepath to a 3D model.
 Model::Model(std::string const &path, glm::vec3 _pos, glm::vec3 _rot, glm::vec3 _scl, bool gamma) : Object3d(_pos, _rot, _scl) {
 	this->path = path;
 	loadModel(path);
-	drawT.addObj(this);
 }
 
 Model::Model(Json::Value j) : Object3d(j) {
 	this->path = j["path"].asString();
 	loadModel(path);
-	drawT.addObj(this);
 }
 
-Model::~Model() {
-	drawT.removeObj(this);
-}
+Model::~Model() {}
 
-// draws the model, and thus all its meshes
-void Model::Draw(Shader &shader){
-	for (auto it : meshes) {
-		shader.set("model", getWorldTransform() * it.transform);
-		it.Draw(shader);
-	}
-}
  
 // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 void Model::loadModel(std::string const &path){
@@ -55,7 +43,7 @@ void Model::processNode(aiNode *node, const aiScene *scene){
 		// the node object only contains indices to index the actual objects in the scene. 
 		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 		aiMesh* aimesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(processMesh(aimesh, scene, node));
+		move<Mesh>(processMesh(aimesh, scene, node));
 	}
 	// after we've processed all of the meshes (if any) we then recursively process each of the children nodes
 	for (unsigned int i = 0; i < node->mNumChildren; i++) {
@@ -64,7 +52,7 @@ void Model::processNode(aiNode *node, const aiScene *scene){
 
 }
 
-Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, aiNode* node) {	
+std::unique_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene, aiNode* node) {	
 	std::vector<unsigned int> indices;
 	// Walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
@@ -89,11 +77,12 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, aiNode* node) {
 	transform = glm::scale(transform, scl);
 
 	// return a mesh object created from the extracted mesh data
-	return Mesh(extractVertices(mesh),
+	return std::make_unique<Mesh>(
+				extractVertices(mesh),
 				indices,
-				extractTextures(mesh, scene), 
-				transform,
-				extractMaterial(mesh,scene)
+				extractTextures(mesh, scene),
+				std::vector<std::shared_ptr<Material>>{extractMeshMaterial(mesh, scene)},
+				transform
 			);
 }
 
@@ -155,8 +144,8 @@ std::vector<Vertex> Model::extractVertices(aiMesh* mesh) {
 	return vertices;
 }
 
-shader_ublock Model::extractMaterial(aiMesh* mesh, const aiScene* scene) {
-	shader_ublock block("Material");
+std::shared_ptr<Material> Model::extractMeshMaterial(aiMesh* mesh, const aiScene* scene) {
+	auto mat = Material::requestMaterial("materials/default.json");
 	aiMaterial* aiMat = scene->mMaterials[mesh->mMaterialIndex]; // Get <mesh>'s aiMat from the <scene>
 	
 	// Material properties
@@ -164,33 +153,33 @@ shader_ublock Model::extractMaterial(aiMesh* mesh, const aiScene* scene) {
 	float placeholder_float;
 
 	aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, placeholder_color);
-	block.add("color_diffuse", "vec3", aiVec3ToGlm(placeholder_color));
+	mat->modifyKey("color_diffuse", aiVec3ToGlm(placeholder_color));
 	
 	aiMat->Get(AI_MATKEY_COLOR_SPECULAR, placeholder_color);
-	block.add("color_specular", "vec3", aiVec3ToGlm(placeholder_color));
+	mat->modifyKey("color_specular", aiVec3ToGlm(placeholder_color));
 
 	aiMat->Get(AI_MATKEY_COLOR_AMBIENT, placeholder_color);
-	block.add("color_ambient", "vec3", aiVec3ToGlm(placeholder_color));
+	mat->modifyKey("color_ambient", aiVec3ToGlm(placeholder_color));
 	
 	aiMat->Get(AI_MATKEY_COLOR_TRANSPARENT, placeholder_color);
-	block.add("color_transparent", "vec3", aiVec3ToGlm(placeholder_color));
+	mat->modifyKey("color_transparent", aiVec3ToGlm(placeholder_color));
 
 	aiMat->Get(AI_MATKEY_COLOR_EMISSIVE, placeholder_color);
-	block.add("color_emissive", "vec3", aiVec3ToGlm(placeholder_color));
+	mat->modifyKey("color_emissive", aiVec3ToGlm(placeholder_color));
 
 	aiMat->Get(AI_MATKEY_SHININESS, placeholder_float);
-	block.add("shine", "float", placeholder_float);
+	mat->modifyKey("shine", placeholder_float);
 
 	aiMat->Get(AI_MATKEY_REFRACTI, placeholder_float);
-	block.add("color_diffuse", "float", placeholder_float);
+	mat->modifyKey("ior", placeholder_float);
 
 	aiMat->Get(AI_MATKEY_OPACITY, placeholder_float);
-	block.add("color_diffuse", "float", placeholder_float);
+	mat->modifyKey("opacity", placeholder_float);
 
 	// aiMat->Get(AI_MATKEY_TWOSIDED, mat.twosided);
-	// block.add("color_diffuse", "vec3", placeholder_bool);
+	// mat.add("color_diffuse", "vec3", placeholder_bool);
 
-	return block;
+	return mat;
 }
 
 std::vector<Texture> Model::extractTextures(aiMesh* mesh, const aiScene* scene) {
@@ -269,12 +258,12 @@ Texture loadTexture(std::string path, std::string directory){
     	filename = directory + '/' + filename;
     Texture tex{0, "", filename};
 
-	if(!Model::tesst.id) {
-		glGenTextures(1,&Model::tesst.id);
+	if(!Model::tesst.glID) {
+		glGenTextures(1,&Model::tesst.glID);
 	}
 
 	// Generate 1 id for this texture
-    glGenTextures(1, &tex.id);
+    glGenTextures(1, &tex.glID);
 
     int width, height, nrComponents;
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
@@ -287,7 +276,7 @@ Texture loadTexture(std::string path, std::string directory){
         else if (nrComponents == 4)
 		    format = GL_RGBA;
 
-		glBindTexture(GL_TEXTURE_2D, tex.id);
+		glBindTexture(GL_TEXTURE_2D, tex.glID);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -310,8 +299,8 @@ Texture loadTexture(std::string path, std::string directory){
 
 Texture loadCubemap(std::vector<std::string> faces, std::string path) {
 	Texture tex{0, "texture_cubemap", path};
-	glGenTextures(1, &tex.id);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, tex.id);
+	glGenTextures(1, &tex.glID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex.glID);
 
 	int width, height, nrChannels;
 	for (unsigned int i = 0; i < faces.size(); i++)

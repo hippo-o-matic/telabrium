@@ -1,21 +1,33 @@
 #include "telabrium/camera.h"
 
-std::unique_ptr<Camera> Camera::ACTIVE = nullptr;
-
-//Generic Camera Class
-//--------------------
+std::vector<Camera*> Camera::cameras{};
 
 Camera::Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 up) : Object3d(position, rotation) {
 	WorldUp = up;
+	cameras.push_back(this);
+}
+
+Camera::~Camera() {
+	cameras.erase(std::find(cameras.begin(), cameras.end(), this));
 }
 
 // Returns the view matrix calculated using Eular Angles and the LookAt Matrix
-glm::mat4 Camera::GetViewMatrix(){
+glm::mat4 Camera::getViewMatrix(){
 	return glm::lookAt(position, position + Front, Up);
 }
 
-glm::mat4 Camera::GetProjectionMatrix(){
-	return glm::perspective(glm::radians(fov), Aspect, 0.1f, 100.0f);
+glm::mat4 Camera::getProjectionMatrix(){
+	return glm::perspective(glm::radians(fov), getAspectRatio(), 0.1f, 100.0f);
+}
+
+glm::mat4 Camera::getOrthoMatrix() {
+	return glm::ortho(0.0f, (float)(*display_width), 0.0f, (float)(*display_height), -1.0f, 1.0f);
+}
+
+float Camera::getAspectRatio() {
+	float w = *display_width;
+	float h = *display_height;
+	return (w / h >= 1) ? w / h : h / w;
 }
 
 void Camera::updateCameraVectors(){
